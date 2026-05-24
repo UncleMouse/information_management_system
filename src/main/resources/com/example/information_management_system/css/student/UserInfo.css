@@ -1,0 +1,89 @@
+.page-root {
+    -fx-background-color: #f1f5f9;
+    -fx-padding: 24;
+    -fx-spacing: 16;
+}
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-border-width: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.content-container {
+    -fx-padding: 0;
+}
+
+/* Card */
+.info-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 2);
+}
+
+.card-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-padding: 16 20 12 20;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.info-grid {
+    -fx-padding: 16 20;
+}
+
+.info-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+    -fx-min-width: 70;
+}
+
+.info-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #1e293b;
+    -fx-min-width: 120;
+}
+
+/* Input fields */
+.input-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-padding: 10 12;
+    -fx-pref-width: 260;
+}
+
+.input-field:focused {
+    -fx-border-color: #4f6ef7;
+}
+
+/* Save button */
+.save-btn {
+    -fx-background-color: #4f6ef7;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 24;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.save-btn:hover {
+    -fx-background-color: #3d5bd5;
+}

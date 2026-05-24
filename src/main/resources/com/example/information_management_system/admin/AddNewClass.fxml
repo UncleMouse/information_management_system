@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.AddNewClassController"
+      stylesheets="@../css/admin/addDialog.css"
+      styleClass="dialog-root" spacing="20">
+
+    <padding><Insets top="24" right="32" bottom="24" left="32" /></padding>
+
+    <Label fx:id="dialogTitle" text="添加班级" styleClass="dialog-title">
+        <font><Font name="System Bold" size="18" /></font>
+    </Label>
+
+    <GridPane hgap="16" vgap="14">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="80" />
+            <ColumnConstraints prefWidth="260" />
+        </columnConstraints>
+
+        <Label text="班级名称 *" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <TextField fx:id="classNameField" promptText="请输入班级名称" styleClass="form-field"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label text="年级" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <TextField fx:id="gradeField" promptText="如：2024" styleClass="form-field"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+        <Label text="专业" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <TextField fx:id="majorField" promptText="请输入专业" styleClass="form-field"
+                   GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+        <Label text="辅导员" styleClass="form-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+        <TextField fx:id="counselorField" promptText="辅导员姓名或工号" styleClass="form-field"
+                   GridPane.rowIndex="3" GridPane.columnIndex="1" />
+    </GridPane>
+
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button fx:id="btnCancel" text="取消" styleClass="btn-cancel" />
+        <Button fx:id="btnSubmit" text="提交" styleClass="btn-submit" />
+    </HBox>
+
+</VBox>

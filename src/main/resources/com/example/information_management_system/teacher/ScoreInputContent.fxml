@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.teacher.ScoreInputController"
+      styleClass="page-root" spacing="16"
+      stylesheets="@../css/teacher/ScoreInputContent.css">
+
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+
+    <Label text="成绩录入" styleClass="page-title">
+        <font><Font name="System Bold" size="20"/></font>
+    </Label>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <VBox spacing="4">
+            <Label text="选择课程" styleClass="field-label"/>
+            <ComboBox fx:id="courseComboBox" promptText="请选择要录入成绩的课程" styleClass="form-combo"
+                      prefWidth="280"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <VBox spacing="4">
+            <Label text="搜索学生" styleClass="field-label"/>
+            <TextField fx:id="searchField" promptText="搜索姓名或学号..." styleClass="search-field"
+                       prefWidth="220"/>
+        </VBox>
+        <VBox alignment="BOTTOM_CENTER">
+            <Button fx:id="exportButton" text="导出Excel" styleClass="btn-outline"/>
+        </VBox>
+    </HBox>
+
+    <TableView fx:id="scoreTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="sduidColumn" text="学号" prefWidth="140"/>
+            <TableColumn fx:id="nameColumn" text="姓名" prefWidth="100"/>
+            <TableColumn fx:id="classNameColumn" text="班级" prefWidth="120"/>
+            <TableColumn fx:id="regularScoreColumn" text="平时成绩" prefWidth="100"/>
+            <TableColumn fx:id="finalScoreColumn" text="期末成绩" prefWidth="100"/>
+            <TableColumn fx:id="totalScoreColumn" text="总成绩" prefWidth="100"/>
+            <TableColumn fx:id="statusColumn" text="状态" prefWidth="80"/>
+            <TableColumn fx:id="remarksColumn" text="备注" prefWidth="150"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="" styleClass="status-label"/>
+        <Button fx:id="saveButton" text="保存成绩" styleClass="btn-primary"/>
+        <Button fx:id="publishButton" text="发布成绩" styleClass="btn-success"/>
+    </HBox>
+
+    <Region VBox.vgrow="ALWAYS"/>
+</VBox>

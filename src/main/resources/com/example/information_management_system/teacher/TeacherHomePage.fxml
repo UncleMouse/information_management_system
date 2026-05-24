@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.teacher.TeacherHomePageController"
+      styleClass="page-root" spacing="24"
+      stylesheets="@../css/teacher/TeacherHomePage.css">
+
+    <padding><Insets top="8" right="0" bottom="16" left="0"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="16">
+        <VBox spacing="4">
+            <Label fx:id="welcomeLabel" text="欢迎回来" styleClass="welcome-text"/>
+            <Label styleClass="subtitle-text" text="以下是您的教学概览"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="20" alignment="CENTER">
+        <VBox styleClass="stat-card" alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label text="📚" styleClass="stat-icon"/>
+            <Label text="我的课程数" styleClass="stat-label"/>
+            <Label fx:id="courseCountLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+
+        <VBox styleClass="stat-card" alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label text="👨‍🎓" styleClass="stat-icon"/>
+            <Label text="学生总数" styleClass="stat-label"/>
+            <Label fx:id="studentCountLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+
+        <VBox styleClass="stat-card" alignment="CENTER" spacing="8" HBox.hgrow="ALWAYS">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label text="📝" styleClass="stat-icon"/>
+            <Label text="待录入成绩" styleClass="stat-label"/>
+            <Label fx:id="pendingScoreLabel" text="0" styleClass="stat-value"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="20" alignment="CENTER">
+        <VBox styleClass="quick-actions-card" spacing="16" HBox.hgrow="ALWAYS">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label text="快捷操作" styleClass="card-title"/>
+            <Button text="开始录入成绩" styleClass="primary-button" maxWidth="Infinity"
+                    onAction="#handleInputScore"/>
+            <Button text="申请新课" styleClass="outline-button" maxWidth="Infinity"
+                    onAction="#handleApplyNewCourse"/>
+            <Button text="查看课表" styleClass="outline-button" maxWidth="Infinity"
+                    onAction="#handleViewSchedule"/>
+        </VBox>
+
+        <VBox styleClass="recent-courses-card" spacing="12" HBox.hgrow="ALWAYS">
+            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
+            <Label text="最近课程" styleClass="card-title"/>
+            <VBox fx:id="recentCoursesBox" spacing="0" VBox.vgrow="ALWAYS">
+                <Label text="  加载中..." styleClass="loading-text"/>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

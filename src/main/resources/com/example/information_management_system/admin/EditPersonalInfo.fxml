@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.EditPersonalInfoController"
+      stylesheets="@../css/admin/editPersonalInfo.css"
+      styleClass="dialog-root" spacing="20">
+
+    <padding><Insets top="24" right="32" bottom="24" left="32" /></padding>
+
+    <Label text="编辑个人信息" styleClass="dialog-title">
+        <font><Font name="System Bold" size="18" /></font>
+    </Label>
+
+    <GridPane hgap="16" vgap="14">
+        <columnConstraints>
+            <ColumnConstraints prefWidth="80" />
+            <ColumnConstraints prefWidth="260" />
+        </columnConstraints>
+
+        <Label text="手机号码" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <TextField fx:id="phoneField" promptText="请输入手机号码" styleClass="form-field"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+        <Label text="电子邮箱" styleClass="form-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <TextField fx:id="emailField" promptText="请输入邮箱地址" styleClass="form-field"
+                   GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+        <Label text="性别" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <ComboBox fx:id="sexCombo" styleClass="form-combo" prefWidth="260"
+                  GridPane.rowIndex="2" GridPane.columnIndex="1" />
+    </GridPane>
+
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Button fx:id="btnCancel" text="取消" styleClass="btn-cancel" />
+        <Button fx:id="btnSubmit" text="保存" styleClass="btn-submit" />
+    </HBox>
+
+</VBox>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.AdminHomePageController"
+      stylesheets="@../css/admin/AdminHomePage.css"
+      styleClass="page-root" spacing="24">
+
+    <padding><Insets top="28" right="32" bottom="28" left="32" /></padding>
+
+    <!-- Page Header -->
+    <HBox alignment="CENTER_LEFT">
+        <Label text="管理后台首页" styleClass="page-title">
+            <font><Font name="System Bold" size="20"/></font>
+        </Label>
+    </HBox>
+
+    <!-- Summary Cards Row -->
+    <GridPane hgap="20" vgap="20">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+        </columnConstraints>
+        <rowConstraints><RowConstraints /></rowConstraints>
+
+        <!-- Total Students -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label text="学生总数" styleClass="stat-label" />
+            <Label fx:id="totalStudentsLabel" text="0" styleClass="stat-value" />
+        </VBox>
+
+        <!-- Total Teachers -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label text="教师总数" styleClass="stat-label" />
+            <Label fx:id="totalTeachersLabel" text="0" styleClass="stat-value" />
+        </VBox>
+
+        <!-- Total Courses -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.rowIndex="0">
+            <Label text="课程总数" styleClass="stat-label" />
+            <Label fx:id="totalCoursesLabel" text="0" styleClass="stat-value" />
+        </VBox>
+
+        <!-- Total Classes -->
+        <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.rowIndex="0">
+            <Label text="班级总数" styleClass="stat-label" />
+            <Label fx:id="totalClassesLabel" text="0" styleClass="stat-value" />
+        </VBox>
+    </GridPane>
+
+    <!-- Secondary Stats Row -->
+    <GridPane hgap="20" vgap="20">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+            <ColumnConstraints percentWidth="25" />
+        </columnConstraints>
+        <rowConstraints><RowConstraints /></rowConstraints>
+
+        <VBox styleClass="stat-card-small" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <Label text="在读学生" styleClass="stat-label-small" />
+            <Label fx:id="activeStudentsLabel" text="--" styleClass="stat-value-small" />
+        </VBox>
+
+        <VBox styleClass="stat-card-small" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <Label text="在职教师" styleClass="stat-label-small" />
+            <Label fx:id="activeTeachersLabel" text="--" styleClass="stat-value-small" />
+        </VBox>
+
+        <VBox styleClass="stat-card-small" GridPane.columnIndex="2" GridPane.rowIndex="0">
+            <Label text="待审核课程" styleClass="stat-label-small" />
+            <Label fx:id="pendingCoursesLabel" text="--" styleClass="stat-value-small" />
+        </VBox>
+
+        <VBox styleClass="stat-card-small" GridPane.columnIndex="3" GridPane.rowIndex="0">
+            <Label text="当前学期" styleClass="stat-label-small" />
+            <Label fx:id="currentSemesterLabel" text="--" styleClass="stat-value-small" />
+        </VBox>
+    </GridPane>
+
+    <!-- Recent Notices -->
+    <VBox spacing="12" VBox.vgrow="ALWAYS">
+        <Label text="最近通知" styleClass="section-title">
+            <font><Font name="System Bold" size="16" /></font>
+        </Label>
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="notice-scroll" hbarPolicy="NEVER">
+            <VBox fx:id="noticesContainer" spacing="8">
+                <padding><Insets top="4" right="4" bottom="4" left="4" /></padding>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+
+</VBox>

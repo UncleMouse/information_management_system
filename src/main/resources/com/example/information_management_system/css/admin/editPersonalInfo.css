@@ -1,0 +1,65 @@
+.dialog-root {
+    -fx-background-color: #ffffff;
+    -fx-min-width: 380;
+    -fx-max-width: 380;
+}
+
+.dialog-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.form-label {
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+.form-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+}
+
+.form-field:focused {
+    -fx-border-color: #4f6ef7;
+}
+
+.form-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+}
+
+.btn-submit {
+    -fx-background-color: #4f6ef7;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 28;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-submit:hover {
+    -fx-background-color: #3d5bd5;
+}
+
+.btn-cancel {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-padding: 10 28;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-cancel:hover {
+    -fx-background-color: #cbd5e1;
+}

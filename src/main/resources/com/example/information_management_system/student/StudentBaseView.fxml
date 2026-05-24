@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.information_management_system.controller.student.StudentBaseViewController"
+            stylesheets="@../css/student/BaseView.css">
+
+    <left>
+        <VBox styleClass="sidebar" minWidth="240" maxWidth="240" prefWidth="240" spacing="0">
+            <!-- Header -->
+            <VBox styleClass="sidebar-header" alignment="CENTER" spacing="6">
+                <padding><Insets top="28" right="16" bottom="20" left="16"/></padding>
+                <Label text="校园信息管理系统" styleClass="sidebar-title">
+                    <font><Font name="System Bold" size="15"/></font>
+                </Label>
+                <Separator styleClass="sidebar-separator" maxWidth="60"/>
+                <Label fx:id="studentNameLabel" text="学生" styleClass="sidebar-username"/>
+                <Label styleClass="sidebar-role" text="学生端"/>
+            </VBox>
+
+            <Separator styleClass="sidebar-divider"/>
+
+            <!-- Navigation -->
+            <VBox styleClass="sidebar-nav" spacing="2" VBox.vgrow="ALWAYS">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Button fx:id="homeBtn" text="首  页" styleClass="sidebar-btn"/>
+                <Button fx:id="scheduleBtn" text="课表查询" styleClass="sidebar-btn"/>
+                <Button fx:id="courseSelectionBtn" text="选课中心" styleClass="sidebar-btn"/>
+                <Button fx:id="scoreSearchBtn" text="成绩查询" styleClass="sidebar-btn"/>
+                <Button fx:id="personalBtn" text="个人中心" styleClass="sidebar-btn"/>
+            </VBox>
+
+            <!-- Footer -->
+            <VBox styleClass="sidebar-footer">
+                <padding><Insets top="12" right="12" bottom="16" left="12"/></padding>
+                <Button fx:id="logoutBtn" text="退出登录" styleClass="sidebar-logout" maxWidth="Infinity"
+                        onAction="#handleLogout"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox fx:id="contentArea" styleClass="content-area"/>
+    </center>
+
+</BorderPane>

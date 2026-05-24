@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.AddNewAnnouncementController"
+      styleClass="page-root" stylesheets="@../css/admin/announcement.css"
+      spacing="20">
+
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+
+    <Label text="发布通知" styleClass="page-title">
+        <font><Font name="System Bold" size="20"/></font>
+    </Label>
+
+    <!-- Notice List Section -->
+    <VBox fx:id="noticeListSection" spacing="12" visible="true" managed="true">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="搜索通知标题..." styleClass="search-field"
+                       HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnSearch" text="搜索" styleClass="btn-primary"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnNewNotice" text="+ 新建通知" styleClass="btn-primary"/>
+            <Button fx:id="btnRefresh" text="刷新" styleClass="btn-secondary"/>
+        </HBox>
+
+        <TableView fx:id="noticeTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+            <columns>
+                <TableColumn fx:id="colId" text="ID" prefWidth="50"/>
+                <TableColumn fx:id="colTitle" text="标题" prefWidth="280"/>
+                <TableColumn fx:id="colCreator" text="发布者" prefWidth="120"/>
+                <TableColumn fx:id="colPublishTime" text="发布时间" prefWidth="160"/>
+                <TableColumn fx:id="colScope" text="可见范围" prefWidth="100"/>
+                <TableColumn fx:id="colStatus" text="状态" prefWidth="80"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <!-- Create Form Section -->
+    <VBox fx:id="formSection" spacing="16" visible="false" managed="false">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button fx:id="btnBack" text="← 返回列表" styleClass="btn-back"/>
+        </HBox>
+
+        <VBox styleClass="form-card" spacing="16">
+            <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+
+            <VBox spacing="6">
+                <Label text="通知标题 *" styleClass="field-label"/>
+                <TextField fx:id="titleField" promptText="请输入通知标题" styleClass="form-field"
+                           maxWidth="Infinity"/>
+            </VBox>
+
+            <VBox spacing="6">
+                <Label text="通知内容 *" styleClass="field-label"/>
+                <TextArea fx:id="contentArea" promptText="请输入通知内容" styleClass="form-textarea"
+                          prefRowCount="10" wrapText="true" maxWidth="Infinity"/>
+            </VBox>
+
+            <HBox spacing="20">
+                <VBox spacing="6" prefWidth="240">
+                    <Label text="可见范围" styleClass="field-label"/>
+                    <ComboBox fx:id="visibilityCombo" styleClass="form-combo" maxWidth="Infinity"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox spacing="6" alignment="BOTTOM_RIGHT">
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox spacing="12">
+                        <Button fx:id="btnCancel" text="取消" styleClass="btn-secondary"/>
+                        <Button fx:id="btnSubmit" text="发布通知" styleClass="btn-primary"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+
+</VBox>

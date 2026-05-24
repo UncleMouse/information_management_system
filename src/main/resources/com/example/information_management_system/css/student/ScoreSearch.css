@@ -1,0 +1,116 @@
+.page-root {
+    -fx-background-color: #f1f5f9;
+    -fx-padding: 24;
+    -fx-spacing: 16;
+}
+
+.page-header {
+    -fx-padding: 0 0 8 0;
+}
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.selector-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.term-selector {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+    -fx-padding: 4 8;
+}
+
+.export-btn {
+    -fx-background-color: #10b981;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-width: 0;
+}
+
+.export-btn:hover {
+    -fx-background-color: #059669;
+}
+
+/* Data Table */
+.data-table {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.data-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 12 16;
+}
+
+.data-table .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.data-table .table-row-cell {
+    -fx-border-color: transparent transparent #f1f5f9 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.data-table .table-row-cell:odd {
+    -fx-background-color: #ffffff;
+}
+
+.data-table .table-row-cell:even {
+    -fx-background-color: #f8fafc;
+}
+
+.data-table .table-row-cell:hover {
+    -fx-background-color: #eef2ff;
+}
+
+.data-table .table-row-cell:selected {
+    -fx-background-color: #e0e7ff;
+}
+
+.data-table .table-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e293b;
+    -fx-padding: 8 8;
+}
+
+/* Summary Bar */
+.summary-bar {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 16 24;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 2);
+}
+
+.summary-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.summary-value {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}

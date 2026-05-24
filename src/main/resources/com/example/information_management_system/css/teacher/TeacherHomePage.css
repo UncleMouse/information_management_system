@@ -1,0 +1,97 @@
+.page-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.welcome-text {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.subtitle-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #64748b;
+}
+
+.stat-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
+    -fx-min-width: 180;
+    -fx-min-height: 140;
+}
+
+.stat-icon {
+    -fx-font-size: 28px;
+}
+
+.stat-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #64748b;
+}
+
+.stat-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.quick-actions-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
+    -fx-min-height: 220;
+}
+
+.recent-courses-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
+    -fx-min-height: 220;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.primary-button {
+    -fx-background-color: #4f6ef7;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3d5bd5;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #2f4bc0;
+}
+
+.outline-button {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4f6ef7;
+    -fx-font-size: 14px;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-border-color: #4f6ef7;
+    -fx-border-radius: 8;
+    -fx-border-width: 1.5;
+    -fx-cursor: hand;
+}
+
+.outline-button:hover {
+    -fx-background-color: #eef2ff;
+}
+
+.loading-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #94a3b8;
+}

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.information_management_system.controller.student.HomeContentController"
+      styleClass="page-root" stylesheets="@../css/student/HomeContent.css"
+      VBox.vgrow="ALWAYS">
+
+    <!-- Welcome Header -->
+    <HBox styleClass="welcome-header" VBox.vgrow="NEVER">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label fx:id="welcomeLabel" text="欢迎回来" styleClass="welcome-title"/>
+            <Label text="这是您的学生工作台，可以查看课程、成绩等信息" styleClass="welcome-subtitle"/>
+        </VBox>
+    </HBox>
+
+    <!-- Stats Cards -->
+    <HBox styleClass="stats-row" VBox.vgrow="NEVER" spacing="16.0">
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="已选课程" styleClass="stat-label"/>
+            <Label fx:id="selectedCourseCountLabel" text="-" styleClass="stat-value"/>
+            <Label text="本学期" styleClass="stat-sub"/>
+        </VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="已修学分" styleClass="stat-label"/>
+            <Label fx:id="earnedCreditLabel" text="-" styleClass="stat-value"/>
+            <Label text="累积学分" styleClass="stat-sub"/>
+        </VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="当前学期" styleClass="stat-label"/>
+            <Label fx:id="currentTermLabel" text="-" styleClass="stat-value"/>
+            <Label text="学期信息" styleClass="stat-sub"/>
+        </VBox>
+        <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <Label text="成绩概览" styleClass="stat-label"/>
+            <Label fx:id="gpaRankLabel" text="-" styleClass="stat-value"/>
+            <Label text="平均绩点" styleClass="stat-sub"/>
+        </VBox>
+    </HBox>
+
+    <!-- Quick Actions + Course List Row -->
+    <HBox VBox.vgrow="ALWAYS" spacing="16.0" styleClass="content-row">
+        <!-- Current Courses -->
+        <VBox styleClass="card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
+            <HBox styleClass="card-header" VBox.vgrow="NEVER">
+                <Label text="本学期课程" styleClass="card-title"/>
+            </HBox>
+            <VBox fx:id="courseListContainer" styleClass="card-body" VBox.vgrow="ALWAYS" spacing="4.0">
+                <Label text="加载中..." styleClass="loading-text"/>
+            </VBox>
+        </VBox>
+
+        <!-- Quick Actions & Notices -->
+        <VBox spacing="16.0" HBox.hgrow="NEVER" prefWidth="300.0" VBox.vgrow="ALWAYS">
+            <!-- Quick Actions -->
+            <VBox styleClass="card" VBox.vgrow="NEVER">
+                <HBox styleClass="card-header">
+                    <Label text="快捷操作" styleClass="card-title"/>
+                </HBox>
+                <VBox styleClass="card-body" spacing="10.0">
+                    <Button fx:id="goToSelectionBtn" text="去选课" styleClass="btn-primary"
+                            maxWidth="Infinity"/>
+                    <Button fx:id="goToScoreBtn" text="查成绩" styleClass="btn-outline"
+                            maxWidth="Infinity"/>
+                    <Button fx:id="goToScheduleBtn" text="看课表" styleClass="btn-outline"
+                            maxWidth="Infinity"/>
+                </VBox>
+            </VBox>
+
+            <!-- Notices -->
+            <VBox styleClass="card" VBox.vgrow="ALWAYS">
+                <HBox styleClass="card-header">
+                    <Label text="最新公告" styleClass="card-title"/>
+                </HBox>
+                <VBox fx:id="noticesContainer" styleClass="card-body" VBox.vgrow="ALWAYS" spacing="4.0">
+                    <Label text="加载中..." styleClass="loading-text"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </HBox>
+</VBox>

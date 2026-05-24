@@ -1,0 +1,128 @@
+.page-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.page-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.search-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-pref-width: 320;
+}
+
+.search-field:focused {
+    -fx-border-color: #4f6ef7;
+}
+
+.btn-primary {
+    -fx-background-color: #4f6ef7;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #3d5bd5;
+}
+
+.btn-secondary {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #475569;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #cbd5e1;
+}
+
+.btn-outline {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4f6ef7;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-border-color: #4f6ef7;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-outline:hover {
+    -fx-background-color: #eef2ff;
+}
+
+.btn-danger {
+    -fx-background-color: #ef4444;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #dc2626;
+}
+
+.status-label {
+    -fx-text-fill: #64748b;
+    -fx-font-size: 12px;
+}
+
+.data-table {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.data-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 12 16;
+}
+
+.data-table .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.data-table .table-cell {
+    -fx-padding: 10 16;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1e293b;
+}
+
+.data-table .table-row-cell {
+    -fx-background-color: #ffffff;
+}
+
+.data-table .table-row-cell:odd {
+    -fx-background-color: #f8fafc;
+}
+
+.data-table .table-row-cell:selected {
+    -fx-background-color: #eef2ff;
+}
+
+.data-table .table-row-cell:hover {
+    -fx-background-color: #f1f5f9;
+}

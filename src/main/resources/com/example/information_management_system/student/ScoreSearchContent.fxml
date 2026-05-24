@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.information_management_system.controller.student.ScoreSearchContentController"
+      styleClass="page-root" stylesheets="@../css/student/ScoreSearch.css"
+      VBox.vgrow="ALWAYS">
+
+    <!-- Header -->
+    <HBox styleClass="page-header" VBox.vgrow="NEVER" spacing="12.0" alignment="CENTER_LEFT">
+        <Label text="成绩查询" styleClass="page-title">
+            <font><Font name="System Bold" size="20"/></font>
+        </Label>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="学期：" styleClass="selector-label"/>
+        <ComboBox fx:id="termSelector" prefWidth="180.0" styleClass="term-selector"/>
+        <Button fx:id="exportBtn" text="导出成绩" styleClass="export-btn"/>
+    </HBox>
+
+    <!-- Score Table -->
+    <TableView fx:id="scoreTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="colIndex" text="序号" prefWidth="50.0" sortable="false"/>
+            <TableColumn fx:id="colCourseName" text="课程名称" prefWidth="180.0" sortable="false"/>
+            <TableColumn fx:id="colPoint" text="学分" prefWidth="60.0" sortable="false"/>
+            <TableColumn fx:id="colType" text="类型" prefWidth="80.0" sortable="false"/>
+            <TableColumn fx:id="colTeacher" text="教师" prefWidth="80.0" sortable="false"/>
+            <TableColumn fx:id="colGrade" text="成绩" prefWidth="70.0" sortable="false"/>
+            <TableColumn fx:id="colGpa" text="GPA" prefWidth="60.0" sortable="false"/>
+            <TableColumn fx:id="colRank" text="排名" prefWidth="60.0" sortable="false"/>
+            <TableColumn fx:id="colRegular" text="平时成绩" prefWidth="80.0" sortable="false"/>
+            <TableColumn fx:id="colFinal" text="期末成绩" prefWidth="80.0" sortable="false"/>
+        </columns>
+    </TableView>
+
+    <!-- Summary Bar -->
+    <HBox styleClass="summary-bar" VBox.vgrow="NEVER" spacing="24.0" alignment="CENTER_RIGHT">
+        <Label text="平均GPA：" styleClass="summary-label"/>
+        <Label fx:id="avgGpaLabel" text="-" styleClass="summary-value"/>
+        <Label text="总学分：" styleClass="summary-label"/>
+        <Label fx:id="totalCreditLabel" text="-" styleClass="summary-value"/>
+    </HBox>
+    <Region VBox.vgrow="ALWAYS"/>
+</VBox>

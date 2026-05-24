@@ -1,0 +1,104 @@
+.page-root {
+    -fx-background-color: #f1f5f9;
+}
+
+.page-title {
+    -fx-text-fill: #1e293b;
+    -fx-font-weight: bold;
+}
+
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #475569;
+}
+
+.form-combo {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 13px;
+}
+
+.form-combo:focused {
+    -fx-border-color: #4f6ef7;
+}
+
+.btn-outline {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4f6ef7;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 8;
+    -fx-border-color: #4f6ef7;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-outline:hover {
+    -fx-background-color: #eef2ff;
+}
+
+.week-label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+    -fx-min-width: 80;
+    -fx-alignment: center;
+}
+
+.schedule-table {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 0;
+    -fx-fixed-cell-size: 72px;
+}
+
+.schedule-table .column-header-background {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 8 8 0 0;
+}
+
+.schedule-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 14 16;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 1 1 0;
+}
+
+.schedule-table .column-header .label {
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-alignment: center;
+}
+
+.schedule-table .table-cell {
+    -fx-padding: 8 12;
+    -fx-font-size: 12px;
+    -fx-text-fill: #334155;
+    -fx-alignment: top-left;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 0 1 1 0;
+    -fx-wrap-text: true;
+}
+
+.schedule-table .table-row-cell {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #f1f5f9;
+}
+
+.schedule-table .table-row-cell:odd {
+    -fx-background-color: #f8fafc;
+}
+
+.schedule-table .table-row-cell:selected {
+    -fx-background-color: #eef2ff;
+}
+
+.schedule-table .table-cell:selected {
+    -fx-text-fill: #1e293b;
+}

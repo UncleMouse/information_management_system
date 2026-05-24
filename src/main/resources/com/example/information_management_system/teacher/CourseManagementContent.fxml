@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.teacher.CourseManagementContent"
+      styleClass="page-root" spacing="16"
+      stylesheets="@../css/teacher/courseManagementContent.css">
+
+    <padding><Insets top="0" right="0" bottom="16" left="0"/></padding>
+
+    <Label text="课程管理" styleClass="page-title">
+        <font><Font name="System Bold" size="20"/></font>
+    </Label>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="搜索课程名称或类型..." styleClass="search-field"
+                   HBox.hgrow="ALWAYS"/>
+        <Button fx:id="applyNewCourseButton" text="申请新课" styleClass="primary-button"/>
+        <Button fx:id="editCourseButton" text="编辑" styleClass="outline-button"/>
+        <Button fx:id="viewStudentsButton" text="查看学生名单" styleClass="outline-button"/>
+    </HBox>
+
+    <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="课程名称" prefWidth="180"/>
+            <TableColumn fx:id="codeColumn" text="课程代码" prefWidth="120"/>
+            <TableColumn fx:id="creditColumn" text="学分" prefWidth="80"/>
+            <TableColumn fx:id="typeColumn" text="类型" prefWidth="120"/>
+            <TableColumn fx:id="peopleNumColumn" text="学生人数" prefWidth="100"/>
+            <TableColumn fx:id="statusColumn" text="状态" prefWidth="120"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+    <Region VBox.vgrow="ALWAYS"/>
+</VBox>
