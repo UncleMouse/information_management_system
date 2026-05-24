@@ -84,7 +84,7 @@ public class ClassManagementController {
 
     private void loadClasses() {
         statusLabel.setText("正在加载班级数据...");
-        NetworkUtils.get("/section/list", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/section/getSectionList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -205,7 +205,7 @@ public class ClassManagementController {
             statusLabel.setText("正在删除...");
             Map<String, String> params = new HashMap<>();
             params.put("id", String.valueOf(selected.getId()));
-            NetworkUtils.delete("/section/delete?id=" + selected.getId(), new NetworkUtils.Callback<String>() {
+            NetworkUtils.post("/section/deleteSection", params, "{}", new NetworkUtils.Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     try {

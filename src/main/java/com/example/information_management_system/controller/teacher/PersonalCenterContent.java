@@ -73,7 +73,7 @@ public class PersonalCenterContent {
         body.addProperty("phone", phone);
         body.addProperty("email", email);
 
-        NetworkUtils.put("/teacher/updateInfo", gson.toJson(body), new NetworkUtils.Callback<String>() {
+        NetworkUtils.put("/user/getInfo", gson.toJson(body), new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -126,7 +126,7 @@ public class PersonalCenterContent {
         body.addProperty("oldPassword", oldPassword);
         body.addProperty("newPassword", newPassword);
 
-        NetworkUtils.put("/teacher/changePassword", gson.toJson(body), new NetworkUtils.Callback<String>() {
+        NetworkUtils.put("/user/updatePassword", gson.toJson(body), new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

@@ -89,9 +89,8 @@ public class CourseScheduleManagementContent {
 
         Map<String, String> params = new HashMap<>();
         params.put("term", term);
-        params.put("week", String.valueOf(currentWeek));
 
-        NetworkUtils.get("/class/getTeacherSchedule", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/getClassSchedule/" + currentWeek, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

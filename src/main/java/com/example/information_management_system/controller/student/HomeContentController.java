@@ -55,7 +55,7 @@ public class HomeContentController {
     }
 
     private void loadSelectedCourses() {
-        NetworkUtils.get("/courseSelection/getSelectedCourses", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/course-selection/results", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -103,7 +103,7 @@ public class HomeContentController {
     }
 
     private void loadGrades() {
-        NetworkUtils.get("/grade/getStudentGrades", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/grade/getGrade", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -167,7 +167,7 @@ public class HomeContentController {
     }
 
     private void loadNotices() {
-        NetworkUtils.get("/notice/getNoticeList", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/notice/getStudentNoticeList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

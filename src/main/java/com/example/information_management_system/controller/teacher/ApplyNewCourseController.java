@@ -89,7 +89,7 @@ public class ApplyNewCourseController {
 
         String jsonBody = gson.toJson(bodyMap);
 
-        NetworkUtils.post("/class/createCourse", jsonBody, new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/class/create", jsonBody, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

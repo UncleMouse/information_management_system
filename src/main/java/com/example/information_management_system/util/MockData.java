@@ -10,69 +10,76 @@ public class MockData {
 
     public static String getMockResponse(String url, String method, String body) {
         // 登录
-        if (url.contains("/login/simpleLogin") || url.contains("/login/SDULogin")) {
-            return loginResponse(body);
-        }
-        if (url.contains("/login/refreshToken")) {
-            return refreshTokenResponse();
-        }
+        if (url.contains("/login/simpleLogin") || url.contains("/login/SDULogin")) return loginResponse(body);
+        if (url.contains("/login/refreshToken")) return refreshTokenResponse();
 
         // 学期
         if (url.contains("/term/getTermList")) return termListResponse();
         if (url.contains("/term/getCurrentTerm")) return currentTermResponse();
 
         // 管理员 - 学生管理
-        if (url.contains("/admin/studentList") || url.contains("/admin/searchStudent")) return studentListResponse();
-        if (url.contains("/admin/addStudent") || url.contains("/admin/updateStudent")) return successResponse("操作成功");
-        if (url.contains("/admin/deleteStudent") || url.contains("/admin/deleteTeacher")) return successResponse("删除成功");
-        if (url.contains("/admin/importStudent") || url.contains("/admin/exportStudent")) return successResponse("操作成功");
+        if (url.contains("/admin/student/list") || url.contains("/admin/searchSdu")) return studentListResponse();
+        if (url.contains("/admin/addUser") || url.contains("/admin/updateUser")) return successResponse("操作成功");
+        if (url.contains("/admin/deleteUser")) return successResponse("删除成功");
+        if (url.contains("/admin/getNum") || url.contains("/admin/getUserInfo")) return successResponse("操作成功");
+        if (url.contains("/admin/upload")) return successResponse("导入成功");
 
         // 管理员 - 教师管理
-        if (url.contains("/admin/teacherList") || url.contains("/admin/searchTeacher")) return teacherListResponse();
-        if (url.contains("/admin/addTeacher") || url.contains("/admin/updateTeacher")) return successResponse("操作成功");
+        if (url.contains("/admin/getTeacherList")) return teacherListResponse();
 
-        // 管理员 - 课程管理
-        if (url.contains("/class/admin/courseList") || url.contains("/class/admin/searchCourse")) return courseListResponse();
-        if (url.contains("/class/admin/reviewCourse")) return successResponse("审核完成");
+        // 管理员 - 课程管理(审批)
+        if (url.contains("/class/pending")) return courseListResponse();
+        if (url.contains("/class/approve") || url.contains("/class/adUpdate")
+                || url.contains("/class/deleteAd")) return successResponse("审核完成");
 
         // 管理员 - 班级管理
-        if (url.contains("/section/list") || url.contains("/section/search")) return sectionListResponse();
-        if (url.contains("/section/add") || url.contains("/section/update")) return successResponse("操作成功");
-        if (url.contains("/section/delete")) return successResponse("删除成功");
+        if (url.contains("/section/getSectionList") || url.contains("/section/search")) return sectionListResponse();
+        if (url.contains("/section/addSection") || url.contains("/section/updateSection")) return successResponse("操作成功");
+        if (url.contains("/section/deleteSection") || url.contains("/section/assign")) return successResponse("操作成功");
 
-        // 通知
-        if (url.contains("/notice/list") || url.contains("/notice/getNoticeList")) return noticeListResponse();
-        if (url.contains("/notice/add")) return successResponse("发布成功");
+        // 通知(new backend)
+        if (url.contains("/notice/get")) return noticeListResponse();
+        if (url.contains("/notice/set") || url.contains("/notice/edit")) return successResponse("操作成功");
+        if (url.contains("/notice/close")) return successResponse("操作成功");
 
         // 教师
-        if (url.contains("/teacher/getTeacherClasses")) return teacherCourseListResponse();
+        if (url.contains("/class/list") || url.contains("/class/searchTeacherCourses")) return teacherCourseListResponse();
         if (url.contains("/Teacher/getClassRoom")) return classRoomListResponse();
-        if (url.contains("/teacher/getClassStudents")) return studentListResponse();
-        if (url.contains("/class/getTeacherSchedule")) return scheduleResponse();
+        if (url.contains("/class/") && url.contains("/students")) return studentListResponse();
+        if (url.contains("/class/getClassSchedule")) return scheduleResponse();
+        if (url.contains("/class/detail")) return successResponse("操作成功");
 
-        // 课程申请
-        if (url.contains("/class/createCourse") || url.contains("/class/updateCourse")) return successResponse("操作成功");
+        // 课程CRUD
+        if (url.contains("/class/create") || url.contains("/class/update")
+                || url.contains("/class/delete")) return successResponse("操作成功");
+
+        // 教师信息
+        if (url.contains("/Teacher/getMessage") || url.contains("/Teacher/countClass")) return successResponse("操作成功");
 
         // 成绩
-        if (url.contains("/grade/getStudentGrades")) return gradeListResponse();
-        if (url.contains("/grade/inputGrade") || url.contains("/grade/publish")) return successResponse("操作成功");
+        if (url.contains("/grade/getGrade") || url.contains("/grade/getMessage")) return gradeListResponse();
+        if (url.contains("/grade/setGrade") || url.contains("/grade/releaseGrade")
+                || url.contains("/grade/getGradeList") || url.contains("/class/updateRank")
+                || url.contains("/class/updatePointRank")) return successResponse("操作成功");
 
         // 学生 - 课表
-        if (url.contains("/courseSelection/getSchedule")) return scheduleResponse();
+        if (url.contains("/class/getClassSchedule")) return scheduleResponse();
 
         // 学生 - 选课
-        if (url.contains("/courseSelection/searchCourse")
-                || url.contains("/courseSelection/getAvailableCourses")) return availableCoursesResponse();
-        if (url.contains("/courseSelection/getSelectedCourses")) return selectedCoursesResponse();
-        if (url.contains("/courseSelection/selectCourse")) return successResponse("选课成功");
-        if (url.contains("/courseSelection/dropCourse")) return successResponse("退课成功");
+        if (url.contains("/course-selection/search") || url.contains("/course-selection/unChoose")) return availableCoursesResponse();
+        if (url.contains("/course-selection/results")) return selectedCoursesResponse();
+        if (url.contains("/course-selection/select")) return successResponse("选课成功");
+        if (url.contains("/course-selection/drop")) return successResponse("退课成功");
 
-        // 用户信息更新
-        if (url.contains("/user/updateInfo") || url.contains("/user/updatePhone")
-                || url.contains("/user/updateEmail") || url.contains("/user/updatePassword")
-                || url.contains("/teacher/updateInfo") || url.contains("/teacher/changePassword")) {
+        // 用户信息
+        if (url.contains("/user/updatePhone") || url.contains("/user/updateEmail")
+                || url.contains("/user/updatePassword") || url.contains("/user/resetPassword")
+                || url.contains("/user/getInfo") || url.contains("/user/logout")) {
             return successResponse("更新成功");
         }
+
+        // 学籍状态
+        if (url.contains("/status/set") || url.contains("/status/getStatusCard")) return successResponse("操作成功");
 
         // 默认成功响应
         return successResponse("操作成功");

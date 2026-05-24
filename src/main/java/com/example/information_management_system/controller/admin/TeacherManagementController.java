@@ -103,7 +103,7 @@ public class TeacherManagementController {
 
     private void loadTeachers() {
         statusLabel.setText("正在加载教师数据...");
-        NetworkUtils.get("/admin/teacherList", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/admin/getTeacherList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -143,7 +143,7 @@ public class TeacherManagementController {
         statusLabel.setText("正在搜索...");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
-        NetworkUtils.get("/admin/searchTeacher", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -223,8 +223,8 @@ public class TeacherManagementController {
         if (confirmed) {
             statusLabel.setText("正在删除...");
             Map<String, String> params = new HashMap<>();
-            params.put("id", String.valueOf(selected.getId()));
-            NetworkUtils.post("/admin/deleteTeacher", params, "{}", new NetworkUtils.Callback<String>() {
+            params.put("userId", String.valueOf(selected.getId()));
+            NetworkUtils.post("/admin/deleteUser", params, "{}", new NetworkUtils.Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     try {

@@ -45,7 +45,7 @@ public class TeacherHomePageController {
     }
 
     private void fetchDashboardData() {
-        NetworkUtils.get("/teacher/getTeacherClasses", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -86,7 +86,7 @@ public class TeacherHomePageController {
     }
 
     private void fetchRecentCourses() {
-        NetworkUtils.get("/teacher/getTeacherClasses", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

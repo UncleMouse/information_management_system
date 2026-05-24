@@ -145,7 +145,7 @@ public class CourseSelectionContentController {
         body.addProperty("studentId", UserSession.getInstance().getId());
         body.addProperty("courseId", course.getCode());
 
-        NetworkUtils.post("/courseSelection/selectCourse", gson.toJson(body), new NetworkUtils.Callback<String>() {
+        NetworkUtils.put("/course-selection/select/" + course.getCode(), gson.toJson(body), new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -180,7 +180,7 @@ public class CourseSelectionContentController {
         body.addProperty("studentId", UserSession.getInstance().getId());
         body.addProperty("courseId", course.getCode());
 
-        NetworkUtils.post("/courseSelection/dropCourse", gson.toJson(body), new NetworkUtils.Callback<String>() {
+        NetworkUtils.delete("/course-selection/drop/" + course.getCode(), gson.toJson(body), new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -223,7 +223,7 @@ public class CourseSelectionContentController {
         params.put("keyword", keyword.trim());
         params.put("term", term);
 
-        NetworkUtils.get("/courseSelection/searchCourse", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/course-selection/search", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -258,7 +258,7 @@ public class CourseSelectionContentController {
         Map<String, String> params = new HashMap<>();
         params.put("term", term);
 
-        NetworkUtils.get("/courseSelection/getAvailableCourses", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/course-selection/unChoose", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -290,7 +290,7 @@ public class CourseSelectionContentController {
         Map<String, String> params = new HashMap<>();
         params.put("term", term);
 
-        NetworkUtils.get("/courseSelection/getSelectedCourses", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/course-selection/results", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

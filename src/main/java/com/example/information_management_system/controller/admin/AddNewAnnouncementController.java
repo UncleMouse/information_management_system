@@ -75,7 +75,7 @@ public class AddNewAnnouncementController {
     }
 
     private void loadNotices() {
-        NetworkUtils.get("/notice/list", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/notice/getAdminNoticeList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -120,7 +120,7 @@ public class AddNewAnnouncementController {
         }
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
-        NetworkUtils.get("/notice/list", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/notice/getAdminNoticeList", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -196,7 +196,7 @@ public class AddNewAnnouncementController {
         String json = gson.toJson(body);
         btnSubmit.setDisable(true);
 
-        NetworkUtils.post("/notice/add", json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/notice/set", json, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

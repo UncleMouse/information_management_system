@@ -3,6 +3,7 @@ package com.example.information_management_system.model;
 import javafx.beans.property.*;
 
 public class Course {
+    private int id;
     private final StringProperty code = new SimpleStringProperty();
     private final StringProperty teacherName = new SimpleStringProperty();
     private final StringProperty department = new SimpleStringProperty();
@@ -15,6 +16,9 @@ public class Course {
     private final IntegerProperty peopleNum = new SimpleIntegerProperty();
     private final StringProperty term = new SimpleStringProperty();
     private final StringProperty status = new SimpleStringProperty();
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getCode() { return code.get(); }
     public StringProperty codeProperty() { return code; }

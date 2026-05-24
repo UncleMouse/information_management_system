@@ -99,7 +99,7 @@ public class ScoreInputController {
     }
 
     private void fetchTeacherClasses() {
-        NetworkUtils.get("/teacher/getTeacherClasses", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -153,7 +153,7 @@ public class ScoreInputController {
             params.put("courseId", String.valueOf(courseId));
         }
 
-        NetworkUtils.get("/teacher/getClassStudents", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/" + courseId + "/students", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -234,7 +234,7 @@ public class ScoreInputController {
         bodyObj.add("scores", scoresArray);
         String jsonBody = gson.toJson(bodyObj);
 
-        NetworkUtils.post("/grade/inputGrade", jsonBody, new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/grade/setGrade", jsonBody, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -271,7 +271,7 @@ public class ScoreInputController {
         JsonObject bodyObj = new JsonObject();
         bodyObj.addProperty("courseName", selectedCourseCode);
 
-        NetworkUtils.post("/grade/publish", gson.toJson(bodyObj), new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/grade/releaseGrade", gson.toJson(bodyObj), new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

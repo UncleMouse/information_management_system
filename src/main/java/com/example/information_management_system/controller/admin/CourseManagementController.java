@@ -114,7 +114,7 @@ public class CourseManagementController {
 
     private void loadCourses() {
         statusLabel.setText("正在加载课程数据...");
-        NetworkUtils.get("/class/admin/courseList", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/pending", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -160,7 +160,7 @@ public class CourseManagementController {
         if (statusFilter.getValue() != null && !"全部".equals(statusFilter.getValue())) {
             params.put("status", statusFilter.getValue());
         }
-        NetworkUtils.get("/class/admin/searchCourse", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/pending", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -216,7 +216,7 @@ public class CourseManagementController {
         body.put("status", approve ? "APPROVED" : "REJECTED");
 
         String json = gson.toJson(body);
-        NetworkUtils.post("/class/admin/reviewCourse", json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/class/approve/" + course.getCode(), json, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

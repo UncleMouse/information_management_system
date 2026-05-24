@@ -34,10 +34,10 @@ public class AdminHomePageController {
     }
 
     private void loadDashboardStats() {
-        fetchCount("/admin/studentList", totalStudentsLabel);
-        fetchCount("/admin/teacherList", totalTeachersLabel);
-        fetchCount("/class/admin/courseList", totalCoursesLabel);
-        fetchCount("/section/list", totalClassesLabel);
+        fetchCount("/admin/student/list", totalStudentsLabel);
+        fetchCount("/admin/getTeacherList", totalTeachersLabel);
+        fetchCount("/class/pending", totalCoursesLabel);
+        fetchCount("/section/getSectionList", totalClassesLabel);
 
         activeStudentsLabel.setText("--");
         activeTeachersLabel.setText("--");
@@ -81,7 +81,7 @@ public class AdminHomePageController {
     }
 
     private void loadRecentNotices() {
-        NetworkUtils.get("/notice/list", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/notice/getAdminNoticeList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

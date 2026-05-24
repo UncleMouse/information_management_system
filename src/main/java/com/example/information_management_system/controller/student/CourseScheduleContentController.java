@@ -90,7 +90,7 @@ public class CourseScheduleContentController {
         params.put("term", term);
         params.put("week", String.valueOf(currentWeek));
 
-        NetworkUtils.get("/courseSelection/getSchedule", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/getClassSchedule/" + currentWeek, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

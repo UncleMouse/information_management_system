@@ -83,7 +83,7 @@ public class CourseManagementContent {
     }
 
     private void fetchCourses() {
-        NetworkUtils.get("/teacher/getTeacherClasses", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -94,6 +94,7 @@ public class CourseManagementContent {
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             Course course = new Course();
+                            if (obj.has("id")) course.setId(obj.get("id").getAsInt());
                             if (obj.has("name")) course.setCode(obj.get("name").getAsString());
                             if (obj.has("code")) course.setCode(obj.get("code").getAsString());
                             if (obj.has("name")) course.setTeacherName(obj.get("name").getAsString());
@@ -197,7 +198,7 @@ public class CourseManagementContent {
                 );
                 Parent view = loader.load();
                 StudentListViewController controller = loader.getController();
-                controller.loadStudentsForCourse(selected.getCode());
+                controller.loadStudentsForCourse(selected.getId(), selected.getCode());
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(view);
             }

@@ -89,7 +89,7 @@ public class AddNewStudentController {
         }
 
         String json = gson.toJson(body);
-        String endpoint = editingStudent != null ? "/admin/updateStudent" : "/admin/addStudent";
+        String endpoint = editingStudent != null ? "/admin/updateUser" : "/admin/addUser";
 
         btnSubmit.setDisable(true);
         NetworkUtils.post(endpoint, json, new NetworkUtils.Callback<String>() {

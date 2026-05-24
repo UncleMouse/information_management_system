@@ -67,19 +67,19 @@ public class StudentListViewController {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    public void loadStudentsForCourse(String courseName) {
+    public void loadStudentsForCourse(int courseId, String courseName) {
         this.currentCourseName = courseName;
         if (courseNameLabel != null) {
             courseNameLabel.setText("学生名单 - " + (courseName != null ? courseName : ""));
         }
-        fetchStudents(courseName);
+        fetchStudents(courseId, courseName);
     }
 
-    private void fetchStudents(String courseName) {
+    private void fetchStudents(int courseId, String courseName) {
         Map<String, String> params = new HashMap<>();
         params.put("courseName", courseName);
 
-        NetworkUtils.get("/teacher/getClassStudents", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/" + courseId + "/students", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

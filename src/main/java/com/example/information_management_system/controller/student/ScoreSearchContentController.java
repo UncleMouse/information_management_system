@@ -86,7 +86,7 @@ public class ScoreSearchContentController {
         Map<String, String> params = new HashMap<>();
         params.put("term", term);
 
-        NetworkUtils.get("/grade/getStudentGrades", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/grade/getGrade", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

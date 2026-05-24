@@ -114,7 +114,7 @@ public class StudentManagementController {
 
     private void loadStudents() {
         statusLabel.setText("正在加载学生数据...");
-        NetworkUtils.get("/admin/studentList", new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/admin/student/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -160,7 +160,7 @@ public class StudentManagementController {
         statusLabel.setText("正在搜索...");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
-        NetworkUtils.get("/admin/searchStudent", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -219,7 +219,7 @@ public class StudentManagementController {
         File file = fileChooser.showOpenDialog(studentTable.getScene().getWindow());
         if (file != null) {
             statusLabel.setText("正在导入...");
-            NetworkUtils.postMultipartFileAsync("/admin/importStudent", file)
+            NetworkUtils.postMultipartFileAsync("/admin/upload", file)
                     .thenAccept(result -> Platform.runLater(() -> {
                         try {
                             JsonObject res = gson.fromJson(result, JsonObject.class);
@@ -305,8 +305,8 @@ public class StudentManagementController {
         if (confirmed) {
             statusLabel.setText("正在删除...");
             Map<String, String> params = new HashMap<>();
-            params.put("id", String.valueOf(selected.getId()));
-            NetworkUtils.post("/admin/deleteStudent", params, "{}", new NetworkUtils.Callback<String>() {
+            params.put("userId", String.valueOf(selected.getId()));
+            NetworkUtils.post("/admin/deleteUser", params, "{}", new NetworkUtils.Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     try {

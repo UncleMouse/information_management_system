@@ -129,7 +129,7 @@ public class editCourseController {
 
         String jsonBody = gson.toJson(bodyMap);
 
-        NetworkUtils.put("/class/updateCourse", jsonBody, new NetworkUtils.Callback<String>() {
+        NetworkUtils.put("/class/update/" + currentCourse.getId(), jsonBody, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
