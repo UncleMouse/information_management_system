@@ -22,7 +22,7 @@ module com.example.information_management_system {
     opens com.example.information_management_system.controller.teacher to javafx.fxml, javafx.base;
     opens com.example.information_management_system.controller.student to javafx.fxml, javafx.base;
     opens com.example.information_management_system.component to javafx.fxml;
-    opens com.example.information_management_system.model to javafx.base;
+    opens com.example.information_management_system.model to javafx.base, com.google.gson;
 
     exports com.example.information_management_system;
     exports com.example.information_management_system.component;

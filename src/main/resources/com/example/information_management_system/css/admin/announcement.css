@@ -14,7 +14,7 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 10 14;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
 }
 
 .search-field:focused {
@@ -25,7 +25,7 @@
 .btn-primary {
     -fx-background-color: #4f6ef7;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
     -fx-font-weight: bold;
     -fx-padding: 10 20;
     -fx-background-radius: 8;
@@ -39,7 +39,7 @@
 .btn-secondary {
     -fx-background-color: #e2e8f0;
     -fx-text-fill: #475569;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
     -fx-padding: 10 20;
     -fx-background-radius: 8;
     -fx-cursor: hand;
@@ -62,42 +62,53 @@
     -fx-text-fill: #3d5bd5;
 }
 
-/* Table */
+/* ===== Table ===== */
 .data-table {
     -fx-background-color: #ffffff;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 0;
-    -fx-fixed-cell-size: 40px;
+    -fx-table-cell-border-color: #e8ecf0;
+    -fx-fixed-cell-size: 42px;
 }
 
+/* Header */
 .data-table .column-header-background {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: #f1f5f9;
     -fx-background-radius: 8 8 0 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8 8 0 0;
 }
 
 .data-table .column-header {
     -fx-background-color: transparent;
-    -fx-padding: 12 16;
+    -fx-padding: 0 16;
+    -fx-border-color: #dde4ee;
+    -fx-border-width: 0 1 1 0;
 }
 
-.data-table .column-header .label {
-    -fx-text-fill: #475569;
+.data-table .column-header .label { -fx-alignment: CENTER;
+    -fx-text-fill: #334155;
     -fx-font-weight: bold;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
+    -fx-padding: 8 0;
 }
 
+/* Cells */
 .data-table .table-cell {
-    -fx-padding: 10 16;
+    -fx-padding: 0 16;
     -fx-font-size: 13px;
     -fx-text-fill: #1e293b;
-    -fx-border-color: transparent;
+    -fx-alignment: CENTER;
 }
 
+/* Rows */
 .data-table .table-row-cell {
     -fx-background-color: #ffffff;
-    -fx-border-color: #f1f5f9;
+    -fx-border-color: #f0f2f5;
+    -fx-border-width: 0 0 1 0;
 }
 
 .data-table .table-row-cell:odd {
@@ -106,11 +117,16 @@
 
 .data-table .table-row-cell:selected {
     -fx-background-color: #eef2ff;
-    -fx-text-fill: #1e293b;
 }
 
 .data-table .table-row-cell:hover {
     -fx-background-color: #f1f5f9;
+}
+
+/* No header in empty table */
+.data-table .placeholder .label {
+    -fx-text-fill: #94a3b8;
+    -fx-font-size: 14px;
 }
 
 /* Form Card */
@@ -122,7 +138,7 @@
 }
 
 .field-label {
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
     -fx-font-weight: bold;
     -fx-text-fill: #475569;
 }
@@ -133,7 +149,7 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 10 14;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
 }
 
 .form-field:focused {
@@ -146,7 +162,7 @@
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
 }
 
 .form-combo:focused {
@@ -159,7 +175,7 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 10 14;
-    -fx-font-size: 13px;
+    -fx-font-size: 13px; -fx-alignment: CENTER;
 }
 
 .form-textarea:focused {

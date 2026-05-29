@@ -41,7 +41,7 @@
 
     <TableView fx:id="classTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colId" text="ID" prefWidth="50" />
+            <TableColumn fx:id="colId" text="序号" prefWidth="50" />
             <TableColumn fx:id="colClassName" text="班级名称" prefWidth="200" />
             <TableColumn fx:id="colMajor" text="专业" prefWidth="180" />
             <TableColumn fx:id="colGrade" text="年级" prefWidth="100" />

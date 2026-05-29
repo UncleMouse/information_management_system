@@ -32,7 +32,6 @@ public class EditPersonalInfoController {
         sexCombo.getItems().addAll("男", "女");
         sexCombo.getSelectionModel().selectFirst();
 
-        // 预填当前用户信息
         UserSession session = UserSession.getInstance();
         if (session.getPhone() != null) phoneField.setText(session.getPhone());
         if (session.getEmail() != null) emailField.setText(session.getEmail());
@@ -56,56 +55,86 @@ public class EditPersonalInfoController {
             return;
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("phone", phone);
-        body.put("email", email);
-        body.put("sex", sex);
-
-        String json = gson.toJson(body);
-
         btnSubmit.setDisable(true);
-        NetworkUtils.post("/user/updateInfo", json, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        Platform.runLater(() -> {
-                            // 更新本地会话
-                            UserSession session = UserSession.getInstance();
-                            session.setPhone(phone);
-                            session.setEmail(email);
-                            session.setSex(sex);
 
-                            ShowMessage.showInfoMessage("成功", "已成功更新");
-                            if (onInfoUpdatedListener != null) {
-                                onInfoUpdatedListener.run();
-                            }
-                            closeDialog();
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            ShowMessage.showErrorMessage("错误",
-                                    res.has("msg") ? res.get("msg").getAsString() : "更新失败");
-                            btnSubmit.setDisable(false);
-                        });
-                    }
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
-                        btnSubmit.setDisable(false);
-                    });
-                }
-            }
+        // 分别调用 updatePhone 和 updateEmail（后端无 /user/updateInfo）
+        final int[] completed = {0};
+        final int total = (StringUtil.isEmpty(phone) ? 0 : 1) + (StringUtil.isEmpty(email) ? 0 : 1);
+        final boolean[] failed = {false};
 
-            @Override
-            public void onFailure(Exception e) {
+        Runnable checkAllDone = () -> {
+            completed[0]++;
+            if (completed[0] >= total) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
-                    btnSubmit.setDisable(false);
+                    if (!failed[0]) {
+                        UserSession session = UserSession.getInstance();
+                        if (!StringUtil.isEmpty(phone)) session.setPhone(phone);
+                        if (!StringUtil.isEmpty(email)) session.setEmail(email);
+                        session.setSex(sex);
+                        ShowMessage.showInfoMessage("成功", "已成功更新");
+                        if (onInfoUpdatedListener != null) onInfoUpdatedListener.run();
+                        closeDialog();
+                    } else {
+                        ShowMessage.showErrorMessage("错误", "更新失败");
+                        btnSubmit.setDisable(false);
+                    }
                 });
             }
-        });
+        };
+
+        if (!StringUtil.isEmpty(phone)) {
+            Map<String, String> phoneParams = new HashMap<>();
+            phoneParams.put("phone", phone);
+            NetworkUtils.postWithQueryParams("/user/updatePhone", phoneParams, new NetworkUtils.Callback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    try {
+                        JsonObject res = gson.fromJson(result, JsonObject.class);
+                        if (res.has("code") && res.get("code").getAsInt() == 200) {
+                            checkAllDone.run();
+                        } else {
+                            failed[0] = true;
+                            checkAllDone.run();
+                        }
+                    } catch (Exception e) {
+                        failed[0] = true;
+                        checkAllDone.run();
+                    }
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    failed[0] = true;
+                    checkAllDone.run();
+                }
+            });
+        }
+
+        if (!StringUtil.isEmpty(email)) {
+            Map<String, String> emailParams = new HashMap<>();
+            emailParams.put("email", email);
+            NetworkUtils.postWithQueryParams("/user/updateEmail", emailParams, new NetworkUtils.Callback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    try {
+                        JsonObject res = gson.fromJson(result, JsonObject.class);
+                        if (res.has("code") && res.get("code").getAsInt() == 200) {
+                            checkAllDone.run();
+                        } else {
+                            failed[0] = true;
+                            checkAllDone.run();
+                        }
+                    } catch (Exception e) {
+                        failed[0] = true;
+                        checkAllDone.run();
+                    }
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    failed[0] = true;
+                    checkAllDone.run();
+                }
+            });
+        }
     }
 
     private void closeDialog() {

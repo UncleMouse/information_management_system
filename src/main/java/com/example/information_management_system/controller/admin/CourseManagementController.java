@@ -9,7 +9,6 @@ import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class CourseManagementController {
@@ -46,13 +44,6 @@ public class CourseManagementController {
     @FXML
     public void initialize() {
         courseTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] courseRatios = {1.0, 1.8, 1.0, 0.6, 0.8, 1.0, 0.8};
-        final double courseTotalRatio = java.util.Arrays.stream(courseRatios).sum();
-        courseTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < courseRatios.length && i < courseTable.getColumns().size(); i++)
-                courseTable.getColumns().get(i).setPrefWidth(w * courseRatios[i] / courseTotalRatio);
-        });
         setupTableColumns();
         courseTable.setItems(courseList);
         setupFilters();
@@ -78,8 +69,9 @@ public class CourseManagementController {
     }
 
     private void setupTableColumns() {
-        colCode.setCellValueFactory(new PropertyValueFactory<>("code"));
-        // Course 模型没有 "name" 属性，用 code 代替课程名称
+        colCode.setCellFactory(col -> new TableCell<Course, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
+        });
         colName.setCellValueFactory(new PropertyValueFactory<>("code"));
         colTeacher.setCellValueFactory(new PropertyValueFactory<>("teacherName"));
         colCredit.setCellValueFactory(new PropertyValueFactory<>("credit"));
@@ -87,24 +79,29 @@ public class CourseManagementController {
         colTerm.setCellValueFactory(new PropertyValueFactory<>("term"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
+        colCredit.setCellFactory(col -> new TableCell<Course, Double>() {
+            @Override protected void updateItem(Double item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:String.valueOf(item)); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colType.setCellFactory(col -> new TableCell<Course, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colTerm.setCellFactory(col -> new TableCell<Course, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
         colStatus.setCellFactory(column -> new TableCell<Course, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
+                if (empty || item == null) { setText(null); setStyle(""); return; }
+                setText(item);
+                if ("已通过".equals(item) || "APPROVED".equalsIgnoreCase(item)) {
+                    setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                } else if ("待审核".equals(item) || "PENDING".equalsIgnoreCase(item)) {
+                    setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                } else if ("已拒绝".equals(item) || "REJECTED".equalsIgnoreCase(item)) {
+                    setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-alignment: CENTER;");
                 } else {
-                    setText(item);
-                    if ("已通过".equals(item) || "APPROVED".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;");
-                    } else if ("待审核".equals(item) || "PENDING".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
-                    } else if ("已拒绝".equals(item) || "REJECTED".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("-fx-text-fill: #64748b;");
-                    }
+                    setStyle("-fx-text-fill: #64748b; -fx-alignment: CENTER;");
                 }
             }
         });
@@ -123,32 +120,58 @@ public class CourseManagementController {
 
     private void loadCourses() {
         statusLabel.setText("加载中…");
-        NetworkUtils.get("/class/pending", new NetworkUtils.Callback<String>() {
+        Map<String, String> params = new HashMap<>();
+        params.put("pageNum", "1");
+        params.put("pageSize", "100");
+
+        NetworkUtils.get("/class/list", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Course>>() {}.getType();
-                        List<Course> list = gson.fromJson(arr, listType);
+                        List<Course> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Course c = new Course();
+                            // 使用 name 作为课程名（显示在 code 字段）
+                            if (obj.has("name")) {
+                                c.setCode(obj.get("name").getAsString());
+                            } else if (obj.has("courseId")) {
+                                c.setCode(String.valueOf(obj.get("courseId").getAsInt()));
+                            }
+                            c.setTeacherName(obj.has("teacherName") ? obj.get("teacherName").getAsString() : "");
+                            c.setCredit(obj.has("credit") ? obj.get("credit").getAsDouble() : 0.0);
+                            c.setType(obj.has("type") ? obj.get("type").getAsString() : "");
+                            c.setTerm(obj.has("term") ? obj.get("term").getAsString() : "");
+                            c.setStatus(obj.has("status") ? obj.get("status").getAsString() : "");
+                            list.add(c);
+                        }
                         Platform.runLater(() -> {
                             courseList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                        Platform.runLater(() -> {
+                            statusLabel.setText("数据加载失败");
+                            ShowMessage.showErrorMessage("错误", "数据加载失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                        });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据解析失败，请稍后重试"));
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        statusLabel.setText("数据解析失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
+                    });
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败，请检查连接");
-                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
+                    statusLabel.setText("网络请求失败");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                 });
             }
         });
@@ -163,34 +186,58 @@ public class CourseManagementController {
         statusLabel.setText("加载中…");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
+        params.put("pageNum", "1");
+        params.put("pageSize", "100");
         if (semesterFilter.getValue() != null && !"全部".equals(semesterFilter.getValue())) {
-            params.put("semester", semesterFilter.getValue());
+            params.put("term", semesterFilter.getValue());
         }
-        if (statusFilter.getValue() != null && !"全部".equals(statusFilter.getValue())) {
-            params.put("status", statusFilter.getValue());
-        }
-        NetworkUtils.get("/class/pending", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/class/list", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Course>>() {}.getType();
-                        List<Course> list = gson.fromJson(arr, listType);
+                        List<Course> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Course c = new Course();
+                            if (obj.has("name")) {
+                                c.setCode(obj.get("name").getAsString());
+                            } else if (obj.has("courseId")) {
+                                c.setCode(String.valueOf(obj.get("courseId").getAsInt()));
+                            }
+                            c.setTeacherName(obj.has("teacherName") ? obj.get("teacherName").getAsString() : "");
+                            c.setCredit(obj.has("credit") ? obj.get("credit").getAsDouble() : 0.0);
+                            c.setType(obj.has("type") ? obj.get("type").getAsString() : "");
+                            c.setTerm(obj.has("term") ? obj.get("term").getAsString() : "");
+                            c.setStatus(obj.has("status") ? obj.get("status").getAsString() : "");
+                            list.add(c);
+                        }
                         Platform.runLater(() -> {
                             courseList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
+                    } else {
+                        Platform.runLater(() -> {
+                            statusLabel.setText("搜索失败");
+                            ShowMessage.showErrorMessage("错误", "搜索失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                        });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                    Platform.runLater(() -> {
+                        statusLabel.setText("数据解析失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
+                    });
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                Platform.runLater(() -> {
+                    statusLabel.setText("网络请求失败");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
+                });
             }
         });
     }
@@ -219,13 +266,17 @@ public class CourseManagementController {
                 "确定要" + action + "课程 " + course.getCode() + " 吗？");
         if (!confirmed) return;
 
-        statusLabel.setText("加载中…");
-        Map<String, Object> body = new HashMap<>();
-        body.put("courseId", course.getCode());
-        body.put("status", approve ? "APPROVED" : "REJECTED");
+        statusLabel.setText("加载中...");
+        int courseId = course.getId();
 
-        String json = gson.toJson(body);
-        NetworkUtils.post("/class/approve/" + course.getCode(), json, new NetworkUtils.Callback<String>() {
+        // 后端期望: status=1(通过) 或 2(拒绝) 作为查询参数, JSON body 为 sectionId 数组
+        Map<String, String> params = new HashMap<>();
+        params.put("status", approve ? "1" : "2");
+
+        String json = "[]"; // 空的 sectionId 数组
+        String endpoint = "/class/approve/" + courseId;
+
+        NetworkUtils.post(endpoint, params, json, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -237,7 +288,7 @@ public class CourseManagementController {
                         });
                     } else {
                         Platform.runLater(() -> ShowMessage.showErrorMessage("错误",
-                                res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试"));
+                                res.has("msg") ? res.get("msg").getAsString() : "操作失败"));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析响应失败"));
@@ -247,8 +298,8 @@ public class CourseManagementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("数据加载失败");
-                    ShowMessage.showErrorMessage("错误", "操作失败，请稍后重试");
+                    statusLabel.setText("操作失败");
+                    ShowMessage.showErrorMessage("错误", "操作失败: " + e.getMessage());
                 });
             }
         });

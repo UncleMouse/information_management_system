@@ -19,7 +19,6 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,13 +48,6 @@ public class ScoreSearchContentController {
     @FXML
     public void initialize() {
         scoreTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] ratios = {0.5, 2.0, 0.7, 0.9, 1.0, 0.8, 0.7, 0.7, 0.9, 0.9};
-        final double totalRatio = Arrays.stream(ratios).sum();
-        scoreTable.widthProperty().addListener((obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < ratios.length && i < scoreTable.getColumns().size(); i++)
-                scoreTable.getColumns().get(i).setPrefWidth(w * ratios[i] / totalRatio);
-        });
         setupColumns();
 
         termSelector.setItems(Data.getInstance().getSemesterList());

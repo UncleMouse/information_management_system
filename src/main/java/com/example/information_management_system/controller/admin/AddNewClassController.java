@@ -47,28 +47,25 @@ public class AddNewClassController {
         String className = classNameField.getText().trim();
         String grade = gradeField.getText().trim();
         String major = majorField.getText().trim();
-        String counselor = counselorField.getText().trim();
 
         if (StringUtil.isEmpty(className)) {
             ShowMessage.showWarningMessage("提示", "班级名称不能为空");
             return;
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("className", className);
-        body.put("grade", grade);
-        body.put("major", major);
-        body.put("counselor", counselor);
+        Map<String, String> params = new HashMap<>();
+        params.put("number", className);
+        params.put("grade", grade);
+        params.put("major", major);
 
         if (editingSection != null) {
-            body.put("id", editingSection.getId());
+            params.put("id", String.valueOf(editingSection.getId()));
         }
 
-        String json = gson.toJson(body);
         String endpoint = editingSection != null ? "/section/updateSection" : "/section/addSection";
 
         btnSubmit.setDisable(true);
-        NetworkUtils.post(endpoint, json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.postWithQueryParams(endpoint, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

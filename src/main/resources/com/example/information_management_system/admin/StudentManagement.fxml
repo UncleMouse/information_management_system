@@ -47,7 +47,7 @@
     <!-- Student Table -->
     <TableView fx:id="studentTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colId" text="ID" prefWidth="50" />
+            <TableColumn fx:id="colId" text="序号" prefWidth="50" />
             <TableColumn fx:id="colSduid" text="学号" prefWidth="120" />
             <TableColumn fx:id="colName" text="姓名" prefWidth="100" />
             <TableColumn fx:id="colGender" text="性别" prefWidth="60" />

@@ -3,7 +3,6 @@ package com.example.information_management_system.controller.admin;
 import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
-import com.example.information_management_system.util.StringUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -14,12 +13,21 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AddNewAnnouncementController {
+
+    private static final Map<String, String> VISIBILITY_MAP = new HashMap<>();
+    static {
+        VISIBILITY_MAP.put("全部可见", "1");
+        VISIBILITY_MAP.put("学生可见", "2");
+        VISIBILITY_MAP.put("教师可见", "1");
+        VISIBILITY_MAP.put("管理员可见", "1");
+    }
 
     private final Gson gson = new Gson();
 
@@ -31,6 +39,7 @@ public class AddNewAnnouncementController {
     @FXML private TableColumn<NoticeItem, String> colPublishTime;
     @FXML private TableColumn<NoticeItem, String> colScope;
     @FXML private TableColumn<NoticeItem, String> colStatus;
+    @FXML private TableColumn<NoticeItem, Void> colAction;
     @FXML private TextField searchField;
     @FXML private Button btnSearch;
     @FXML private Button btnNewNotice;
@@ -51,20 +60,61 @@ public class AddNewAnnouncementController {
     @FXML
     public void initialize() {
         noticeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] noticeRatios = {0.5, 2.8, 1.2, 1.6, 1.0, 0.8};
-        final double noticeTotalRatio = java.util.Arrays.stream(noticeRatios).sum();
-        noticeTable.widthProperty().addListener((obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < noticeRatios.length && i < noticeTable.getColumns().size(); i++)
-                noticeTable.getColumns().get(i).setPrefWidth(w * noticeRatios[i] / noticeTotalRatio);
-        });
-        // 列表初始化
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        // 数据绑定
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colCreator.setCellValueFactory(new PropertyValueFactory<>("creatorName"));
         colPublishTime.setCellValueFactory(new PropertyValueFactory<>("publishTime"));
         colScope.setCellValueFactory(new PropertyValueFactory<>("visibleScope"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        // 样式 + 格式化
+        colId.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+                setStyle("-fx-alignment: CENTER;");
+            }
+        });
+        colTitle.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty || item == null ? null : item); setStyle("-fx-alignment: CENTER-LEFT;"); }
+        });
+        colCreator.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty || item == null ? null : item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colPublishTime.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty || item == null ? null : formatTime(item)); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colScope.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setText(null); }
+                else { setText(mapScope(item)); setStyle("-fx-alignment: CENTER;"); }
+            }
+        });
+        colStatus.setCellFactory(col -> new TableCell<NoticeItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) { setText(null); }
+                else { setText(mapStatus(item)); setStyle("-fx-alignment: CENTER;"); }
+            }
+        });
+        // 操作列
+        colAction.setCellFactory(col -> new TableCell<NoticeItem, Void>() {
+            private final Button viewBtn = new Button("查看");
+            {
+                viewBtn.setStyle("-fx-background-color: #4f6ef7; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 6; -fx-cursor: hand;");
+                viewBtn.setOnAction(e -> {
+                    NoticeItem item = getTableView().getItems().get(getIndex());
+                    viewNotice(item);
+                });
+            }
+            @Override protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) { setGraphic(null); return; }
+                HBox hbox = new HBox(viewBtn);
+                hbox.setStyle("-fx-alignment: CENTER;");
+                setGraphic(hbox);
+            }
+        });
         noticeTable.setItems(noticeList);
 
         btnSearch.setOnAction(e -> searchNotices());
@@ -84,14 +134,21 @@ public class AddNewAnnouncementController {
     }
 
     private void loadNotices() {
-        NetworkUtils.get("/notice/getAdminNoticeList", new NetworkUtils.Callback<String>() {
+        Map<String, String> params = new HashMap<>();
+        params.put("Status", "1");
+
+        NetworkUtils.get("/notice/getAdminNoticeList", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray records = res.get("data").isJsonArray() ? res.getAsJsonArray("data")
-                                : res.getAsJsonObject("data").getAsJsonArray("records");
+                        JsonArray records = null;
+                        if (res.get("data").isJsonArray()) {
+                            records = res.getAsJsonArray("data");
+                        } else if (res.getAsJsonObject("data").has("records")) {
+                            records = res.getAsJsonObject("data").getAsJsonArray("records");
+                        }
                         ObservableList<NoticeItem> items = FXCollections.observableArrayList();
                         if (records != null) {
                             for (int i = 0; i < records.size(); i++) {
@@ -99,6 +156,7 @@ public class AddNewAnnouncementController {
                                 NoticeItem item = new NoticeItem();
                                 item.setId(safeString(obj, "id"));
                                 item.setTitle(safeString(obj, "title"));
+                                item.setContent(safeString(obj, "content"));
                                 item.setCreatorName(safeString(obj, "creatorName"));
                                 item.setPublishTime(safeString(obj, "publishTime"));
                                 item.setVisibleScope(safeString(obj, "visibleScope"));
@@ -107,16 +165,18 @@ public class AddNewAnnouncementController {
                             }
                         }
                         Platform.runLater(() -> noticeList.setAll(items));
+                    } else {
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "加载失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误")));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage()));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("错误", "数据加载失败"));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage()));
             }
         });
     }
@@ -129,6 +189,7 @@ public class AddNewAnnouncementController {
         }
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
+        params.put("Status", "1");
         NetworkUtils.get("/notice/getAdminNoticeList", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -190,7 +251,7 @@ public class AddNewAnnouncementController {
         String content = contentArea.getText().trim();
         String visibility = visibilityCombo.getValue();
 
-        if (StringUtil.isEmpty(title) || StringUtil.isEmpty(content)) {
+        if (title == null || title.isEmpty() || content == null || content.isEmpty()) {
             ShowMessage.showWarningMessage("提示", "标题和内容不能为空");
             return;
         }
@@ -199,11 +260,13 @@ public class AddNewAnnouncementController {
         params.put("title", title);
         params.put("content", content);
         params.put("creatorName", UserSession.getInstance().getUsername());
-        if (visibility != null) params.put("visibleScope", visibility);
+        if (visibility != null) {
+            params.put("visibleScope", VISIBILITY_MAP.getOrDefault(visibility, "1"));
+        }
 
         btnSubmit.setDisable(true);
 
-        NetworkUtils.get("/notice/set", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.postWithQueryParams("/notice/set", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -222,7 +285,7 @@ public class AddNewAnnouncementController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -231,7 +294,7 @@ public class AddNewAnnouncementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                     btnSubmit.setDisable(false);
                 });
             }
@@ -242,9 +305,42 @@ public class AddNewAnnouncementController {
         return obj.has(key) && !obj.get(key).isJsonNull() ? obj.get(key).getAsString() : "";
     }
 
+    /** 将 ISO 8601 时间格式转为可读格式: 2026-05-28T23:24:01 → 2026-05-28 23:24:01 */
+    private String formatTime(String time) {
+        if (time == null || time.isEmpty()) return "";
+        return time.replace("T", " ");
+    }
+
+    private String mapScope(String val) {
+        if (val == null) return "";
+        switch (val) {
+            case "2": return "学生可见";
+            case "1": return "全部可见";
+            default: return val;
+        }
+    }
+
+    private String mapStatus(String val) {
+        if (val == null) return "";
+        switch (val) {
+            case "1": return "已发布";
+            case "0": return "已关闭";
+            default: return val;
+        }
+    }
+
+    private void viewNotice(NoticeItem item) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("查看公告");
+        alert.setHeaderText(item.getTitle());
+        alert.setContentText(item.getContent());
+        alert.showAndWait();
+    }
+
     public static class NoticeItem {
         private String id;
         private String title;
+        private String content;
         private String creatorName;
         private String publishTime;
         private String visibleScope;
@@ -254,6 +350,8 @@ public class AddNewAnnouncementController {
         public void setId(String id) { this.id = id; }
         public String getTitle() { return title; }
         public void setTitle(String title) { this.title = title; }
+        public String getContent() { return content; }
+        public void setContent(String content) { this.content = content; }
         public String getCreatorName() { return creatorName; }
         public void setCreatorName(String creatorName) { this.creatorName = creatorName; }
         public String getPublishTime() { return publishTime; }

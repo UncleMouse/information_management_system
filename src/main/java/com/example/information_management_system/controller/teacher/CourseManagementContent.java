@@ -42,13 +42,6 @@ public class CourseManagementContent {
     @FXML
     public void initialize() {
         courseTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] courseRatios = {1.8, 1.2, 0.8, 1.2, 1.0, 1.2};
-        final double courseTotalRatio = java.util.Arrays.stream(courseRatios).sum();
-        courseTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < courseRatios.length && i < courseTable.getColumns().size(); i++)
-                courseTable.getColumns().get(i).setPrefWidth(w * courseRatios[i] / courseTotalRatio);
-        });
         setupTableColumns();
         courseTable.setItems(courseList);
 

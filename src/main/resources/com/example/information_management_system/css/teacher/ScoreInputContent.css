@@ -118,7 +118,8 @@
 }
 
 .data-table .table-cell {
-    -fx-padding: 10 16;
+    -fx-padding: 0 16;
+    -fx-alignment: CENTER;
     -fx-font-size: 13px;
     -fx-text-fill: #1e293b;
     -fx-border-color: transparent;

@@ -3,7 +3,6 @@ package com.example.information_management_system.controller.admin;
 import com.example.information_management_system.model.TeacherInfo;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
-import com.example.information_management_system.util.StringUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
@@ -50,26 +49,34 @@ public class AddNewTeacherController {
         String college = collegeField.getText().trim();
         String contact = contactField.getText().trim();
 
-        if (StringUtil.isEmpty(sduid) || StringUtil.isEmpty(name)) {
+        if (sduid.isEmpty() || name.isEmpty()) {
             ShowMessage.showWarningMessage("提示", "工号和姓名不能为空");
             return;
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("sduid", sduid);
-        body.put("name", name);
-        body.put("college", college);
-        body.put("contactInfo", contact);
+        // 发送所有后端需要的字段（参考示例项目）
+        Map<String, String> params = new HashMap<>();
+        params.put("SDUId", sduid);
+        params.put("username", name);
+        params.put("college", college.isEmpty() ? "软件学院" : college);
+        params.put("email", contact.isEmpty() ? sduid + "@sdu.edu.cn" : contact);
+        params.put("phone", contact.isEmpty() ? "" : contact);
+        params.put("password", "123456");
+        params.put("permission", "1");  // 教师权限
+        params.put("major", "0");        // 教师不需要专业，填默认值
+        params.put("sex", "男");
+        params.put("ethnic", "汉族");
+        params.put("nation", "中国");
+        params.put("PoliticsStatus", "群众");
 
         if (editingTeacher != null) {
-            body.put("id", editingTeacher.getId());
+            params.put("id", String.valueOf(editingTeacher.getId()));
         }
 
-        String json = gson.toJson(body);
         String endpoint = editingTeacher != null ? "/admin/updateUser" : "/admin/addUser";
 
         btnSubmit.setDisable(true);
-        NetworkUtils.post(endpoint, json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.postWithQueryParams(endpoint, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -89,7 +96,7 @@ public class AddNewTeacherController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -98,7 +105,7 @@ public class AddNewTeacherController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                     btnSubmit.setDisable(false);
                 });
             }

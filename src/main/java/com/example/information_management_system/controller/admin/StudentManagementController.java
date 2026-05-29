@@ -8,7 +8,6 @@ import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +23,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class StudentManagementController {
@@ -54,13 +52,6 @@ public class StudentManagementController {
     @FXML
     public void initialize() {
         studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] studentRatios = {0.5, 1.2, 1.0, 0.6, 1.5, 1.2, 0.8};
-        final double studentTotalRatio = java.util.Arrays.stream(studentRatios).sum();
-        studentTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < studentRatios.length && i < studentTable.getColumns().size(); i++)
-                studentTable.getColumns().get(i).setPrefWidth(w * studentRatios[i] / studentTotalRatio);
-        });
         setupTableColumns();
         studentTable.setItems(studentList);
 
@@ -91,7 +82,6 @@ public class StudentManagementController {
     }
 
     private void setupTableColumns() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colSduid.setCellValueFactory(new PropertyValueFactory<>("sduid"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
@@ -99,23 +89,37 @@ public class StudentManagementController {
         colClassName.setCellValueFactory(new PropertyValueFactory<>("className"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // 状态列样式
+        // 序号列
+        colId.setCellFactory(col -> new TableCell<Student, Integer>() {
+            @Override protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+                setStyle("-fx-alignment: CENTER;");
+            }
+        });
+        // 居中对齐列
+        colSduid.setCellFactory(col -> new TableCell<Student, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colGender.setCellFactory(col -> new TableCell<Student, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colClassName.setCellFactory(col -> new TableCell<Student, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        // 状态列样式 + 居中
         colStatus.setCellFactory(column -> new TableCell<Student, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
+                if (empty || item == null) { setText(null); setStyle(""); return; }
+                setText(item);
+                if ("在读".equals(item) || "正常".equals(item) || "ACTIVE".equalsIgnoreCase(item)) {
+                    setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER;");
+                } else if ("休学".equals(item) || "退学".equals(item) || "INACTIVE".equalsIgnoreCase(item)) {
+                    setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-alignment: CENTER;");
                 } else {
-                    setText(item);
-                    if ("在读".equals(item) || "正常".equals(item) || "ACTIVE".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;");
-                    } else if ("休学".equals(item) || "退学".equals(item) || "INACTIVE".equalsIgnoreCase(item)) {
-                        setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("-fx-text-fill: #64748b;");
-                    }
+                    setStyle("-fx-text-fill: #64748b; -fx-alignment: CENTER;");
                 }
             }
         });
@@ -123,15 +127,30 @@ public class StudentManagementController {
 
     private void loadStudents() {
         statusLabel.setText("加载中…");
-        NetworkUtils.get("/admin/student/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> params = new HashMap<>();
+        params.put("pageNum", "1");
+        params.put("pageSize", "100");
+
+        NetworkUtils.get("/admin/student/list", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Student>>() {}.getType();
-                        List<Student> list = gson.fromJson(arr, listType);
+                        List<Student> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Student s = new Student();
+                            s.setId(JsonUtil.safeGetInt(obj, "id"));
+                            s.setSduid(JsonUtil.safeGetString(obj, "sduid"));
+                            s.setName(JsonUtil.safeGetString(obj, "username"));
+                            s.setGender(JsonUtil.safeGetString(obj, "sex"));
+                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setClassName(JsonUtil.safeGetString(obj, "section"));
+                            s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            list.add(s);
+                        }
                         Platform.runLater(() -> {
                             studentList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
@@ -139,13 +158,14 @@ public class StudentManagementController {
                     } else {
                         Platform.runLater(() -> {
                             statusLabel.setText("数据加载失败");
-                            ShowMessage.showErrorMessage("错误", "数据加载失败");
+                            ShowMessage.showErrorMessage("错误", "数据加载失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
                         });
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     Platform.runLater(() -> {
-                        statusLabel.setText("数据解析失败，请稍后重试");
-                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
+                        statusLabel.setText("数据解析失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
                     });
                 }
             }
@@ -153,8 +173,8 @@ public class StudentManagementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败，请检查连接");
-                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
+                    statusLabel.setText("网络请求失败");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                 });
             }
         });
@@ -169,6 +189,10 @@ public class StudentManagementController {
         statusLabel.setText("加载中…");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
+        params.put("permission", "2");
+        params.put("pageNum", "1");
+        params.put("pageSize", "100");
+
         NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -176,25 +200,42 @@ public class StudentManagementController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Student>>() {}.getType();
-                        List<Student> list = gson.fromJson(arr, listType);
+                        List<Student> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Student s = new Student();
+                            s.setId(JsonUtil.safeGetInt(obj, "id"));
+                            s.setSduid(JsonUtil.safeGetString(obj, "sduid"));
+                            s.setName(JsonUtil.safeGetString(obj, "username"));
+                            s.setGender(JsonUtil.safeGetString(obj, "sex"));
+                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setClassName(JsonUtil.safeGetString(obj, "section"));
+                            s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            list.add(s);
+                        }
                         Platform.runLater(() -> {
                             studentList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                        Platform.runLater(() -> {
+                            statusLabel.setText("搜索失败");
+                            ShowMessage.showErrorMessage("错误", "搜索失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                        });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                    Platform.runLater(() -> {
+                        statusLabel.setText("数据解析失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
+                    });
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("数据加载失败");
-                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
+                    statusLabel.setText("网络请求失败");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                 });
             }
         });
@@ -315,7 +356,7 @@ public class StudentManagementController {
             statusLabel.setText("加载中…");
             Map<String, String> params = new HashMap<>();
             params.put("userId", String.valueOf(selected.getId()));
-            NetworkUtils.post("/admin/deleteUser", params, "{}", new NetworkUtils.Callback<String>() {
+            NetworkUtils.postWithQueryParams("/admin/deleteUser", params, new NetworkUtils.Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     try {

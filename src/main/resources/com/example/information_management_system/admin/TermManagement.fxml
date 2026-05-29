@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.TermManagementController"
+      spacing="20" style="-fx-background-color: #f8fafc; -fx-padding: 24;">
+    <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
+
+    <!-- 页面标题 -->
+    <Label text="学期管理" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+
+    <!-- 添加学期区域 -->
+    <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+        <Label text="添加新学期" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="newTermField" promptText="格式: 2023-2024-1" prefWidth="200"
+                       style="-fx-background-radius: 4; -fx-border-radius: 4;"/>
+            <Button fx:id="btnAddTerm" text="添加学期" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 8 16;"/>
+        </HBox>
+        <Label text="格式说明: 年份-年份-学期(1为上学期, 2为下学期)" style="-fx-font-size: 12; -fx-text-fill: #64748b;"/>
+    </VBox>
+
+    <!-- 学期列表 -->
+    <VBox spacing="12" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label text="学期列表" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" text="" style="-fx-font-size: 12; -fx-text-fill: #64748b;"/>
+        </HBox>
+
+        <TableView fx:id="termTable" VBox.vgrow="ALWAYS" style="-fx-background-radius: 4;">
+            <columns>
+                <TableColumn fx:id="colTerm" text="学期" prefWidth="150"/>
+                <TableColumn fx:id="colSelectionStatus" text="选课状态" prefWidth="120"/>
+                <TableColumn fx:id="colCurrentStatus" text="当前状态" prefWidth="120"/>
+                <TableColumn fx:id="colActions" text="操作" prefWidth="200"/>
+            </columns>
+        </TableView>
+    </VBox>
+</VBox>

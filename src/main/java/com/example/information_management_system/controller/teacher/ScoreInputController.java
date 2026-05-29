@@ -51,13 +51,6 @@ public class ScoreInputController {
     @FXML
     public void initialize() {
         scoreTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] scoreRatios = {1.4, 1.0, 1.2, 1.0, 1.0, 1.0, 0.8, 1.5};
-        final double scoreTotalRatio = java.util.Arrays.stream(scoreRatios).sum();
-        scoreTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < scoreRatios.length && i < scoreTable.getColumns().size(); i++)
-                scoreTable.getColumns().get(i).setPrefWidth(w * scoreRatios[i] / scoreTotalRatio);
-        });
         setupTableColumns();
         scoreTable.setItems(scoreList);
         scoreTable.setEditable(true);

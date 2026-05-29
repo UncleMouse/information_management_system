@@ -167,7 +167,35 @@ public class NetworkUtils {
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", DEFAULT_CONTENT_TYPE);
         headers.put("Authorization", "Bearer " + UserSession.getInstance().getToken());
-        return requestAsync(appendQueryParams(urlString, params), HttpMethod.POST, headers, body);
+        String fullUrl = appendQueryParams(urlString, params);
+        return requestAsync(fullUrl, HttpMethod.POST, headers, body != null ? body : "");
+    }
+
+    // --- Form提交 (application/x-www-form-urlencoded) ---
+    public static void postForm(String urlString, Map<String, String> params, Callback<String> callback) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("Authorization", "Bearer " + UserSession.getInstance().getToken());
+        String body = params.entrySet().stream()
+                .map(e -> {
+                    try {
+                        return URLEncoder.encode(e.getKey(), "UTF-8") + "=" + URLEncoder.encode(e.getValue(), "UTF-8");
+                    } catch (Exception ex) {
+                        return e.getKey() + "=" + e.getValue();
+                    }
+                })
+                .reduce((a, b) -> a + "&" + b).orElse("");
+        request(urlString, HttpMethod.POST, headers, body, callback);
+    }
+
+    // --- 发送参数作为查询参数 (params in URL, body=null) ---
+    public static void postWithQueryParams(String urlString, Map<String, String> params, Callback<String> callback) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/x-www-form-urlencoded");
+        headers.put("Authorization", "Bearer " + UserSession.getInstance().getToken());
+        String fullUrl = appendQueryParams(urlString, params);
+        System.out.println("POST URL: " + fullUrl);
+        request(fullUrl, HttpMethod.POST, headers, null, callback);
     }
 
     // --- PUT 请求 ---
@@ -275,6 +303,7 @@ public class NetworkUtils {
         if (!urlString.contains("?")) sb.append("?");
         else if (!urlString.endsWith("&")) sb.append("&");
         String query = params.entrySet().stream()
+                .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
                 .map(e -> { try { return URLEncoder.encode(e.getKey(), "UTF-8") + "=" + URLEncoder.encode(e.getValue(), "UTF-8"); } catch (Exception ex) { return e.getKey() + "=" + e.getValue(); } })
                 .reduce((a, b) -> a + "&" + b).orElse("");
         return sb.append(query).toString();
@@ -294,11 +323,16 @@ public class NetworkUtils {
                 for (Map.Entry<String, String> e : headers.entrySet())
                     connection.setRequestProperty(e.getKey(), e.getValue());
             }
-            if (body != null && !body.isEmpty() && (method == HttpMethod.POST || method == HttpMethod.PUT)) {
+            // POST/PUT must setDoOutput(true) for HttpURLConnection to work correctly
+            if (method == HttpMethod.POST || method == HttpMethod.PUT) {
                 connection.setDoOutput(true);
-                try (OutputStream os = connection.getOutputStream()) {
+                connection.setRequestProperty("Content-Length", "0");
+                if (body != null && !body.isEmpty()) {
                     byte[] input = body.getBytes(StandardCharsets.UTF_8);
-                    os.write(input, 0, input.length);
+                    connection.setRequestProperty("Content-Length", String.valueOf(input.length));
+                    try (OutputStream os = connection.getOutputStream()) {
+                        os.write(input, 0, input.length);
+                    }
                 }
             }
             int code = connection.getResponseCode();

@@ -47,13 +47,6 @@ public class StudentListViewController {
     @FXML
     public void initialize() {
         studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] studentRatios = {1.3, 1.0, 0.6, 1.2, 1.2, 0.8, 1.2, 0.8};
-        final double studentTotalRatio = java.util.Arrays.stream(studentRatios).sum();
-        studentTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < studentRatios.length && i < studentTable.getColumns().size(); i++)
-                studentTable.getColumns().get(i).setPrefWidth(w * studentRatios[i] / studentTotalRatio);
-        });
         setupTableColumns();
         studentTable.setItems(studentList);
 

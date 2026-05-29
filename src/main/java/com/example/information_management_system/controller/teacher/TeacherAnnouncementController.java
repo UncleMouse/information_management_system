@@ -30,27 +30,33 @@ public class TeacherAnnouncementController {
 
     @FXML
     public void initialize() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colCreator.setCellValueFactory(new PropertyValueFactory<>("creatorName"));
         colTime.setCellValueFactory(new PropertyValueFactory<>("publishTime"));
 
+        colId.setCellFactory(col -> new TableCell<AnnouncementItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : String.valueOf(getIndex() + 1));
+                setStyle("-fx-alignment: CENTER;");
+            }
+        });
+        colCreator.setCellFactory(col -> new TableCell<AnnouncementItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colTime.setCellFactory(col -> new TableCell<AnnouncementItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:fmt(item)); setStyle("-fx-alignment: CENTER;"); }
+        });
         colAction.setCellFactory(col -> new TableCell<>() {
             private final Button viewBtn = new Button("查看");
             {
-                viewBtn.getStyleClass().add("btn-primary");
-                viewBtn.setStyle("-fx-padding: 1 18; -fx-translate-y: -2; -fx-translate-x: 4;");
+                viewBtn.setStyle("-fx-background-color: #4f6ef7; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 6; -fx-cursor: hand;");
                 viewBtn.setOnAction(e -> {
                     AnnouncementItem item = getTableView().getItems().get(getIndex());
-                    ShowMessage.showInfoMessage(item.getTitle(),
-                            item.getContent() != null ? item.getContent() : "暂无内容");
+                    ShowMessage.showInfoMessage(item.getTitle(), item.getContent() != null ? item.getContent() : "暂无内容");
                 });
             }
-            @Override
-            protected void updateItem(Void v, boolean empty) {
-                super.updateItem(v, empty);
-                setGraphic(empty ? null : viewBtn);
-            }
+            @Override protected void updateItem(Void v, boolean empty) { super.updateItem(v, empty); setGraphic(empty ? null : viewBtn); setStyle("-fx-alignment: CENTER;"); }
         });
 
         announcementTable.setItems(items);
@@ -58,6 +64,8 @@ public class TeacherAnnouncementController {
         searchField.setOnAction(e -> loadAnnouncements(searchField.getText().trim()));
         loadAnnouncements("");
     }
+
+    private String fmt(String t) { return t != null ? t.replace("T", " ") : ""; }
 
     private void loadAnnouncements(String keyword) {
         NetworkUtils.get("/notice/getTeacherNoticeList", new NetworkUtils.Callback<String>() {
@@ -83,7 +91,7 @@ public class TeacherAnnouncementController {
                         Platform.runLater(() -> items.setAll(list));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败"));
                 }
             }
             @Override

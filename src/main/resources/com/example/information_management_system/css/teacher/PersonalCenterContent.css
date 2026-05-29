@@ -53,12 +53,11 @@
 .btn-primary {
     -fx-background-color: #4f6ef7;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-padding: 10 20;
     -fx-background-radius: 8;
     -fx-cursor: hand;
-    -fx-border-color: transparent;
 }
 
 .btn-primary:hover {

@@ -115,11 +115,44 @@ public class LoginController {
     }
 
     private void fetchInitialData() {
+        fetchUserInfo();
         fetchSemesters();
         fetchCurrentTerm();
         if (UserSession.getInstance().getIdentity() != 2) {
             fetchClassRooms();
         }
+    }
+
+    private void fetchUserInfo() {
+        NetworkUtils.post("/user/getInfo", "", new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonObject data = res.getAsJsonObject("data");
+                        UserSession session = UserSession.getInstance();
+                        session.setId(data.has("id") ? data.get("id").getAsInt() : null);
+                        session.setSduid(data.has("sduid") ? data.get("sduid").getAsString() : null);
+                        session.setPhone(data.has("phone") ? data.get("phone").getAsString() : null);
+                        session.setEmail(data.has("email") ? data.get("email").getAsString() : null);
+                        session.setSex(data.has("sex") ? data.get("sex").getAsString() : null);
+                        session.setCollege(data.has("college") ? data.get("college").getAsString() : null);
+                        session.setMajor(data.has("major") ? data.get("major").getAsString() : null);
+                        session.setNation(data.has("nation") ? data.get("nation").getAsString() : null);
+                        session.setEthnic(data.has("ethnic") ? data.get("ethnic").getAsString() : null);
+                        session.setPoliticsStatus(data.has("politicsStatus") ? data.get("politicsStatus").getAsString() : null);
+                    }
+                } catch (Exception e) {
+                    System.err.println("获取用户信息失败: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                System.err.println("获取用户信息失败: " + e.getMessage());
+            }
+        });
     }
 
     private void fetchSemesters() {

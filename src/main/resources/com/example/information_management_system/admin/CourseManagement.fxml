@@ -46,7 +46,7 @@
     <!-- Course Table -->
     <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colCode" text="课程代码" prefWidth="100" />
+            <TableColumn fx:id="colCode" text="序号" prefWidth="50" />
             <TableColumn fx:id="colName" text="课程名称" prefWidth="180" />
             <TableColumn fx:id="colTeacher" text="教师" prefWidth="100" />
             <TableColumn fx:id="colCredit" text="学分" prefWidth="60" />

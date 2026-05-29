@@ -52,21 +52,7 @@ public class CourseSelectionContentController {
     @FXML
     public void initialize() {
         availableTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] availRatios = {2.0, 1.2, 0.7, 1.0, 0.8, 0.7, 1.8, 0.8};
-        final double availTotalRatio = java.util.Arrays.stream(availRatios).sum();
-        availableTable.widthProperty().addListener((obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < availRatios.length && i < availableTable.getColumns().size(); i++)
-                availableTable.getColumns().get(i).setPrefWidth(w * availRatios[i] / availTotalRatio);
-        });
         selectedTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] selRatios = {2.5, 1.2, 0.7, 1.0, 2.5, 0.8};
-        final double selTotalRatio = java.util.Arrays.stream(selRatios).sum();
-        selectedTable.widthProperty().addListener((obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < selRatios.length && i < selectedTable.getColumns().size(); i++)
-                selectedTable.getColumns().get(i).setPrefWidth(w * selRatios[i] / selTotalRatio);
-        });
         setupAvailableTable();
         setupSelectedTable();
 

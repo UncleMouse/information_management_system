@@ -3,7 +3,6 @@ package com.example.information_management_system.controller.admin;
 import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
-import com.example.information_management_system.util.StringUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
@@ -15,6 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AddNewStudentController {
+
+    private static final Map<String, String> MAJOR_ENUM_MAP = new HashMap<>();
+    static {
+        MAJOR_ENUM_MAP.put("软件工程", "MAJOR_0");
+        MAJOR_ENUM_MAP.put("数字媒体技术", "MAJOR_1");
+        MAJOR_ENUM_MAP.put("数据科学与大数据技术", "MAJOR_2");
+        MAJOR_ENUM_MAP.put("人工智能", "MAJOR_3");
+    }
 
     private final Gson gson = new Gson();
     private Student editingStudent;
@@ -69,30 +76,39 @@ public class AddNewStudentController {
         String grade = gradeField.getText().trim();
         String className = classCombo.getValue();
 
-        if (StringUtil.isEmpty(sduid) || StringUtil.isEmpty(name)) {
+        if (sduid == null || sduid.isEmpty() || name == null || name.isEmpty()) {
             ShowMessage.showWarningMessage("提示", "学号和姓名不能为空");
             return;
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("sduid", sduid);
-        body.put("name", name);
-        body.put("gender", gender);
-        body.put("major", major);
-        body.put("grade", grade);
+        Map<String, String> params = new HashMap<>();
+        params.put("SDUId", sduid);
+        params.put("username", name);
+        params.put("sex", gender != null ? gender : "男");
+        // major 必须填有效的枚举值，null 会报400
+        String majorValue = MAJOR_ENUM_MAP.getOrDefault(major, "MAJOR_0");
+        params.put("major", majorValue);
+        params.put("password", "123456");
+        if (grade != null && !grade.isEmpty()) params.put("grade", grade);
+        params.put("permission", "2");
+        params.put("college", "软件学院");
+        params.put("ethnic", "汉族");
+        params.put("nation", "中国");
+        params.put("PoliticsStatus", "群众");
+        params.put("email", sduid + "@sdu.edu.cn");
+        params.put("phone", "");
         if (className != null && !className.isEmpty()) {
-            body.put("className", className);
+            params.put("section", className);
         }
 
         if (editingStudent != null) {
-            body.put("id", editingStudent.getId());
+            params.put("id", String.valueOf(editingStudent.getId()));
         }
 
-        String json = gson.toJson(body);
         String endpoint = editingStudent != null ? "/admin/updateUser" : "/admin/addUser";
 
         btnSubmit.setDisable(true);
-        NetworkUtils.post(endpoint, json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.postWithQueryParams(endpoint, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -115,7 +131,7 @@ public class AddNewStudentController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -124,7 +140,7 @@ public class AddNewStudentController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
                     btnSubmit.setDisable(false);
                 });
             }

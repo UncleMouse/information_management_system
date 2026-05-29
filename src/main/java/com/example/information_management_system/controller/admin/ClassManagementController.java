@@ -8,7 +8,6 @@ import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +21,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.*;
 
 public class ClassManagementController {
@@ -49,15 +47,21 @@ public class ClassManagementController {
     @FXML
     public void initialize() {
         classTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        final double[] classRatios = {0.5, 2.0, 1.8, 1.0, 0.8};
-        final double classTotalRatio = java.util.Arrays.stream(classRatios).sum();
-        classTable.widthProperty().addListener((_obs, oldW, newW) -> {
-            double w = newW.doubleValue() - 2;
-            for (int i = 0; i < classRatios.length && i < classTable.getColumns().size(); i++)
-                classTable.getColumns().get(i).setPrefWidth(w * classRatios[i] / classTotalRatio);
-        });
-        setupTableColumns();
+        colClassName.setCellValueFactory(new PropertyValueFactory<>("className"));
+        colMajor.setCellValueFactory(new PropertyValueFactory<>("major"));
+        colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
+        colNumber.setCellValueFactory(new PropertyValueFactory<>("number"));
         classTable.setItems(classList);
+
+        colId.setCellFactory(col -> new TableCell<Section, Integer>() {
+            @Override protected void updateItem(Integer item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colGrade.setCellFactory(col -> new TableCell<Section, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colNumber.setCellFactory(col -> new TableCell<Section, Integer>() {
+            @Override protected void updateItem(Integer item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:String.valueOf(item)); setStyle("-fx-alignment: CENTER;"); }
+        });
 
         btnSearch.setOnAction(e -> searchClasses());
         btnAddClass.setOnAction(e -> openAddClassDialog());
@@ -83,25 +87,30 @@ public class ClassManagementController {
         loadClasses();
     }
 
-    private void setupTableColumns() {
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colClassName.setCellValueFactory(new PropertyValueFactory<>("className"));
-        colMajor.setCellValueFactory(new PropertyValueFactory<>("major"));
-        colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        colNumber.setCellValueFactory(new PropertyValueFactory<>("number"));
-    }
-
     private void loadClasses() {
-        statusLabel.setText("加载中…");
-        NetworkUtils.get("/section/getSectionList", new NetworkUtils.Callback<String>() {
+        statusLabel.setText("加载中...");
+        Map<String, String> params = new HashMap<>();
+        params.put("page", "1");
+        params.put("size", "100");
+
+        NetworkUtils.get("/section/getSectionListAll", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Section>>() {}.getType();
-                        List<Section> list = gson.fromJson(arr, listType);
+                        List<Section> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Section s = new Section();
+                            s.setId(JsonUtil.safeGetInt(obj, "id"));
+                            s.setClassName(JsonUtil.safeGetString(obj, "className"));
+                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setGrade(JsonUtil.safeGetString(obj, "grade"));
+                            s.setNumber(JsonUtil.safeGetInt(obj, "number"));
+                            list.add(s);
+                        }
                         Platform.runLater(() -> {
                             classList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
@@ -110,51 +119,56 @@ public class ClassManagementController {
                         Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据解析失败，请稍后重试"));
+                    Platform.runLater(() -> statusLabel.setText("数据解析失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败，请检查连接");
-                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
-                });
+                Platform.runLater(() -> statusLabel.setText("网络请求失败"));
             }
         });
     }
 
     private void searchClasses() {
         String keyword = searchField.getText().trim();
-        if (keyword.isEmpty()) {
-            loadClasses();
-            return;
-        }
-        statusLabel.setText("加载中…");
+        if (keyword.isEmpty()) { loadClasses(); return; }
+        statusLabel.setText("搜索中...");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
-        NetworkUtils.get("/section/search", params, new NetworkUtils.Callback<String>() {
+        params.put("page", "1");
+        params.put("size", "100");
+
+        NetworkUtils.get("/section/getSectionListAll", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        Type listType = new TypeToken<List<Section>>() {}.getType();
-                        List<Section> list = gson.fromJson(arr, listType);
+                        List<Section> list = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            Section s = new Section();
+                            s.setId(JsonUtil.safeGetInt(obj, "id"));
+                            s.setClassName(JsonUtil.safeGetString(obj, "className"));
+                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setGrade(JsonUtil.safeGetString(obj, "grade"));
+                            s.setNumber(JsonUtil.safeGetInt(obj, "number"));
+                            list.add(s);
+                        }
                         Platform.runLater(() -> {
                             classList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据解析失败"));
                 }
             }
-
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                Platform.runLater(() -> statusLabel.setText("网络请求失败"));
             }
         });
     }
@@ -172,16 +186,13 @@ public class ClassManagementController {
             stage.showAndWait();
             loadClasses();
         } catch (IOException e) {
-            ShowMessage.showErrorMessage("错误", "无法打开添加班级窗口: " + e.getMessage());
+            ShowMessage.showErrorMessage("错误", "无法打开添加班级窗口");
         }
     }
 
     private void handleEditClass() {
         Section selected = classTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            ShowMessage.showWarningMessage("提示", "请先选择一个班级");
-            return;
-        }
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一个班级"); return; }
         try {
             String path = "/com/example/information_management_system/admin/AddNewClass.fxml";
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
@@ -191,67 +202,95 @@ public class ClassManagementController {
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setResizable(false);
-
             AddNewClassController controller = loader.getController();
             controller.setEditMode(selected);
-
             stage.showAndWait();
             loadClasses();
         } catch (IOException e) {
-            ShowMessage.showErrorMessage("错误", "无法打开编辑窗口: " + e.getMessage());
+            ShowMessage.showErrorMessage("错误", "无法打开编辑窗口");
         }
     }
 
     private void handleDeleteClass() {
         Section selected = classTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            ShowMessage.showWarningMessage("提示", "请先选择一个班级");
-            return;
-        }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认",
-                "确定要删除班级 " + selected.getClassName() + " 吗？该操作不可撤销。");
-        if (confirmed) {
-        statusLabel.setText("加载中…");
-            Map<String, String> params = new HashMap<>();
-            params.put("id", String.valueOf(selected.getId()));
-            NetworkUtils.post("/section/deleteSection", params, "{}", new NetworkUtils.Callback<String>() {
-                @Override
-                public void onSuccess(String result) {
-                    try {
-                        JsonObject res = gson.fromJson(result, JsonObject.class);
-                        if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            Platform.runLater(() -> {
-                                ShowMessage.showInfoMessage("成功", "已成功删除");
-                                loadClasses();
-                            });
-                        } else {
-                            Platform.runLater(() -> ShowMessage.showErrorMessage("错误",
-                                    res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试"));
-                        }
-                    } catch (Exception e) {
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析响应失败"));
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一个班级"); return; }
+        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要删除 " + selected.getClassName() + " 吗？");
+        if (!confirmed) return;
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(selected.getId()));
+        NetworkUtils.postWithQueryParams("/section/deleteSection", params, new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        Platform.runLater(() -> { ShowMessage.showInfoMessage("成功", "已删除"); loadClasses(); });
+                    } else {
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "操作失败"));
                     }
+                } catch (Exception e) {
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析失败"));
                 }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("数据加载失败");
-                        ShowMessage.showErrorMessage("错误", "操作失败，请稍后重试");
-                    });
-                }
-            });
-        }
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败"));
+            }
+        });
     }
 
     private void handleViewStudents() {
         Section selected = classTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            ShowMessage.showWarningMessage("提示", "请先选择一个班级");
-            return;
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一个班级"); return; }
+        statusLabel.setText("加载中...");
+        Map<String, String> params = new HashMap<>();
+        params.put("id", String.valueOf(selected.getId()));
+        NetworkUtils.get("/section/getSectionMember", params, new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
+                        Platform.runLater(() -> {
+                            statusLabel.setText("共 " + arr.size() + " 名学生");
+                            showStudentsDialog(selected, arr);
+                        });
+                    } else {
+                        Platform.runLater(() -> statusLabel.setText("加载失败"));
+                    }
+                } catch (Exception e) {
+                    Platform.runLater(() -> statusLabel.setText("解析失败"));
+                }
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Platform.runLater(() -> statusLabel.setText("网络请求失败"));
+            }
+        });
+    }
+
+    private void showStudentsDialog(Section section, JsonArray students) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("班级学生名单");
+        dialog.setHeaderText(section.getClassName() + " - 学生名单 (" + students.size() + "人)");
+        dialog.getDialogPane().getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
+
+        TableView<String[]> tv = new TableView<>();
+        TableColumn<String[], String> c1 = new TableColumn<>("学号");
+        c1.setCellValueFactory(p -> new javafx.beans.property.SimpleObjectProperty<>(p.getValue()[0]));
+        TableColumn<String[], String> c2 = new TableColumn<>("姓名");
+        c2.setCellValueFactory(p -> new javafx.beans.property.SimpleObjectProperty<>(p.getValue()[1]));
+        tv.getColumns().addAll(c1, c2);
+
+        ObservableList<String[]> data = FXCollections.observableArrayList();
+        for (int i = 0; i < students.size(); i++) {
+            JsonObject obj = students.get(i).getAsJsonObject();
+            data.add(new String[]{JsonUtil.safeGetString(obj, "sduid"), JsonUtil.safeGetString(obj, "username")});
         }
-        ShowMessage.showInfoMessage("提示",
-                "班级 " + selected.getClassName() + " 共有 " + selected.getNumber() + " 名学生。\n"
-                        + "详细名单功能即将上线");
+        tv.setItems(data);
+        tv.setPrefHeight(400);
+        dialog.getDialogPane().setContent(tv);
+        dialog.showAndWait();
     }
 }

@@ -46,7 +46,8 @@
     -fx-border-radius: 8;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
     -fx-table-cell-border-color: transparent;
-    -fx-fixed-cell-size: 40px;
+    -fx-table-cell-border-color: #e8ecf0;
+    -fx-fixed-cell-size: 42px;
 }
 
 .data-table .column-header-background {
@@ -68,9 +69,10 @@
 .data-table .table-cell {
     -fx-font-size: 13px;
     -fx-text-fill: #1e293b;
-    -fx-padding: 10 16;
+    -fx-padding: 0 16;
+    -fx-alignment: CENTER;
     -fx-border-color: transparent;
-    -fx-alignment: CENTER_LEFT;
+    -fx-alignment: CENTER;
 }
 
 .data-table .table-row-cell {
