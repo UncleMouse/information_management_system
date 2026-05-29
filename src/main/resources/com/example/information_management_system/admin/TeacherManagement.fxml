@@ -38,7 +38,7 @@
         <Label fx:id="statusLabel" text="" styleClass="status-label" />
     </HBox>
 
-    <TableView fx:id="teacherTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+    <TableView fx:id="teacherTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="50" />
             <TableColumn fx:id="colSduid" text="工号" prefWidth="120" />
@@ -47,6 +47,8 @@
             <TableColumn fx:id="colContact" text="联系方式" prefWidth="160" />
             <TableColumn fx:id="colStatus" text="状态" prefWidth="80" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
     </TableView>
-    <Region VBox.vgrow="ALWAYS"/>
 </VBox>

@@ -69,6 +69,7 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 0;
+    -fx-fixed-cell-size: 40px;
 }
 
 .data-table .column-header-background {

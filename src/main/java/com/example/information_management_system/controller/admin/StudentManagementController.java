@@ -3,6 +3,7 @@ package com.example.information_management_system.controller.admin;
 import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
+
 import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -52,6 +53,14 @@ public class StudentManagementController {
 
     @FXML
     public void initialize() {
+        studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] studentRatios = {0.5, 1.2, 1.0, 0.6, 1.5, 1.2, 0.8};
+        final double studentTotalRatio = java.util.Arrays.stream(studentRatios).sum();
+        studentTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < studentRatios.length && i < studentTable.getColumns().size(); i++)
+                studentTable.getColumns().get(i).setPrefWidth(w * studentRatios[i] / studentTotalRatio);
+        });
         setupTableColumns();
         studentTable.setItems(studentList);
 
@@ -113,7 +122,7 @@ public class StudentManagementController {
     }
 
     private void loadStudents() {
-        statusLabel.setText("正在加载学生数据...");
+        statusLabel.setText("加载中…");
         NetworkUtils.get("/admin/student/list", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -125,18 +134,18 @@ public class StudentManagementController {
                         List<Student> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             studentList.setAll(list);
-                            statusLabel.setText("共 " + list.size() + " 名学生");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
                         Platform.runLater(() -> {
-                            statusLabel.setText("加载失败");
-                            ShowMessage.showErrorMessage("错误", res.has("msg") ? res.get("msg").getAsString() : "获取学生列表失败");
+                            statusLabel.setText("数据加载失败");
+                            ShowMessage.showErrorMessage("错误", "数据加载失败");
                         });
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        statusLabel.setText("数据解析失败");
-                        ShowMessage.showErrorMessage("错误", "解析数据失败: " + e.getMessage());
+                        statusLabel.setText("数据解析失败，请稍后重试");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                     });
                 }
             }
@@ -144,8 +153,8 @@ public class StudentManagementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
+                    statusLabel.setText("网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                 });
             }
         });
@@ -157,7 +166,7 @@ public class StudentManagementController {
             loadStudents();
             return;
         }
-        statusLabel.setText("正在搜索...");
+        statusLabel.setText("加载中…");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
         NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
@@ -171,21 +180,21 @@ public class StudentManagementController {
                         List<Student> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             studentList.setAll(list);
-                            statusLabel.setText("搜索到 " + list.size() + " 条结果");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("搜索请求失败");
-                    ShowMessage.showErrorMessage("错误", "搜索失败: " + e.getMessage());
+                    statusLabel.setText("数据加载失败");
+                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
                 });
             }
         });
@@ -218,23 +227,23 @@ public class StudentManagementController {
                 new FileChooser.ExtensionFilter("Excel文件", "*.xlsx", "*.xls"));
         File file = fileChooser.showOpenDialog(studentTable.getScene().getWindow());
         if (file != null) {
-            statusLabel.setText("正在导入...");
+            statusLabel.setText("加载中…");
             NetworkUtils.postMultipartFileAsync("/admin/upload", file)
                     .thenAccept(result -> Platform.runLater(() -> {
                         try {
                             JsonObject res = gson.fromJson(result, JsonObject.class);
                             if (res.has("code") && res.get("code").getAsInt() == 200) {
-                                ShowMessage.showInfoMessage("导入成功", "学生数据已成功导入");
+                                ShowMessage.showInfoMessage("成功", "已成功导入");
                                 loadStudents();
                             } else {
-                                ShowMessage.showErrorMessage("导入失败", res.has("msg") ? res.get("msg").getAsString() : "未知错误");
+                                ShowMessage.showErrorMessage("错误", res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试");
                             }
                         } catch (Exception e) {
                             ShowMessage.showErrorMessage("错误", "解析响应失败");
                         }
                     }))
                     .exceptionally(ex -> {
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("导入失败", "文件上传失败: " + ex.getMessage()));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
                         return null;
                     });
         }
@@ -247,21 +256,21 @@ public class StudentManagementController {
         fileChooser.setInitialFileName("学生信息.xlsx");
         File file = fileChooser.showSaveDialog(studentTable.getScene().getWindow());
         if (file != null) {
-            statusLabel.setText("正在导出...");
+            statusLabel.setText("加载中…");
             NetworkUtils.get("/admin/exportStudent", new NetworkUtils.Callback<String>() {
                 @Override
                 public void onSuccess(String result) {
                     Platform.runLater(() -> {
-                        statusLabel.setText("导出成功");
-                        ShowMessage.showInfoMessage("导出", "学生数据已导出至 " + file.getName());
+                        statusLabel.setText("已成功导出");
+                        ShowMessage.showInfoMessage("成功", "已成功导出至: " + file.getName());
                     });
                 }
 
                 @Override
                 public void onFailure(Exception e) {
                     Platform.runLater(() -> {
-                        statusLabel.setText("导出失败");
-                        ShowMessage.showErrorMessage("导出失败", e.getMessage());
+                        statusLabel.setText("数据加载失败");
+                        ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     });
                 }
             });
@@ -300,10 +309,10 @@ public class StudentManagementController {
             ShowMessage.showWarningMessage("提示", "请先选择一名学生");
             return;
         }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认删除",
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要删除学生 " + selected.getName() + " (" + selected.getSduid() + ") 吗？");
         if (confirmed) {
-            statusLabel.setText("正在删除...");
+            statusLabel.setText("加载中…");
             Map<String, String> params = new HashMap<>();
             params.put("userId", String.valueOf(selected.getId()));
             NetworkUtils.post("/admin/deleteUser", params, "{}", new NetworkUtils.Callback<String>() {
@@ -313,12 +322,12 @@ public class StudentManagementController {
                         JsonObject res = gson.fromJson(result, JsonObject.class);
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
                             Platform.runLater(() -> {
-                                ShowMessage.showInfoMessage("成功", "学生已删除");
+                                ShowMessage.showInfoMessage("成功", "已成功删除");
                                 loadStudents();
                             });
                         } else {
-                            Platform.runLater(() -> ShowMessage.showErrorMessage("删除失败",
-                                    res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                            Platform.runLater(() -> ShowMessage.showErrorMessage("错误",
+                                    res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试"));
                         }
                     } catch (Exception e) {
                         Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析响应失败"));
@@ -328,8 +337,8 @@ public class StudentManagementController {
                 @Override
                 public void onFailure(Exception e) {
                     Platform.runLater(() -> {
-                        statusLabel.setText("删除失败");
-                        ShowMessage.showErrorMessage("删除失败", e.getMessage());
+                        statusLabel.setText("数据加载失败");
+                        ShowMessage.showErrorMessage("错误", "操作失败，请稍后重试");
                     });
                 }
             });

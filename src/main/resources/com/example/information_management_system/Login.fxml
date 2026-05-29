@@ -2,51 +2,85 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<HBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.LoginController"
-      alignment="CENTER" spacing="0" styleClass="root">
+      styleClass="root" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
 
-    <StackPane styleClass="login-container">
-        <VBox alignment="CENTER" spacing="24" styleClass="login-card">
-            <padding><Insets top="40" right="50" bottom="40" left="50"/></padding>
+    <!-- ===== 左侧品牌区 ===== -->
+    <VBox styleClass="brand-panel" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS"
+          alignment="CENTER" spacing="0">
+        <padding><Insets top="60" right="60" bottom="60" left="60"/></padding>
 
-            <Label text="校园信息管理系统" styleClass="app-title"/>
+        <!-- 几何装饰 -->
+        <StackPane styleClass="deco-container" VBox.vgrow="ALWAYS" maxHeight="400">
+            <VBox alignment="CENTER" spacing="16">
+                <Label text="SDUCMS" styleClass="brand-logo"/>
+                <Label text="山东大学校园信息管理系统" styleClass="brand-title"/>
+                <Label text="Shandong University Campus Management System" styleClass="brand-subtitle"/>
+            </VBox>
+        </StackPane>
 
-            <VBox spacing="4" alignment="CENTER">
-                <Label text="欢迎回来" styleClass="welcome-text"/>
-                <Label text="请登录您的账号以继续" styleClass="sub-text"/>
+        <!-- 作者标注 -->
+        <Label text="Designed by Group 15" styleClass="brand-footer"/>
+    </VBox>
+
+    <!-- ===== 右侧登录区 ===== -->
+    <VBox styleClass="login-panel" alignment="CENTER" minWidth="480" prefWidth="520"
+          VBox.vgrow="ALWAYS">
+        <padding><Insets top="40" right="80" bottom="40" left="80"/></padding>
+
+        <VBox alignment="CENTER" spacing="28" maxWidth="360">
+
+            <!-- 登录标题 -->
+            <VBox alignment="CENTER" spacing="8">
+                <Label text="用户登录" styleClass="login-title"/>
+                <Region styleClass="title-underline" prefHeight="3" prefWidth="40"/>
             </VBox>
 
-            <VBox spacing="18" maxWidth="320">
+            <!-- 表单 -->
+            <VBox spacing="20">
+                <!-- 用户名 -->
                 <VBox spacing="6">
                     <Label text="用户名" styleClass="field-label"/>
-                    <TextField fx:id="usernameField" promptText="请输入学号或工号" styleClass="input-field"/>
+                    <TextField fx:id="usernameField" promptText="请输入学号或工号"
+                               styleClass="input-field" maxWidth="Infinity"/>
                 </VBox>
 
+                <!-- 密码 -->
                 <VBox spacing="6">
                     <Label text="密码" styleClass="field-label"/>
-                    <PasswordField fx:id="passwordField" promptText="请输入密码" styleClass="input-field"/>
+                    <PasswordField fx:id="passwordField" promptText="请输入密码"
+                                   styleClass="input-field" maxWidth="Infinity"/>
                 </VBox>
 
-                <Label fx:id="errorMessageLabel" styleClass="error-label" visible="false" wrapText="true"/>
+                <!-- 错误提示 -->
+                <Label fx:id="errorMessageLabel" styleClass="error-label"
+                       visible="false" wrapText="true"/>
 
-                <Button fx:id="loginButton" text="登  录" styleClass="login-button" maxWidth="Infinity"/>
+                <!-- 登录按钮 -->
+                <Button fx:id="loginButton" text="登  录" styleClass="login-button"
+                        maxWidth="Infinity"/>
             </VBox>
 
-            <VBox spacing="8" alignment="CENTER">
-                <Hyperlink fx:id="toggleLoginLink" text="统一认证登录" styleClass="toggle-link"
-                           onAction="#handleToggleLogin"/>
-                <HBox spacing="16" alignment="CENTER">
-                    <Hyperlink fx:id="studentQuickLogin" text="学生登录(测试)" styleClass="quick-link"
-                               onAction="#studentQuickLogin"/>
-                    <Hyperlink fx:id="teacherQuickLogin" text="教师登录(测试)" styleClass="quick-link"
-                               onAction="#teacherQuickLogin"/>
-                    <Hyperlink fx:id="adminQuickLogin" text="管理员登录(测试)" styleClass="quick-link"
-                               onAction="#adminQuickLogin"/>
-                </HBox>
-            </VBox>
+            <!-- 切换登录方式 -->
+            <Hyperlink fx:id="toggleLoginLink" text="统一认证登录" styleClass="toggle-link"
+                       onAction="#handleToggleLogin"/>
+
+            <!-- 快捷测试 -->
+            <HBox spacing="12" alignment="CENTER">
+                <Hyperlink fx:id="studentQuickLogin" text="学生登录(测试)"
+                           styleClass="quick-link" onAction="#studentQuickLogin"/>
+                <Hyperlink fx:id="teacherQuickLogin" text="教师登录(测试)"
+                           styleClass="quick-link" onAction="#teacherQuickLogin"/>
+                <Hyperlink fx:id="adminQuickLogin" text="管理员登录(测试)"
+                           styleClass="quick-link" onAction="#adminQuickLogin"/>
+            </HBox>
         </VBox>
-    </StackPane>
-</VBox>
+
+        <!-- SCU 水印 -->
+        <Label text="SCU" styleClass="watermark"/>
+    </VBox>
+</HBox>

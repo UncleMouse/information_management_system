@@ -57,7 +57,7 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
         if (StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
-            showErrorMessage("用户名和密码不能为空");
+            showErrorMessage("请输入用户名和密码");
             return;
         }
         authenticateUser(username, password);
@@ -82,14 +82,19 @@ public class LoginController {
                         UserSession.getInstance().setToken(data.get("accessToken").getAsString());
                         UserSession.getInstance().setRefreshToken(data.get("refreshToken").getAsString());
                         UserSession.getInstance().setUsername(data.get("username").getAsString());
+                        MainApplication.saveSession(
+                            data.get("permission").getAsInt(),
+                            data.get("username").getAsString(),
+                            data.get("accessToken").getAsString(),
+                            data.get("refreshToken").getAsString());
                         fetchInitialData();
                         MainApplication.startTokenRefreshTimer();
                         navigateToMain();
                     } else {
-                        showErrorMessage(res.has("msg") ? res.get("msg").getAsString() : "登录失败");
+                        showErrorMessage(res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试");
                     }
                 } catch (Exception e) {
-                    showErrorMessage("登录响应处理失败");
+                    showErrorMessage("登录验证失败，请检查账号密码");
                 }
             }
 
@@ -173,7 +178,7 @@ public class LoginController {
         try {
             MainApplication.showMainView();
         } catch (IOException e) {
-            showErrorMessage("无法加载主界面");
+            showErrorMessage("页面加载失败，请重启应用");
         }
     }
 
@@ -183,7 +188,7 @@ public class LoginController {
             errorMessageLabel.setVisible(true);
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("登录错误");
+            alert.setTitle("错误");
             alert.setHeaderText(null);
             alert.setContentText(msg);
             alert.showAndWait();
@@ -218,8 +223,8 @@ public class LoginController {
 
     @FXML
     public void adminQuickLogin(javafx.event.ActionEvent event) {
-        usernameField.setText("1");
-        passwordField.setText("123456");
+        usernameField.setText("admin");
+        passwordField.setText("admin123");
         doLogin();
     }
 }

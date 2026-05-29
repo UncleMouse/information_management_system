@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.prefs.Preferences;
 
 public class MainApplication extends Application {
     private static Stage stage;
@@ -28,8 +29,44 @@ public class MainApplication extends Application {
         stage.setHeight(APP_HEIGHT);
         stage.setMinWidth(900);
         stage.setMinHeight(600);
-        changeView("Login.fxml", "css/Login.css");
+
+        // 自动登录检查
+        if (tryAutoLogin()) {
+            try {
+                showMainView();
+            } catch (IOException e) {
+                changeView("Login.fxml", "css/Login.css");
+            }
+        } else {
+            changeView("Login.fxml", "css/Login.css");
+        }
         stage.show();
+    }
+
+    public static void saveSession(int identity, String username, String token, String refreshToken) {
+        Preferences prefs = Preferences.userNodeForPackage(MainApplication.class);
+        prefs.putInt("identity", identity);
+        prefs.put("username", username);
+        prefs.put("token", token);
+        prefs.put("refreshToken", refreshToken);
+    }
+
+    public static void clearSession() {
+        Preferences prefs = Preferences.userNodeForPackage(MainApplication.class);
+        prefs.remove("identity"); prefs.remove("username");
+        prefs.remove("token"); prefs.remove("refreshToken");
+    }
+
+    private boolean tryAutoLogin() {
+        Preferences prefs = Preferences.userNodeForPackage(MainApplication.class);
+        String token = prefs.get("token", null);
+        if (token == null || token.isEmpty()) return false;
+        UserSession.getInstance().setIdentity(prefs.getInt("identity", 0));
+        UserSession.getInstance().setUsername(prefs.get("username", ""));
+        UserSession.getInstance().setToken(token);
+        UserSession.getInstance().setRefreshToken(prefs.get("refreshToken", ""));
+        startTokenRefreshTimer();
+        return true;
     }
 
     @Override

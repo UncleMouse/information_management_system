@@ -100,7 +100,7 @@ public class AddNewStudentController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
                             ShowMessage.showInfoMessage("成功",
-                                    editingStudent != null ? "学生信息已更新" : "学生已添加");
+                                    editingStudent != null ? "已成功更新" : "已成功添加");
                             if (onStudentAddedListener != null) {
                                 onStudentAddedListener.run();
                             }
@@ -115,7 +115,7 @@ public class AddNewStudentController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "解析响应失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -124,7 +124,7 @@ public class AddNewStudentController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "请求失败: " + e.getMessage());
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     btnSubmit.setDisable(false);
                 });
             }

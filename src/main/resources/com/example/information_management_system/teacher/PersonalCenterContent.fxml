@@ -11,7 +11,7 @@
       styleClass="page-root" spacing="20"
       stylesheets="@../css/teacher/PersonalCenterContent.css">
 
-    <padding><Insets top="0" right="0" bottom="16" left="0"/></padding>
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <Label text="个人中心" styleClass="page-title">
         <font><Font name="System Bold" size="20"/></font>

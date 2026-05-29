@@ -67,23 +67,23 @@ public class PasswordChangeController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("成功", "密码修改成功");
+                            ShowMessage.showInfoMessage("成功", "密码已修改成功");
                             oldPasswordField.clear();
                             newPasswordField.clear();
                             confirmPasswordField.clear();
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "密码修改失败";
-                            ShowMessage.showErrorMessage("修改失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("修改失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("修改失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }

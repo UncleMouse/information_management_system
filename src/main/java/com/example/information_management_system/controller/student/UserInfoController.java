@@ -72,7 +72,6 @@ public class UserInfoController {
         boolean emailChanged = !email.equals(nullToEmpty(UserSession.getInstance().getEmail()));
 
         if (!phoneChanged && !emailChanged) {
-            ShowMessage.showInfoMessage("提示", "联系方式未做修改");
             return;
         }
 
@@ -96,20 +95,20 @@ public class UserInfoController {
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
                             UserSession.getInstance().setPhone(phone);
-                            ShowMessage.showInfoMessage("成功", "手机号更新成功");
+                            ShowMessage.showInfoMessage("成功", "已成功更新");
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "更新失败";
-                            ShowMessage.showErrorMessage("更新失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -126,20 +125,20 @@ public class UserInfoController {
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
                             UserSession.getInstance().setEmail(email);
-                            ShowMessage.showInfoMessage("成功", "邮箱更新成功");
+                            ShowMessage.showInfoMessage("成功", "已成功更新");
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "更新失败";
-                            ShowMessage.showErrorMessage("更新失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -181,23 +180,23 @@ public class UserInfoController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("成功", "密码修改成功");
+                            ShowMessage.showInfoMessage("成功", "密码已修改成功");
                             oldPasswordField.clear();
                             newPasswordField.clear();
                             confirmPasswordField.clear();
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "密码修改失败";
-                            ShowMessage.showErrorMessage("修改失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("修改失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("修改失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }

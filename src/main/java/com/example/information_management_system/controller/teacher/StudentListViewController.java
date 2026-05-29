@@ -3,6 +3,7 @@ package com.example.information_management_system.controller.teacher;
 import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -45,6 +46,14 @@ public class StudentListViewController {
 
     @FXML
     public void initialize() {
+        studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] studentRatios = {1.3, 1.0, 0.6, 1.2, 1.2, 0.8, 1.2, 0.8};
+        final double studentTotalRatio = java.util.Arrays.stream(studentRatios).sum();
+        studentTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < studentRatios.length && i < studentTable.getColumns().size(); i++)
+                studentTable.getColumns().get(i).setPrefWidth(w * studentRatios[i] / studentTotalRatio);
+        });
         setupTableColumns();
         studentTable.setItems(studentList);
 
@@ -104,21 +113,21 @@ public class StudentListViewController {
                         Platform.runLater(() -> {
                             studentList.setAll(list);
                             if (studentCountLabel != null) {
-                                studentCountLabel.setText("共 " + list.size() + " 名学生");
+                                studentCountLabel.setText("共 " + list.size() + " 条");
                             }
                         });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     Platform.runLater(() ->
-                            ShowMessage.showErrorMessage("加载失败", "学生数据解析失败"));
+                            ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("加载失败", "获取学生列表失败: " + e.getMessage()));
+                        ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage()));
             }
         });
     }

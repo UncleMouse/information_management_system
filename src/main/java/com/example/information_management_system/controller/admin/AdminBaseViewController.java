@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -14,65 +14,62 @@ import java.util.Objects;
 
 public class AdminBaseViewController {
 
-    @FXML private BorderPane rootPane;
     @FXML private VBox contentArea;
-
+    @FXML private VBox navContainer;
+    @FXML private Button logoutBtn;
     @FXML private Label userDisplayName;
     @FXML private Label userRoleLabel;
-
-    @FXML private Button btnHome;
-    @FXML private Button btnStudentMgmt;
-    @FXML private Button btnTeacherMgmt;
-    @FXML private Button btnCourseMgmt;
-    @FXML private Button btnClassMgmt;
-    @FXML private Button btnNoticeMgmt;
-    @FXML private Button btnPersonalCenter;
 
     private Button activeButton;
 
     @FXML
     public void initialize() {
-        loadUserInfo();
-        setActiveButton(btnHome);
-        loadContent("AdminHomePage.fxml");
+        userDisplayName.setText(UserSession.getInstance().getUsername());
+        userRoleLabel.setText("系统管理员");
 
-        btnHome.setOnAction(e -> { setActiveButton(btnHome); loadContent("AdminHomePage.fxml"); });
-        btnStudentMgmt.setOnAction(e -> { setActiveButton(btnStudentMgmt); loadContent("StudentManagement.fxml"); });
-        btnTeacherMgmt.setOnAction(e -> { setActiveButton(btnTeacherMgmt); loadContent("TeacherManagement.fxml"); });
-        btnCourseMgmt.setOnAction(e -> { setActiveButton(btnCourseMgmt); loadContent("CourseManagement.fxml"); });
-        btnClassMgmt.setOnAction(e -> { setActiveButton(btnClassMgmt); loadContent("ClassManagement.fxml"); });
-        btnNoticeMgmt.setOnAction(e -> { setActiveButton(btnNoticeMgmt); loadContent("AddNewAnnouncement.fxml"); });
-        btnPersonalCenter.setOnAction(e -> { setActiveButton(btnPersonalCenter); loadContent("PersonalCenter.fxml"); });
+        Button homeBtn = addNavBtn("首  页", "AdminHomePage.fxml");
+        addNavBtn("学生管理", "StudentManagement.fxml");
+        addNavBtn("教师管理", "TeacherManagement.fxml");
+        addNavBtn("课程管理", "CourseManagement.fxml");
+        addNavBtn("班级管理", "ClassManagement.fxml");
+        addNavBtn("通知管理", "AddNewAnnouncement.fxml");
+        addNavBtn("个人中心", "PersonalCenter.fxml");
+
+        logoutBtn.setOnAction(e -> handleLogout());
+
+        // 主题切换按钮
+        Button themeBtn = new Button("🌙 暗色");
+        themeBtn.getStyleClass().add("sidebar-btn");
+        themeBtn.setMaxWidth(Double.MAX_VALUE);
+        themeBtn.setOnAction(e -> {
+            boolean dark = !com.example.information_management_system.util.ThemeManager.isDark();
+            com.example.information_management_system.util.ThemeManager.setDark(dark);
+            themeBtn.setText(dark ? "☀ 亮色" : "🌙 暗色");
+            if (navContainer.getScene() != null)
+                com.example.information_management_system.util.ThemeManager.applyTheme(navContainer.getScene());
+        });
+        navContainer.getChildren().add(themeBtn);
+        navContainer.sceneProperty().addListener((obs, o, s) -> {
+            if (s != null) com.example.information_management_system.util.ThemeManager.applyTheme(s);
+        });
+
+        loadContent("AdminHomePage.fxml");
+        setActiveButton(homeBtn);
     }
 
-    private void loadUserInfo() {
-        UserSession session = UserSession.getInstance();
-        String username = session.getUsername();
-        if (username != null && !username.isEmpty()) {
-            userDisplayName.setText(username);
-        } else {
-            userDisplayName.setText("管理员");
-        }
-        userRoleLabel.setText("系统管理员");
+    private Button addNavBtn(String text, String fxmlName) {
+        Button btn = new Button(text);
+        btn.getStyleClass().add("sidebar-btn");
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setOnAction(e -> { setActiveButton(btn); loadContent(fxmlName); });
+        navContainer.getChildren().add(btn);
+        return btn;
     }
 
     private void setActiveButton(Button button) {
-        if (activeButton != null) {
-            activeButton.getStyleClass().remove("sidebar-btn-active");
-        }
+        if (activeButton != null) activeButton.getStyleClass().remove("sidebar-btn-active");
         activeButton = button;
-        activeButton.getStyleClass().add("sidebar-btn-active");
-    }
-
-    @FXML
-    private void handleLogout() {
-        com.example.information_management_system.MainApplication.stopTokenRefreshTimer();
-        UserSession.getInstance().clearSession();
-        try {
-            com.example.information_management_system.MainApplication.changeView("Login.fxml", "css/Login.css");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        button.getStyleClass().add("sidebar-btn-active");
     }
 
     private void loadContent(String fxmlName) {
@@ -82,6 +79,7 @@ public class AdminBaseViewController {
             Parent view = loader.load();
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
+            VBox.setVgrow(view, Priority.ALWAYS);
         } catch (IOException e) {
             e.printStackTrace();
             Label errorLabel = new Label("页面加载失败: " + fxmlName);
@@ -89,5 +87,14 @@ public class AdminBaseViewController {
             contentArea.getChildren().clear();
             contentArea.getChildren().add(errorLabel);
         }
+    }
+
+    private void handleLogout() {
+        com.example.information_management_system.MainApplication.clearSession();
+        com.example.information_management_system.MainApplication.stopTokenRefreshTimer();
+        UserSession.getInstance().clearSession();
+        try {
+            com.example.information_management_system.MainApplication.changeView("Login.fxml", "css/Login.css");
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

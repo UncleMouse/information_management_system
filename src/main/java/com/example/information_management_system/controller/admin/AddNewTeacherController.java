@@ -77,7 +77,7 @@ public class AddNewTeacherController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
                             ShowMessage.showInfoMessage("成功",
-                                    editingTeacher != null ? "教师信息已更新" : "教师已添加");
+                                    editingTeacher != null ? "已成功更新" : "已成功添加");
                             closeDialog();
                         });
                     } else {
@@ -89,7 +89,7 @@ public class AddNewTeacherController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "解析响应失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -98,7 +98,7 @@ public class AddNewTeacherController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "请求失败: " + e.getMessage());
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     btnSubmit.setDisable(false);
                 });
             }

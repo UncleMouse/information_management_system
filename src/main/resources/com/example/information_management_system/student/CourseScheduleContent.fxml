@@ -25,16 +25,16 @@
         <Button fx:id="btnNextWeek" text="下一周 ▶" styleClass="btn-outline"/>
     </HBox>
 
-    <TableView fx:id="scheduleTable" styleClass="schedule-table" VBox.vgrow="NEVER">
+    <TableView fx:id="scheduleTable" styleClass="schedule-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colTime" text="时间" prefWidth="100" resizable="false" sortable="false"/>
-            <TableColumn fx:id="colMon" text="周一" prefWidth="130"/>
-            <TableColumn fx:id="colTue" text="周二" prefWidth="130"/>
-            <TableColumn fx:id="colWed" text="周三" prefWidth="130"/>
-            <TableColumn fx:id="colThu" text="周四" prefWidth="130"/>
-            <TableColumn fx:id="colFri" text="周五" prefWidth="130"/>
-            <TableColumn fx:id="colSat" text="周六" prefWidth="130"/>
-            <TableColumn fx:id="colSun" text="周日" prefWidth="130"/>
+            <TableColumn fx:id="colMon" text="周一" minWidth="80"/>
+            <TableColumn fx:id="colTue" text="周二" minWidth="80"/>
+            <TableColumn fx:id="colWed" text="周三" minWidth="80"/>
+            <TableColumn fx:id="colThu" text="周四" minWidth="80"/>
+            <TableColumn fx:id="colFri" text="周五" minWidth="80"/>
+            <TableColumn fx:id="colSat" text="周六" minWidth="80"/>
+            <TableColumn fx:id="colSun" text="周日" minWidth="80"/>
         </columns>
         <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>

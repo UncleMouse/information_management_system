@@ -4,6 +4,7 @@ import com.example.information_management_system.model.TeacherInfo;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -47,6 +48,14 @@ public class TeacherManagementController {
 
     @FXML
     public void initialize() {
+        teacherTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] teacherRatios = {0.5, 1.2, 1.0, 1.6, 1.6, 0.8};
+        final double teacherTotalRatio = java.util.Arrays.stream(teacherRatios).sum();
+        teacherTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < teacherRatios.length && i < teacherTable.getColumns().size(); i++)
+                teacherTable.getColumns().get(i).setPrefWidth(w * teacherRatios[i] / teacherTotalRatio);
+        });
         // TeacherInfo 使用普通字段，注意 PropertyValueFactory 的使用方式
         setupTableColumns();
         teacherTable.setItems(teacherList);
@@ -102,7 +111,7 @@ public class TeacherManagementController {
     }
 
     private void loadTeachers() {
-        statusLabel.setText("正在加载教师数据...");
+        statusLabel.setText("加载中…");
         NetworkUtils.get("/admin/getTeacherList", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -114,21 +123,21 @@ public class TeacherManagementController {
                         List<TeacherInfo> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             teacherList.setAll(list);
-                            statusLabel.setText("共 " + list.size() + " 名教师");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("加载失败"));
+                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据解析失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "获取教师列表失败: " + e.getMessage());
+                    statusLabel.setText("网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
                 });
             }
         });
@@ -140,7 +149,7 @@ public class TeacherManagementController {
             loadTeachers();
             return;
         }
-        statusLabel.setText("正在搜索...");
+        statusLabel.setText("加载中…");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
         NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
@@ -154,17 +163,17 @@ public class TeacherManagementController {
                         List<TeacherInfo> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             teacherList.setAll(list);
-                            statusLabel.setText("搜索到 " + list.size() + " 条结果");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                Platform.runLater(() -> statusLabel.setText("数据加载失败"));
             }
         });
     }
@@ -218,10 +227,10 @@ public class TeacherManagementController {
             ShowMessage.showWarningMessage("提示", "请先选择一名教师");
             return;
         }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认删除",
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要删除教师 " + selected.getName() + " (" + selected.getSduid() + ") 吗？");
         if (confirmed) {
-            statusLabel.setText("正在删除...");
+            statusLabel.setText("加载中…");
             Map<String, String> params = new HashMap<>();
             params.put("userId", String.valueOf(selected.getId()));
             NetworkUtils.post("/admin/deleteUser", params, "{}", new NetworkUtils.Callback<String>() {
@@ -231,12 +240,12 @@ public class TeacherManagementController {
                         JsonObject res = gson.fromJson(result, JsonObject.class);
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
                             Platform.runLater(() -> {
-                                ShowMessage.showInfoMessage("成功", "教师已删除");
+                                ShowMessage.showInfoMessage("成功", "已成功删除");
                                 loadTeachers();
                             });
                         } else {
-                            Platform.runLater(() -> ShowMessage.showErrorMessage("删除失败",
-                                    res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                            Platform.runLater(() -> ShowMessage.showErrorMessage("错误",
+                                    res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试"));
                         }
                     } catch (Exception e) {
                         Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析响应失败"));
@@ -246,8 +255,8 @@ public class TeacherManagementController {
                 @Override
                 public void onFailure(Exception e) {
                     Platform.runLater(() -> {
-                        statusLabel.setText("删除失败");
-                        ShowMessage.showErrorMessage("删除失败", e.getMessage());
+                        statusLabel.setText("数据加载失败");
+                        ShowMessage.showErrorMessage("错误", "操作失败，请稍后重试");
                     });
                 }
             });

@@ -136,12 +136,12 @@ public class editCourseController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
-                            ShowMessage.showInfoMessage("成功", "课程信息已更新！");
+                            ShowMessage.showInfoMessage("成功", "已成功更新");
                             navigateBack();
                         });
                     } else {
                         String msg = res.has("msg") ? res.get("msg").getAsString() : "更新失败";
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", msg));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
@@ -150,7 +150,7 @@ public class editCourseController {
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }

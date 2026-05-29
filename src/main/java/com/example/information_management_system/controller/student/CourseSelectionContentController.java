@@ -1,10 +1,10 @@
 package com.example.information_management_system.controller.student;
 
 import com.example.information_management_system.entity.Data;
-import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.model.Course;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -51,6 +51,22 @@ public class CourseSelectionContentController {
 
     @FXML
     public void initialize() {
+        availableTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] availRatios = {2.0, 1.2, 0.7, 1.0, 0.8, 0.7, 1.8, 0.8};
+        final double availTotalRatio = java.util.Arrays.stream(availRatios).sum();
+        availableTable.widthProperty().addListener((obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < availRatios.length && i < availableTable.getColumns().size(); i++)
+                availableTable.getColumns().get(i).setPrefWidth(w * availRatios[i] / availTotalRatio);
+        });
+        selectedTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] selRatios = {2.5, 1.2, 0.7, 1.0, 2.5, 0.8};
+        final double selTotalRatio = java.util.Arrays.stream(selRatios).sum();
+        selectedTable.widthProperty().addListener((obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < selRatios.length && i < selectedTable.getColumns().size(); i++)
+                selectedTable.getColumns().get(i).setPrefWidth(w * selRatios[i] / selTotalRatio);
+        });
         setupAvailableTable();
         setupSelectedTable();
 
@@ -81,8 +97,7 @@ public class CourseSelectionContentController {
         availColType.setCellValueFactory(new PropertyValueFactory<>("type"));
         availColCapacity.setCellValueFactory(new PropertyValueFactory<>("classNum"));
         availColEnrolled.setCellValueFactory(new PropertyValueFactory<>("peopleNum"));
-        availColTime.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().getTerm() != null ? cellData.getValue().getTerm() : ""));
+        availColTime.setCellValueFactory(new PropertyValueFactory<>("term"));
 
         availColAction.setCellFactory(col -> new TableCell<>() {
             private final Button selectBtn = new Button("选课");
@@ -111,8 +126,7 @@ public class CourseSelectionContentController {
         selColTeacher.setCellValueFactory(new PropertyValueFactory<>("teacherName"));
         selColCredit.setCellValueFactory(new PropertyValueFactory<>("credit"));
         selColType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        selColTime.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().getTerm() != null ? cellData.getValue().getTerm() : ""));
+        selColTime.setCellValueFactory(new PropertyValueFactory<>("term"));
 
         selColAction.setCellFactory(col -> new TableCell<>() {
             private final Button dropBtn = new Button("退课");
@@ -137,71 +151,65 @@ public class CourseSelectionContentController {
     }
 
     private void handleSelectCourse(Course course) {
-        boolean confirmed = ShowMessage.showConfirmMessage("确认选课",
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要选择课程 \"" + course.getCode() + "\" 吗？");
         if (!confirmed) return;
 
-        JsonObject body = new JsonObject();
-        body.addProperty("studentId", UserSession.getInstance().getId());
-        body.addProperty("courseId", course.getCode());
-
-        NetworkUtils.put("/course-selection/select/" + course.getCode(), gson.toJson(body), new NetworkUtils.Callback<String>() {
+        int courseId = course.getId();
+        NetworkUtils.post("/course-selection/select/" + courseId, "", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("选课成功", "课程 \"" + course.getCode() + "\" 选课成功！");
+                            ShowMessage.showInfoMessage("成功", "已成功选课");
                             refreshAll();
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "选课失败";
-                            ShowMessage.showErrorMessage("选课失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("选课失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("选课失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
 
     private void handleDropCourse(Course course) {
-        boolean confirmed = ShowMessage.showConfirmMessage("确认退课",
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要退选课程 \"" + course.getCode() + "\" 吗？");
         if (!confirmed) return;
 
-        JsonObject body = new JsonObject();
-        body.addProperty("studentId", UserSession.getInstance().getId());
-        body.addProperty("courseId", course.getCode());
-
-        NetworkUtils.delete("/course-selection/drop/" + course.getCode(), gson.toJson(body), new NetworkUtils.Callback<String>() {
+        int courseId = course.getId();
+        NetworkUtils.post("/course-selection/drop/" + courseId, "", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("退课成功", "课程 \"" + course.getCode() + "\" 退课成功！");
+                            ShowMessage.showInfoMessage("成功", "已成功退课");
                             refreshAll();
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "退课失败";
-                            ShowMessage.showErrorMessage("退课失败", msg);
+                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试";
+                            ShowMessage.showErrorMessage("错误", msg);
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("退课失败", "响应解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("退课失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -236,13 +244,13 @@ public class CourseSelectionContentController {
                         });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("搜索失败", "数据解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("搜索失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -323,19 +331,20 @@ public class CourseSelectionContentController {
         for (int i = 0; i < arr.size(); i++) {
             JsonObject obj = arr.get(i).getAsJsonObject();
             Course course = new Course();
-            if (obj.has("code")) course.setCode(obj.get("code").getAsString());
-            if (obj.has("name")) course.setCode(obj.get("name").getAsString());
-            if (obj.has("courseName")) course.setCode(obj.get("courseName").getAsString());
+            course.setId(obj.has("id") ? obj.get("id").getAsInt() : 0);
+            course.setCode(obj.has("name") ? obj.get("name").getAsString()
+                    : obj.has("code") ? obj.get("code").getAsString() : "");
             if (obj.has("teacherName")) course.setTeacherName(obj.get("teacherName").getAsString());
-            if (obj.has("teacher")) course.setTeacherName(obj.get("teacher").getAsString());
-            if (obj.has("credit")) course.setCredit(obj.get("credit").getAsDouble());
+            if (obj.has("credit")) course.setCredit(obj.has("point") ? obj.get("point").getAsDouble()
+                    : obj.get("credit").getAsDouble());
             if (obj.has("type")) course.setType(obj.get("type").getAsString());
+            if (obj.has("capacity")) course.setClassNum(obj.get("capacity").getAsInt());
             if (obj.has("classNum")) course.setClassNum(obj.get("classNum").getAsInt());
             if (obj.has("peopleNum")) course.setPeopleNum(obj.get("peopleNum").getAsInt());
+            if (obj.has("selectedCount")) course.setPeopleNum(obj.get("selectedCount").getAsInt());
             if (obj.has("term")) course.setTerm(obj.get("term").getAsString());
+            if (obj.has("time")) course.setTerm(obj.get("time").getAsString());
             if (obj.has("status")) course.setStatus(obj.get("status").getAsString());
-            if (obj.has("department")) course.setDepartment(obj.get("department").getAsString());
-            if (obj.has("teacher")) course.setTeacher(obj.get("teacher").getAsString());
             list.add(course);
         }
         return list;

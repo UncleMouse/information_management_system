@@ -12,6 +12,7 @@ module com.example.information_management_system {
     requires eu.hansolo.tilesfx;
     requires java.desktop;
     requires java.logging;
+    requires java.prefs;
     requires transitive com.google.gson;
     requires org.apache.poi.ooxml;
 
@@ -20,9 +21,11 @@ module com.example.information_management_system {
     opens com.example.information_management_system.controller.admin to javafx.fxml, javafx.base;
     opens com.example.information_management_system.controller.teacher to javafx.fxml, javafx.base;
     opens com.example.information_management_system.controller.student to javafx.fxml, javafx.base;
+    opens com.example.information_management_system.component to javafx.fxml;
     opens com.example.information_management_system.model to javafx.base;
 
     exports com.example.information_management_system;
+    exports com.example.information_management_system.component;
     exports com.example.information_management_system.controller;
     exports com.example.information_management_system.controller.admin;
     exports com.example.information_management_system.controller.teacher;

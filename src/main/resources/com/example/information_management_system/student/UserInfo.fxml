@@ -5,10 +5,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.student.UserInfoController"
       styleClass="page-root" stylesheets="@../css/student/UserInfo.css"
-      VBox.vgrow="ALWAYS">
+      spacing="16">
+
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <!-- Header -->
     <Label text="个人中心" styleClass="page-title" VBox.vgrow="NEVER">

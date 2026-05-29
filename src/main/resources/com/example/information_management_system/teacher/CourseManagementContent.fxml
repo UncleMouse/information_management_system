@@ -12,7 +12,7 @@
       styleClass="page-root" spacing="16"
       stylesheets="@../css/teacher/courseManagementContent.css">
 
-    <padding><Insets top="0" right="0" bottom="16" left="0"/></padding>
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <Label text="课程管理" styleClass="page-title">
         <font><Font name="System Bold" size="20"/></font>
@@ -26,7 +26,7 @@
         <Button fx:id="viewStudentsButton" text="查看学生名单" styleClass="outline-button"/>
     </HBox>
 
-    <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+    <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="nameColumn" text="课程名称" prefWidth="180"/>
             <TableColumn fx:id="codeColumn" text="课程代码" prefWidth="120"/>
@@ -39,5 +39,4 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
         </columnResizePolicy>
     </TableView>
-    <Region VBox.vgrow="ALWAYS"/>
 </VBox>

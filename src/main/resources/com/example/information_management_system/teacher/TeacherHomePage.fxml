@@ -11,7 +11,7 @@
       styleClass="page-root" spacing="24"
       stylesheets="@../css/teacher/TeacherHomePage.css">
 
-    <padding><Insets top="8" right="0" bottom="16" left="0"/></padding>
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="16">
         <VBox spacing="4">
@@ -47,11 +47,11 @@
         <VBox styleClass="quick-actions-card" spacing="16" HBox.hgrow="ALWAYS">
             <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
             <Label text="快捷操作" styleClass="card-title"/>
-            <Button text="开始录入成绩" styleClass="primary-button" maxWidth="Infinity"
+            <Button text="开始录入成绩" styleClass="btn-primary" maxWidth="Infinity"
                     onAction="#handleInputScore"/>
-            <Button text="申请新课" styleClass="outline-button" maxWidth="Infinity"
+            <Button text="申请新课" styleClass="btn-outline" maxWidth="Infinity"
                     onAction="#handleApplyNewCourse"/>
-            <Button text="查看课表" styleClass="outline-button" maxWidth="Infinity"
+            <Button text="查看课表" styleClass="btn-outline" maxWidth="Infinity"
                     onAction="#handleViewSchedule"/>
         </VBox>
 

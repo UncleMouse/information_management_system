@@ -97,6 +97,6 @@ public class PersonalCenterController {
     }
 
     private void handleChangePassword() {
-        ShowMessage.showInfoMessage("修改密码", "请联系系统管理员重置密码，或通过邮箱/手机验证码自助修改。");
+        ShowMessage.showInfoMessage("提示", "请联系系统管理员重置密码，或通过邮箱/手机验证码自助修改。");
     }
 }

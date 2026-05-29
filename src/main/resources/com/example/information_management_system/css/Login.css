@@ -1,37 +1,58 @@
 .root {
-    -fx-background-color: #f0f4f8;
+    -fx-background-color: #ffffff;
 }
 
-.login-container {
-    -fx-background-color: #f0f4f8;
-    -fx-pref-width: 1000;
-    -fx-pref-height: 680;
+/* ===== 左侧品牌区 ===== */
+.brand-panel {
+    -fx-background-color: linear-gradient(to bottom, #1e3a5f, #2d6aa0);
     -fx-alignment: center;
 }
 
-.login-card {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 16;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 20, 0, 0, 4);
-    -fx-min-width: 420;
-    -fx-max-width: 420;
+.deco-container {
+    -fx-alignment: center;
 }
 
-.app-title {
-    -fx-font-size: 26px;
+.brand-logo {
+    -fx-font-size: 56px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e3a5f;
+    -fx-text-fill: #ffffff;
+    -fx-letter-spacing: 8px;
 }
 
-.welcome-text {
-    -fx-font-size: 18px;
+.brand-title {
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #334155;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 16 0 0 0;
 }
 
-.sub-text {
+.brand-subtitle {
     -fx-font-size: 13px;
-    -fx-text-fill: #94a3b8;
+    -fx-text-fill: rgba(255,255,255,0.6);
+    -fx-padding: 4 0 0 0;
+}
+
+.brand-footer {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255,255,255,0.4);
+    -fx-padding: 0 0 16 0;
+}
+
+/* ===== 右侧登录区 ===== */
+.login-panel {
+    -fx-background-color: #ffffff;
+    -fx-alignment: center;
+}
+
+.login-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1e293b;
+}
+
+.title-underline {
+    -fx-background-color: #4f6ef7;
+    -fx-background-radius: 2;
 }
 
 .field-label {
@@ -45,7 +66,7 @@
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-padding: 12 14;
+    -fx-padding: 14 16;
     -fx-font-size: 14px;
 }
 
@@ -62,10 +83,10 @@
 
 .login-button {
     -fx-background-color: #4f6ef7;
-    -fx-text-fill: white;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-padding: 12 0;
+    -fx-padding: 14 0;
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
@@ -84,6 +105,10 @@
     -fx-border-color: transparent;
 }
 
+.toggle-link:hover {
+    -fx-text-fill: #3d5bd5;
+}
+
 .quick-link {
     -fx-text-fill: #94a3b8;
     -fx-font-size: 12px;
@@ -93,4 +118,13 @@
 
 .quick-link:hover {
     -fx-text-fill: #4f6ef7;
+}
+
+/* SCU 水印 */
+.watermark {
+    -fx-text-fill: rgba(0,0,0,0.04);
+    -fx-font-size: 100px;
+    -fx-font-weight: bold;
+    -fx-padding: 20 0 0 0;
+    -fx-rotate: -15;
 }

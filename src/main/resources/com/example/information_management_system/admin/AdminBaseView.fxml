@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
@@ -12,39 +10,33 @@
             stylesheets="@../css/admin/AdminBaseView.css">
 
     <left>
-        <VBox styleClass="sidebar" minWidth="240" maxWidth="240" prefWidth="240" spacing="0">
-            <!-- Header -->
-            <VBox styleClass="sidebar-header" alignment="CENTER" spacing="6">
-                <padding><Insets top="28" right="16" bottom="20" left="16"/></padding>
-                <Label text="校园信息管理系统" styleClass="sidebar-title">
-                    <font><Font name="System Bold" size="15"/></font>
-                </Label>
-                <Separator styleClass="sidebar-separator" maxWidth="60"/>
-                <Label fx:id="userDisplayName" text="管理员" styleClass="sidebar-username"/>
-                <Label fx:id="userRoleLabel" text="系统管理员" styleClass="sidebar-role"/>
-            </VBox>
-
-            <Separator styleClass="sidebar-divider"/>
-
-            <!-- Navigation -->
-            <VBox styleClass="sidebar-nav" spacing="2" VBox.vgrow="ALWAYS">
-                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-                <Button fx:id="btnHome" text="首  页" styleClass="sidebar-btn"/>
-                <Button fx:id="btnStudentMgmt" text="学生管理" styleClass="sidebar-btn"/>
-                <Button fx:id="btnTeacherMgmt" text="教师管理" styleClass="sidebar-btn"/>
-                <Button fx:id="btnCourseMgmt" text="课程管理" styleClass="sidebar-btn"/>
-                <Button fx:id="btnClassMgmt" text="班级管理" styleClass="sidebar-btn"/>
-                <Button fx:id="btnNoticeMgmt" text="通知管理" styleClass="sidebar-btn"/>
-                <Button fx:id="btnPersonalCenter" text="个人中心" styleClass="sidebar-btn"/>
-            </VBox>
-
-            <!-- Footer -->
-            <VBox styleClass="sidebar-footer">
-                <padding><Insets top="12" right="12" bottom="16" left="12"/></padding>
-                <Button text="退出登录" styleClass="sidebar-logout" maxWidth="Infinity"
-                        onAction="#handleLogout"/>
-            </VBox>
-        </VBox>
+        <!-- 内嵌 BorderPane：top/center/bottom 三区自动布局 -->
+        <BorderPane styleClass="sidebar" minWidth="240" maxWidth="240" prefWidth="240">
+            <top>
+                <VBox styleClass="sidebar-header" alignment="CENTER" spacing="6"
+                      BorderPane.alignment="CENTER">
+                    <padding><Insets top="28" right="16" bottom="20" left="16"/></padding>
+                    <Label text="校园信息管理系统" styleClass="sidebar-title">
+                        <font><Font name="System Bold" size="15"/></font>
+                    </Label>
+                    <Separator styleClass="sidebar-separator" maxWidth="60"/>
+                    <Label fx:id="userDisplayName" text="管理员" styleClass="sidebar-username"/>
+                    <Label fx:id="userRoleLabel" text="系统管理员" styleClass="sidebar-role"/>
+                </VBox>
+            </top>
+            <center>
+                <VBox fx:id="navContainer" styleClass="sidebar-nav" spacing="2"
+                      BorderPane.alignment="CENTER">
+                    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                </VBox>
+            </center>
+            <bottom>
+                <VBox style="-fx-padding: 12 12 16 12; -fx-border-color: #334155 transparent transparent transparent; -fx-border-width: 1 0 0 0;"
+                      BorderPane.alignment="CENTER">
+                    <Button fx:id="logoutBtn" text="退出登录" styleClass="sidebar-logout" maxWidth="Infinity"/>
+                </VBox>
+            </bottom>
+        </BorderPane>
     </left>
 
     <center>

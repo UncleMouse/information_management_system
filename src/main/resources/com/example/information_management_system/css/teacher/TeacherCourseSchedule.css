@@ -55,6 +55,7 @@
     -fx-background-radius: 8;
     -fx-padding: 0;
     -fx-fixed-cell-size: 72px;
+    -fx-fixed-cell-size: 72px;
 }
 
 .schedule-table .column-header-background {

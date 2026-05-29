@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="mainBorderPane" xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
+<BorderPane fx:id="mainBorderPane" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.information_management_system.controller.teacher.TeacherBaseViewController"
             stylesheets="@../css/teacher/TeacherBaseView.css">
 
     <left>
-        <VBox styleClass="sidebar" minWidth="240" maxWidth="240" prefWidth="240" spacing="0">
-            <!-- Header -->
-            <VBox styleClass="sidebar-header" alignment="CENTER" spacing="6">
-                <padding><Insets top="28" right="16" bottom="20" left="16"/></padding>
-                <Label text="校园信息管理系统" styleClass="sidebar-title">
-                    <font><Font name="System Bold" size="15"/></font>
-                </Label>
-                <Separator styleClass="sidebar-separator" maxWidth="60"/>
-                <Label fx:id="teacherNameLabel" text="教师" styleClass="sidebar-username"/>
-                <Label styleClass="sidebar-role" text="教师端"/>
-            </VBox>
-
-            <Separator styleClass="sidebar-divider"/>
-
-            <!-- Navigation -->
-            <VBox styleClass="sidebar-nav" spacing="2" VBox.vgrow="ALWAYS">
-                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-                <Button fx:id="homeButton" text="首  页" styleClass="sidebar-btn"/>
-                <Button fx:id="courseMgmtButton" text="课程管理" styleClass="sidebar-btn"/>
-                <Button fx:id="scheduleButton" text="课表查看" styleClass="sidebar-btn"/>
-                <Button fx:id="scoreInputButton" text="成绩录入" styleClass="sidebar-btn"/>
-                <Button fx:id="personalCenterButton" text="个人中心" styleClass="sidebar-btn"/>
-            </VBox>
-
-            <!-- Footer -->
-            <VBox styleClass="sidebar-footer">
-                <padding><Insets top="12" right="12" bottom="16" left="12"/></padding>
-                <Button text="退出登录" styleClass="sidebar-logout" maxWidth="Infinity"
-                        onAction="#handleLogout"/>
-            </VBox>
-        </VBox>
+        <BorderPane styleClass="sidebar" minWidth="240" maxWidth="240" prefWidth="240">
+            <top>
+                <VBox styleClass="sidebar-header" alignment="CENTER" spacing="6"
+                      BorderPane.alignment="CENTER">
+                    <padding><Insets top="28" right="16" bottom="20" left="16"/></padding>
+                    <Label text="校园信息管理系统" styleClass="sidebar-title">
+                        <font><Font name="System Bold" size="15"/></font>
+                    </Label>
+                    <Separator styleClass="sidebar-separator" maxWidth="60"/>
+                    <Label fx:id="teacherNameLabel" text="教师" styleClass="sidebar-username"/>
+                    <Label styleClass="sidebar-role" text="教师端"/>
+                </VBox>
+            </top>
+            <center>
+                <VBox fx:id="navContainer" styleClass="sidebar-nav" spacing="2"
+                      BorderPane.alignment="CENTER">
+                    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                </VBox>
+            </center>
+            <bottom>
+                <VBox style="-fx-padding: 12 12 16 12; -fx-border-color: #334155 transparent transparent transparent; -fx-border-width: 1 0 0 0;"
+                      BorderPane.alignment="CENTER">
+                    <Button fx:id="logoutBtn" text="退出登录" styleClass="sidebar-logout" maxWidth="Infinity"/>
+                </VBox>
+            </bottom>
+        </BorderPane>
     </left>
 
     <center>
-        <StackPane fx:id="contentArea" styleClass="content-area">
-            <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
-        </StackPane>
+        <VBox fx:id="contentArea" styleClass="content-area"/>
     </center>
+
 </BorderPane>

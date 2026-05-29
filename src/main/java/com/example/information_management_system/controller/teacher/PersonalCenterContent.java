@@ -65,7 +65,7 @@ public class PersonalCenterContent {
         String email = emailField.getText().trim();
 
         if (StringUtil.isEmpty(phone) && StringUtil.isEmpty(email)) {
-            ShowMessage.showWarningMessage("提示", "请至少填写一项联系信息");
+            ShowMessage.showWarningMessage("提示", "请填写需要修改的信息");
             return;
         }
 
@@ -82,10 +82,10 @@ public class PersonalCenterContent {
                         UserSession.getInstance().setPhone(phone);
                         UserSession.getInstance().setEmail(email);
                         Platform.runLater(() ->
-                                ShowMessage.showInfoMessage("成功", "个人信息更新成功！"));
+                                ShowMessage.showInfoMessage("成功", "已成功更新"));
                     } else {
                         String msg = res.has("msg") ? res.get("msg").getAsString() : "更新失败";
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("更新失败", msg));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
@@ -95,7 +95,7 @@ public class PersonalCenterContent {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("更新失败", e.getMessage()));
+                        ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -133,14 +133,14 @@ public class PersonalCenterContent {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
-                            ShowMessage.showInfoMessage("成功", "密码修改成功，下次登录时请使用新密码。");
+                            ShowMessage.showInfoMessage("成功", "密码已修改成功");
                             oldPasswordField.clear();
                             newPasswordField.clear();
                             confirmPasswordField.clear();
                         });
                     } else {
                         String msg = res.has("msg") ? res.get("msg").getAsString() : "修改失败";
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("修改失败", msg));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
@@ -150,7 +150,7 @@ public class PersonalCenterContent {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("修改失败", e.getMessage()));
+                        ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }

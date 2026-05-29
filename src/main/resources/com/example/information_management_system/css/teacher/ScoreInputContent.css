@@ -20,7 +20,7 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-font-size: 13px;
-    -fx-padding: 2 0;
+    -fx-padding: 4 0;
 }
 
 .form-combo:focused {
@@ -97,6 +97,8 @@
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 0;
+    -fx-table-cell-border-color: transparent;
+    -fx-fixed-cell-size: 38px;
 }
 
 .data-table .column-header-background {

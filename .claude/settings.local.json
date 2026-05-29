@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./mvnw javafx:run)"
+      "Bash(./mvnw javafx:run)",
+      "Bash(mvn compile *)",
+      "Bash(java -version)",
+      "Bash(javac -version)",
+      "WebFetch(domain:github.com)",
+      "Bash(gh repo *)"
     ]
   }
 }

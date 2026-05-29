@@ -45,7 +45,7 @@
     </HBox>
 
     <!-- Student Table -->
-    <TableView fx:id="studentTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+    <TableView fx:id="studentTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colId" text="ID" prefWidth="50" />
             <TableColumn fx:id="colSduid" text="学号" prefWidth="120" />
@@ -55,6 +55,8 @@
             <TableColumn fx:id="colClassName" text="班级" prefWidth="120" />
             <TableColumn fx:id="colStatus" text="状态" prefWidth="80" />
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
     </TableView>
-    <Region VBox.vgrow="ALWAYS"/>
 </VBox>

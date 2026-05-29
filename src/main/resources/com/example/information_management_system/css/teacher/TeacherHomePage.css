@@ -16,6 +16,8 @@
 .stat-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
     -fx-min-width: 180;
     -fx-min-height: 140;
@@ -39,6 +41,8 @@
 .quick-actions-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
     -fx-min-height: 220;
 }
@@ -46,6 +50,8 @@
 .recent-courses-card {
     -fx-background-color: #ffffff;
     -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);
     -fx-min-height: 220;
 }
@@ -56,7 +62,7 @@
     -fx-text-fill: #1e293b;
 }
 
-.primary-button {
+.btn-primary {
     -fx-background-color: #4f6ef7;
     -fx-text-fill: #ffffff;
     -fx-font-size: 14px;
@@ -67,15 +73,15 @@
     -fx-border-color: transparent;
 }
 
-.primary-button:hover {
+.btn-primary:hover {
     -fx-background-color: #3d5bd5;
 }
 
-.primary-button:pressed {
+.btn-primary:pressed {
     -fx-background-color: #2f4bc0;
 }
 
-.outline-button {
+.btn-outline {
     -fx-background-color: #ffffff;
     -fx-text-fill: #4f6ef7;
     -fx-font-size: 14px;
@@ -87,7 +93,7 @@
     -fx-cursor: hand;
 }
 
-.outline-button:hover {
+.btn-outline:hover {
     -fx-background-color: #eef2ff;
 }
 

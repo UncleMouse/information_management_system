@@ -52,7 +52,7 @@ public class EditPersonalInfoController {
         String sex = sexCombo.getValue();
 
         if (StringUtil.isEmpty(phone) && StringUtil.isEmpty(email)) {
-            ShowMessage.showWarningMessage("提示", "请至少填写一项信息");
+            ShowMessage.showWarningMessage("提示", "请填写需要修改的信息");
             return;
         }
 
@@ -77,7 +77,7 @@ public class EditPersonalInfoController {
                             session.setEmail(email);
                             session.setSex(sex);
 
-                            ShowMessage.showInfoMessage("成功", "个人信息已更新");
+                            ShowMessage.showInfoMessage("成功", "已成功更新");
                             if (onInfoUpdatedListener != null) {
                                 onInfoUpdatedListener.run();
                             }
@@ -92,7 +92,7 @@ public class EditPersonalInfoController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "解析响应失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -101,7 +101,7 @@ public class EditPersonalInfoController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "请求失败: " + e.getMessage());
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     btnSubmit.setDisable(false);
                 });
             }

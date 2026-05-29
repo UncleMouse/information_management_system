@@ -76,7 +76,7 @@ public class AddNewClassController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
                             ShowMessage.showInfoMessage("成功",
-                                    editingSection != null ? "班级信息已更新" : "班级已添加");
+                                    editingSection != null ? "已成功更新" : "已成功添加");
                             closeDialog();
                         });
                     } else {
@@ -88,7 +88,7 @@ public class AddNewClassController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "解析响应失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -97,7 +97,7 @@ public class AddNewClassController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "请求失败: " + e.getMessage());
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     btnSubmit.setDisable(false);
                 });
             }

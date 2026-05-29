@@ -4,6 +4,7 @@ import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.example.information_management_system.util.StringUtil;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -49,6 +50,14 @@ public class AddNewAnnouncementController {
 
     @FXML
     public void initialize() {
+        noticeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] noticeRatios = {0.5, 2.8, 1.2, 1.6, 1.0, 0.8};
+        final double noticeTotalRatio = java.util.Arrays.stream(noticeRatios).sum();
+        noticeTable.widthProperty().addListener((obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < noticeRatios.length && i < noticeTable.getColumns().size(); i++)
+                noticeTable.getColumns().get(i).setPrefWidth(w * noticeRatios[i] / noticeTotalRatio);
+        });
         // 列表初始化
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -107,7 +116,7 @@ public class AddNewAnnouncementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("加载失败", "获取通知列表失败"));
+                        ShowMessage.showErrorMessage("错误", "数据加载失败"));
             }
         });
     }
@@ -153,7 +162,7 @@ public class AddNewAnnouncementController {
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("搜索失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage()));
             }
         });
     }
@@ -186,24 +195,22 @@ public class AddNewAnnouncementController {
             return;
         }
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("title", title);
-        body.put("content", content);
-        body.put("publisherId", UserSession.getInstance().getId());
-        body.put("publisherName", UserSession.getInstance().getUsername());
-        if (visibility != null) body.put("visibility", visibility);
+        Map<String, String> params = new HashMap<>();
+        params.put("title", title);
+        params.put("content", content);
+        params.put("creatorName", UserSession.getInstance().getUsername());
+        if (visibility != null) params.put("visibleScope", visibility);
 
-        String json = gson.toJson(body);
         btnSubmit.setDisable(true);
 
-        NetworkUtils.post("/notice/set", json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/notice/set", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
-                            ShowMessage.showInfoMessage("成功", "通知已发布");
+                            ShowMessage.showInfoMessage("成功", "已成功发布");
                             showList();
                         });
                     } else {
@@ -215,7 +222,7 @@ public class AddNewAnnouncementController {
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "解析响应失败");
+                        ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试");
                         btnSubmit.setDisable(false);
                     });
                 }
@@ -224,7 +231,7 @@ public class AddNewAnnouncementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "请求失败: " + e.getMessage());
+                    ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
                     btnSubmit.setDisable(false);
                 });
             }

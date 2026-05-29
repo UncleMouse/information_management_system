@@ -329,25 +329,26 @@ public class MockData {
         JsonObject res = new JsonObject();
         res.addProperty("code", 200);
         JsonArray data = new JsonArray();
-        // 5个时间段，每个有7天的课程数据
-        String[] times = {"第1-2节", "第3-4节", "第5-6节", "第7-8节", "第9-10节"};
-        String[][] schedule = {
-            {"数据结构\n教学楼A101", "操作系统\n教学楼B201", "", "计算机网络\n实验楼C301", "", "", ""},
-            {"Java程序设计\n教学楼A102", "人工智能导论\n综合楼D101", "数据结构\n教学楼A101", "", "数据库原理\n实验楼C302", "", ""},
-            {"", "计算机网络\n实验楼C301", "操作系统\n教学楼B201", "Java程序设计\n教学楼A102", "", "", ""},
-            {"数据库原理\n实验楼C302", "", "人工智能导论\n综合楼D101", "", "", "", ""},
-            {"", "", "", "", "", "", ""},
+        String[][] courses = {
+            {"数据结构", "教学楼A101", "周一 1-2节", "1"},
+            {"操作系统", "教学楼B201", "周二 1-2节", "2"},
+            {"计算机网络", "实验楼C301", "周四 1-2节", "4"},
+            {"Java程序设计", "教学楼A102", "周一 3-4节", "1"},
+            {"人工智能导论", "综合楼D101", "周二 3-4节", "2"},
+            {"数据结构", "教学楼A101", "周三 3-4节", "3"},
+            {"数据库原理", "实验楼C302", "周五 3-4节", "5"},
+            {"计算机网络", "实验楼C301", "周二 5-6节", "2"},
+            {"操作系统", "教学楼B201", "周三 5-6节", "3"},
+            {"Java程序设计", "教学楼A102", "周四 5-6节", "4"},
+            {"数据库原理", "实验楼C302", "周一 7-8节", "1"},
+            {"人工智能导论", "综合楼D101", "周四 7-8节", "4"},
         };
-        for (int i = 0; i < times.length; i++) {
+        for (String[] c : courses) {
             JsonObject obj = new JsonObject();
-            obj.addProperty("time", times[i]);
-            obj.addProperty("monday", schedule[i][0]);
-            obj.addProperty("tuesday", schedule[i][1]);
-            obj.addProperty("wednesday", schedule[i][2]);
-            obj.addProperty("thursday", schedule[i][3]);
-            obj.addProperty("friday", schedule[i][4]);
-            obj.addProperty("saturday", schedule[i][5]);
-            obj.addProperty("sunday", schedule[i][6]);
+            obj.addProperty("name", c[0]);
+            obj.addProperty("classroom", c[1]);
+            obj.addProperty("time", c[2]);
+            obj.addProperty("day", c[3]);
             data.add(obj);
         }
         res.add("data", data);

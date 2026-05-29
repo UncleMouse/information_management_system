@@ -11,7 +11,7 @@
       styleClass="page-root" spacing="16"
       stylesheets="@../css/teacher/courseManagementContent.css">
 
-    <padding><Insets top="0" right="0" bottom="16" left="0"/></padding>
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="16">
         <Button fx:id="backButton" text="< 返回" styleClass="back-button"/>

@@ -5,44 +5,48 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.student.ScoreSearchContentController"
       styleClass="page-root" stylesheets="@../css/student/ScoreSearch.css"
-      VBox.vgrow="ALWAYS">
+      spacing="16">
+
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <!-- Header -->
-    <HBox styleClass="page-header" VBox.vgrow="NEVER" spacing="12.0" alignment="CENTER_LEFT">
+    <HBox spacing="12" alignment="CENTER_LEFT">
         <Label text="成绩查询" styleClass="page-title">
             <font><Font name="System Bold" size="20"/></font>
         </Label>
         <Region HBox.hgrow="ALWAYS"/>
-        <Label text="学期：" styleClass="selector-label"/>
-        <ComboBox fx:id="termSelector" prefWidth="180.0" styleClass="term-selector"/>
-        <Button fx:id="exportBtn" text="导出成绩" styleClass="export-btn"/>
+        <Label text="学期：" styleClass="field-label"/>
+        <ComboBox fx:id="termSelector" prefWidth="180" styleClass="form-combo"/>
+        <Button fx:id="exportBtn" text="导出成绩" styleClass="btn-outline"/>
     </HBox>
 
     <!-- Score Table -->
-    <TableView fx:id="scoreTable" styleClass="data-table" VBox.vgrow="NEVER" prefHeight="400">
+    <TableView fx:id="scoreTable" styleClass="data-table" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="colIndex" text="序号" prefWidth="50.0" sortable="false"/>
-            <TableColumn fx:id="colCourseName" text="课程名称" prefWidth="180.0" sortable="false"/>
-            <TableColumn fx:id="colPoint" text="学分" prefWidth="60.0" sortable="false"/>
-            <TableColumn fx:id="colType" text="类型" prefWidth="80.0" sortable="false"/>
-            <TableColumn fx:id="colTeacher" text="教师" prefWidth="80.0" sortable="false"/>
-            <TableColumn fx:id="colGrade" text="成绩" prefWidth="70.0" sortable="false"/>
-            <TableColumn fx:id="colGpa" text="GPA" prefWidth="60.0" sortable="false"/>
-            <TableColumn fx:id="colRank" text="排名" prefWidth="60.0" sortable="false"/>
-            <TableColumn fx:id="colRegular" text="平时成绩" prefWidth="80.0" sortable="false"/>
-            <TableColumn fx:id="colFinal" text="期末成绩" prefWidth="80.0" sortable="false"/>
+            <TableColumn fx:id="colIndex" text="序号" prefWidth="50" sortable="false"/>
+            <TableColumn fx:id="colCourseName" text="课程名称" prefWidth="200" sortable="false"/>
+            <TableColumn fx:id="colPoint" text="学分" prefWidth="70" sortable="false"/>
+            <TableColumn fx:id="colType" text="类型" prefWidth="90" sortable="false"/>
+            <TableColumn fx:id="colTeacher" text="教师" prefWidth="100" sortable="false"/>
+            <TableColumn fx:id="colGrade" text="成绩" prefWidth="80" sortable="false"/>
+            <TableColumn fx:id="colGpa" text="GPA" prefWidth="70" sortable="false"/>
+            <TableColumn fx:id="colRank" text="排名" prefWidth="70" sortable="false"/>
+            <TableColumn fx:id="colRegular" text="平时成绩" prefWidth="90" sortable="false"/>
+            <TableColumn fx:id="colFinal" text="期末成绩" prefWidth="90" sortable="false"/>
         </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
     </TableView>
 
     <!-- Summary Bar -->
-    <HBox styleClass="summary-bar" VBox.vgrow="NEVER" spacing="24.0" alignment="CENTER_RIGHT">
+    <HBox spacing="24" alignment="CENTER_RIGHT" styleClass="summary-bar">
         <Label text="平均GPA：" styleClass="summary-label"/>
         <Label fx:id="avgGpaLabel" text="-" styleClass="summary-value"/>
         <Label text="总学分：" styleClass="summary-label"/>
         <Label fx:id="totalCreditLabel" text="-" styleClass="summary-value"/>
     </HBox>
-    <Region VBox.vgrow="ALWAYS"/>
 </VBox>

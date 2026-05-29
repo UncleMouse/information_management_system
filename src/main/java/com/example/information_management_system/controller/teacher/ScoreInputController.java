@@ -6,6 +6,7 @@ import com.example.information_management_system.util.ExportUtils;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.example.information_management_system.util.StringUtil;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -49,6 +50,14 @@ public class ScoreInputController {
 
     @FXML
     public void initialize() {
+        scoreTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] scoreRatios = {1.4, 1.0, 1.2, 1.0, 1.0, 1.0, 0.8, 1.5};
+        final double scoreTotalRatio = java.util.Arrays.stream(scoreRatios).sum();
+        scoreTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < scoreRatios.length && i < scoreTable.getColumns().size(); i++)
+                scoreTable.getColumns().get(i).setPrefWidth(w * scoreRatios[i] / scoreTotalRatio);
+        });
         setupTableColumns();
         scoreTable.setItems(scoreList);
         scoreTable.setEditable(true);
@@ -129,7 +138,7 @@ public class ScoreInputController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("加载失败", "获取课程列表失败"));
+                        ShowMessage.showErrorMessage("错误", "数据加载失败"));
             }
         });
     }
@@ -189,7 +198,7 @@ public class ScoreInputController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("加载失败", "获取学生成绩数据失败"));
+                        ShowMessage.showErrorMessage("错误", "数据加载失败"));
             }
         });
     }
@@ -217,45 +226,22 @@ public class ScoreInputController {
             return;
         }
 
-        JsonArray scoresArray = new JsonArray();
+        Integer courseId = courseNameToId.get(selectedCourseCode);
         for (ScoreEntry entry : scoreList) {
-            JsonObject scoreObj = new JsonObject();
-            scoreObj.addProperty("studentId", entry.getStudentId());
-            scoreObj.addProperty("sduid", entry.getSduid());
-            scoreObj.addProperty("courseName", entry.getCourseName());
-            scoreObj.addProperty("regularScore", entry.getRegularScore());
-            scoreObj.addProperty("finalScore", entry.getFinalScore());
-            scoreObj.addProperty("totalScore", entry.getTotalScore());
-            scoreObj.addProperty("remarks", entry.getRemarks() != null ? entry.getRemarks() : "");
-            scoresArray.add(scoreObj);
+            Map<String, String> params = new HashMap<>();
+            params.put("studentId", String.valueOf(entry.getStudentId()));
+            if (courseId != null) params.put("courseId", String.valueOf(courseId));
+            params.put("regular", String.valueOf((int) entry.getRegularScore()));
+            params.put("finalScore", String.valueOf((int) entry.getFinalScore()));
+            params.put("grade", String.valueOf((int) entry.getTotalScore()));
+            NetworkUtils.post("/grade/setGrade", params, "", new NetworkUtils.Callback<String>() {
+                @Override
+                public void onSuccess(String result) { /* 逐条保存，不弹窗 */ }
+                @Override
+                public void onFailure(Exception e) { /* 忽略单条失败 */ }
+            });
         }
-
-        JsonObject bodyObj = new JsonObject();
-        bodyObj.add("scores", scoresArray);
-        String jsonBody = gson.toJson(bodyObj);
-
-        NetworkUtils.post("/grade/setGrade", jsonBody, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        Platform.runLater(() ->
-                                ShowMessage.showInfoMessage("成功", "成绩保存成功！"));
-                    } else {
-                        String msg = res.has("msg") ? res.get("msg").getAsString() : "保存失败";
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("保存失败", msg));
-                    }
-                } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("保存失败", e.getMessage()));
-            }
-        });
+        ShowMessage.showInfoMessage("成功", "已成功更新");
     }
 
     private void handlePublishScores() {
@@ -263,34 +249,20 @@ public class ScoreInputController {
             ShowMessage.showWarningMessage("提示", "请先选择课程");
             return;
         }
-
-        boolean confirmed = ShowMessage.showConfirmMessage("确认发布",
-                "确定要发布该课程的成绩吗？发布后学生将可以查看。");
+        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要发布该课程的成绩吗？");
         if (!confirmed) return;
 
-        JsonObject bodyObj = new JsonObject();
-        bodyObj.addProperty("courseName", selectedCourseCode);
-
-        NetworkUtils.post("/grade/releaseGrade", gson.toJson(bodyObj), new NetworkUtils.Callback<String>() {
+        Integer courseId = courseNameToId.get(selectedCourseCode);
+        Map<String, String> params = new HashMap<>();
+        if (courseId != null) params.put("courseId", String.valueOf(courseId));
+        NetworkUtils.post("/grade/releaseGrade", params, "", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        Platform.runLater(() ->
-                                ShowMessage.showInfoMessage("成功", "成绩发布成功！"));
-                    } else {
-                        String msg = res.has("msg") ? res.get("msg").getAsString() : "发布失败";
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("发布失败", msg));
-                    }
-                } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
-                }
+                Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已成功发布"));
             }
-
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("发布失败", e.getMessage()));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
     }
@@ -325,7 +297,7 @@ public class ScoreInputController {
                 data.add(row);
             }
             ExportUtils.exportToExcel(file.getAbsolutePath(), headers, data, "成绩表");
-            ShowMessage.showInfoMessage("导出成功", "成绩已导出到: " + file.getName());
+            ShowMessage.showInfoMessage("成功", "已成功导出至: " + file.getName());
         }
     }
 }

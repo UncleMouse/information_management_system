@@ -7,95 +7,90 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
 public class StudentBaseViewController {
 
     @FXML private Label studentNameLabel;
     @FXML private VBox contentArea;
-    @FXML private Button homeBtn;
-    @FXML private Button scheduleBtn;
-    @FXML private Button courseSelectionBtn;
-    @FXML private Button scoreSearchBtn;
-    @FXML private Button personalBtn;
+    @FXML private VBox navContainer;
+    @FXML private Button logoutBtn;
 
-    private final Map<String, String> btnFxmlMap = new HashMap<>();
-    private static final String FXML_BASE = "student/";
-    private String currentActiveBtn = null;
+    private Button activeButton;
 
     @FXML
     public void initialize() {
         studentNameLabel.setText(UserSession.getInstance().getUsername());
 
-        btnFxmlMap.put("homeBtn", "StudentHomeContent.fxml");
-        btnFxmlMap.put("scheduleBtn", "CourseScheduleContent.fxml");
-        btnFxmlMap.put("courseSelectionBtn", "CourseSelectionContent.fxml");
-        btnFxmlMap.put("scoreSearchBtn", "ScoreSearchContent.fxml");
-        btnFxmlMap.put("personalBtn", "UserInfo.fxml");
+        Button homeBtn = addNavBtn("首  页", "student/StudentHomeContent.fxml");
+        addNavBtn("课表查询", "student/CourseScheduleContent.fxml");
+        addNavBtn("选课中心", "student/CourseSelectionContent.fxml");
+        addNavBtn("成绩查询", "student/ScoreSearchContent.fxml");
+        addNavBtn("公告查看", "student/StudentAnnouncement.fxml");
+        addNavBtn("个人中心", "student/UserInfo.fxml");
 
-        homeBtn.setOnAction(e -> switchContent("homeBtn"));
-        scheduleBtn.setOnAction(e -> switchContent("scheduleBtn"));
-        courseSelectionBtn.setOnAction(e -> switchContent("courseSelectionBtn"));
-        scoreSearchBtn.setOnAction(e -> switchContent("scoreSearchBtn"));
-        personalBtn.setOnAction(e -> switchContent("personalBtn"));
+        logoutBtn.setOnAction(e -> handleLogout());
 
-        switchContent("homeBtn");
+        Button themeBtn = new Button("🌙 暗色");
+        themeBtn.getStyleClass().add("sidebar-btn");
+        themeBtn.setMaxWidth(Double.MAX_VALUE);
+        themeBtn.setOnAction(e -> {
+            boolean dark = !com.example.information_management_system.util.ThemeManager.isDark();
+            com.example.information_management_system.util.ThemeManager.setDark(dark);
+            themeBtn.setText(dark ? "☀ 亮色" : "🌙 暗色");
+            if (navContainer.getScene() != null)
+                com.example.information_management_system.util.ThemeManager.applyTheme(navContainer.getScene());
+        });
+        navContainer.getChildren().add(themeBtn);
+        navContainer.sceneProperty().addListener((obs, o, s) -> {
+            if (s != null) com.example.information_management_system.util.ThemeManager.applyTheme(s);
+        });
+
+        loadContent("student/StudentHomeContent.fxml");
+        setActiveButton(homeBtn);
     }
 
-    private void switchContent(String btnName) {
-        if (btnName.equals(currentActiveBtn)) return;
-        currentActiveBtn = btnName;
+    private Button addNavBtn(String text, String fxmlPath) {
+        Button btn = new Button(text);
+        btn.getStyleClass().add("sidebar-btn");
+        btn.setMaxWidth(Double.MAX_VALUE);
+        btn.setOnAction(e -> { setActiveButton(btn); loadContent(fxmlPath); });
+        navContainer.getChildren().add(btn);
+        return btn;
+    }
 
-        resetAllButtonStyles();
-        highlightButton(btnName);
+    private void setActiveButton(Button button) {
+        if (activeButton != null) activeButton.getStyleClass().remove("sidebar-btn-active");
+        activeButton = button;
+        button.getStyleClass().add("sidebar-btn-active");
+    }
 
-        String fxmlFile = btnFxmlMap.get(btnName);
-        if (fxmlFile == null) return;
-
+    private void loadContent(String fxmlPath) {
         try {
-            String path = "/com/example/information_management_system/" + FXML_BASE + fxmlFile;
-            FXMLLoader loader = new FXMLLoader(
-                    java.util.Objects.requireNonNull(getClass().getResource(path)));
+            String path = "/com/example/information_management_system/" + fxmlPath;
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(path)));
             VBox content = loader.load();
             contentArea.getChildren().clear();
             contentArea.getChildren().add(content);
+            VBox.setVgrow(content, Priority.ALWAYS);
         } catch (IOException e) {
-            ShowMessage.showErrorMessage("加载失败", "无法加载页面: " + fxmlFile);
+            ShowMessage.showErrorMessage("错误", "页面加载失败，请重启应用");
             e.printStackTrace();
         }
     }
 
-    private void resetAllButtonStyles() {
-        homeBtn.getStyleClass().remove("sidebar-btn-active");
-        scheduleBtn.getStyleClass().remove("sidebar-btn-active");
-        courseSelectionBtn.getStyleClass().remove("sidebar-btn-active");
-        scoreSearchBtn.getStyleClass().remove("sidebar-btn-active");
-        personalBtn.getStyleClass().remove("sidebar-btn-active");
-    }
-
-    private void highlightButton(String btnName) {
-        switch (btnName) {
-            case "homeBtn" -> homeBtn.getStyleClass().add("sidebar-btn-active");
-            case "scheduleBtn" -> scheduleBtn.getStyleClass().add("sidebar-btn-active");
-            case "courseSelectionBtn" -> courseSelectionBtn.getStyleClass().add("sidebar-btn-active");
-            case "scoreSearchBtn" -> scoreSearchBtn.getStyleClass().add("sidebar-btn-active");
-            case "personalBtn" -> personalBtn.getStyleClass().add("sidebar-btn-active");
-        }
-    }
-
-    @FXML
     private void handleLogout() {
-        boolean confirmed = ShowMessage.showConfirmMessage("退出登录", "确定要退出登录吗？");
+        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要退出登录吗？");
         if (confirmed) {
             UserSession.getInstance().clearSession();
             try {
                 MainApplication.changeView("Login.fxml", "css/Login.css");
             } catch (IOException e) {
-                ShowMessage.showErrorMessage("错误", "无法加载登录页面");
+                ShowMessage.showErrorMessage("错误", "页面加载失败，请重启应用");
             }
         }
     }

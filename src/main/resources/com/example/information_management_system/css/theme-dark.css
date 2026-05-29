@@ -1,0 +1,308 @@
+/* ===== Dark Theme - 全局背景 ===== */
+.root, .page-root, .content-area, .page-header {
+    -fx-background-color: #0f172a !important;
+}
+
+/* ===== 侧边栏 ===== */
+.sidebar {
+    -fx-background-color: #020617 !important;
+}
+.sidebar-header, .sidebar-nav, .sidebar-footer {
+    -fx-background-color: transparent !important;
+}
+.sidebar-title, .sidebar-username, .sidebar-user {
+    -fx-text-fill: #e2e8f0 !important;
+}
+.sidebar-role {
+    -fx-text-fill: #64748b !important;
+}
+.sidebar-divider, .sidebar-separator {
+    -fx-background-color: #1e293b !important;
+}
+.sidebar-separator .line {
+    -fx-stroke: #334155 !important;
+}
+.sidebar-btn {
+    -fx-text-fill: #94a3b8 !important;
+}
+.sidebar-btn:hover {
+    -fx-background-color: #1e293b !important;
+    -fx-text-fill: #e2e8f0 !important;
+}
+.sidebar-btn-active {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.sidebar-logout {
+    -fx-text-fill: #64748b !important;
+    -fx-border-color: #475569 !important;
+    -fx-background-color: transparent !important;
+}
+.sidebar-logout:hover {
+    -fx-background-color: #ef4444 !important;
+    -fx-text-fill: #ffffff !important;
+    -fx-border-color: transparent !important;
+}
+
+/* ===== 登录页 ===== */
+.login-panel {
+    -fx-background-color: #0f172a !important;
+}
+.brand-panel {
+    -fx-background-color: #020617 !important;
+}
+.login-title {
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 页面标题 ===== */
+.page-title, .card-title, .card-section-title,
+.welcome-text, .welcome-title, .stat-value, .stat-value-small,
+.summary-value, .info-value, .dialog-title, .form-title,
+.loading-text {
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 辅助文本 ===== */
+.stat-label, .stat-sub, .sub-text, .subtitle-text,
+.welcome-subtitle, .stat-label-small, .info-label,
+.selector-label, .filter-label, .summary-label,
+.status-label, .count-label, .field-label, .form-label,
+.page-header .label {
+    -fx-text-fill: #94a3b8 !important;
+}
+
+/* ===== 卡片 ===== */
+.stat-card, .stat-card-small, .card, .info-card,
+.form-card, .summary-bar, .quick-actions-card,
+.recent-courses-card, .info-grid, .content-container,
+.form-container, .dialog-root {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 表格 ===== */
+.data-table, .schedule-table {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+.data-table .column-header-background,
+.schedule-table .column-header-background {
+    -fx-background-color: #0f172a !important;
+}
+.data-table .column-header,
+.schedule-table .column-header {
+    -fx-background-color: transparent !important;
+    -fx-border-color: #334155 !important;
+}
+.data-table .column-header .label,
+.schedule-table .column-header .label {
+    -fx-text-fill: #94a3b8 !important;
+}
+.data-table .table-cell,
+.schedule-table .table-cell {
+    -fx-text-fill: #cbd5e1 !important;
+    -fx-border-color: #1e293b !important;
+}
+.data-table .table-row-cell {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #0f172a !important;
+}
+.data-table .table-row-cell:odd {
+    -fx-background-color: #1e293b !important;
+}
+.data-table .table-row-cell:even {
+    -fx-background-color: #1e293b !important;
+}
+.data-table .table-row-cell:selected {
+    -fx-background-color: #1e3a5f !important;
+}
+.data-table .table-row-cell:hover {
+    -fx-background-color: #334155 !important;
+}
+.schedule-table .table-row-cell {
+    -fx-background-color: #1e293b !important;
+}
+.schedule-table .table-row-cell:odd {
+    -fx-background-color: #1e293b !important;
+}
+
+/* ===== 输入框 ===== */
+.input-field, .search-field, .form-field, .form-textarea {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-prompt-text-fill: #64748b !important;
+}
+.input-field:focused, .search-field:focused,
+.form-field:focused, .form-textarea:focused {
+    -fx-border-color: #4f6ef7 !important;
+    -fx-background-color: #0f172a !important;
+}
+.form-textarea .content {
+    -fx-background-color: #020617 !important;
+}
+
+/* ===== 下拉框 ===== */
+.form-combo, .filter-combo, .term-selector {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+}
+.form-combo .list-cell, .filter-combo .list-cell,
+.term-selector .list-cell {
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-background-color: #020617 !important;
+}
+.form-combo .list-view, .filter-combo .list-view,
+.term-selector .list-view {
+    -fx-background-color: #1e293b !important;
+}
+.form-combo .list-cell:hover, .filter-combo .list-cell:hover {
+    -fx-background-color: #334155 !important;
+}
+.form-combo:focused, .filter-combo:focused {
+    -fx-border-color: #4f6ef7 !important;
+}
+
+/* ===== 按钮 ===== */
+.btn-primary {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-primary:hover {
+    -fx-background-color: #3d5bd5 !important;
+}
+.btn-secondary {
+    -fx-background-color: #334155 !important;
+    -fx-text-fill: #cbd5e1 !important;
+}
+.btn-secondary:hover {
+    -fx-background-color: #475569 !important;
+}
+.btn-outline {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #4f6ef7 !important;
+    -fx-border-color: #4f6ef7 !important;
+}
+.btn-outline:hover {
+    -fx-background-color: #1e3a5f !important;
+}
+.btn-success, .publish-button {
+    -fx-background-color: #059669 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-success:hover, .publish-button:hover {
+    -fx-background-color: #047857 !important;
+}
+.btn-danger {
+    -fx-background-color: #dc2626 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-danger:hover {
+    -fx-background-color: #b91c1c !important;
+}
+.btn-back, .back-button {
+    -fx-text-fill: #4f6ef7 !important;
+}
+.btn-back:hover, .back-button:hover {
+    -fx-text-fill: #3d5bd5 !important;
+}
+.login-button {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.toggle-link {
+    -fx-text-fill: #4f6ef7 !important;
+}
+.quick-link {
+    -fx-text-fill: #64748b !important;
+}
+
+/* ===== Tab 标签页 ===== */
+.tab-pane .tab-header-area {
+    -fx-background-color: transparent !important;
+}
+.tab-pane .tab-header-background {
+    -fx-background-color: transparent !important;
+}
+.course-tab-pane .tab {
+    -fx-background-color: transparent !important;
+}
+.course-tab-pane .tab:selected {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 #334155 transparent #334155 !important;
+}
+.course-tab-pane .tab .tab-label {
+    -fx-text-fill: #64748b !important;
+}
+.course-tab-pane .tab:selected .tab-label {
+    -fx-text-fill: #4f6ef7 !important;
+}
+.course-tab-pane .tab-content-area {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 卡片内部元素 ===== */
+.card-header {
+    -fx-border-color: transparent transparent #334155 transparent !important;
+}
+.card-separator {
+    -fx-border-color: #334155 !important;
+}
+.card-body {
+    -fx-background-color: transparent !important;
+}
+
+/* ===== 滚动条 ===== */
+.scroll-pane, .scroll-pane .viewport {
+    -fx-background-color: transparent !important;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #475569 !important;
+}
+
+/* ===== 通知卡片 ===== */
+.notice-item {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 课表 ===== */
+.week-label {
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 水印 ===== */
+.watermark {
+    -fx-text-fill: rgba(255,255,255,0.04) !important;
+}
+
+/* ===== 表格操作按钮 ===== */
+.action-btn-select {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.action-btn-select:hover {
+    -fx-background-color: #3d5bd5 !important;
+}
+.action-btn-drop {
+    -fx-background-color: #dc2626 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.action-btn-drop:hover {
+    -fx-background-color: #b91c1c !important;
+}
+
+/* ===== 分隔线 ===== */
+.separator .line {
+    -fx-stroke: #334155 !important;
+}
+
+/* ===== 选中文本 ===== */
+.data-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: #e2e8f0 !important;
+}
+.data-table:focused {
+    -fx-background-insets: 0 !important;
+}

@@ -1,9 +1,9 @@
 package com.example.information_management_system.controller.teacher;
 
-import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.model.Course;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -14,16 +14,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class CourseManagementContent {
@@ -46,6 +41,14 @@ public class CourseManagementContent {
 
     @FXML
     public void initialize() {
+        courseTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] courseRatios = {1.8, 1.2, 0.8, 1.2, 1.0, 1.2};
+        final double courseTotalRatio = java.util.Arrays.stream(courseRatios).sum();
+        courseTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < courseRatios.length && i < courseTable.getColumns().size(); i++)
+                courseTable.getColumns().get(i).setPrefWidth(w * courseRatios[i] / courseTotalRatio);
+        });
         setupTableColumns();
         courseTable.setItems(courseList);
 
@@ -118,7 +121,7 @@ public class CourseManagementContent {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("加载失败", "获取课程列表失败: " + e.getMessage()));
+                        ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage()));
             }
         });
     }

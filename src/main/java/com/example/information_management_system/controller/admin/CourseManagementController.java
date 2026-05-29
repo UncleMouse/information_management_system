@@ -5,6 +5,7 @@ import com.example.information_management_system.model.Course;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -44,6 +45,14 @@ public class CourseManagementController {
 
     @FXML
     public void initialize() {
+        courseTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] courseRatios = {1.0, 1.8, 1.0, 0.6, 0.8, 1.0, 0.8};
+        final double courseTotalRatio = java.util.Arrays.stream(courseRatios).sum();
+        courseTable.widthProperty().addListener((_obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < courseRatios.length && i < courseTable.getColumns().size(); i++)
+                courseTable.getColumns().get(i).setPrefWidth(w * courseRatios[i] / courseTotalRatio);
+        });
         setupTableColumns();
         courseTable.setItems(courseList);
         setupFilters();
@@ -113,7 +122,7 @@ public class CourseManagementController {
     }
 
     private void loadCourses() {
-        statusLabel.setText("正在加载课程数据...");
+        statusLabel.setText("加载中…");
         NetworkUtils.get("/class/pending", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
@@ -125,21 +134,21 @@ public class CourseManagementController {
                         List<Course> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             courseList.setAll(list);
-                            statusLabel.setText("共 " + list.size() + " 门课程");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("加载失败"));
+                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据解析失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "获取课程列表失败: " + e.getMessage());
+                    statusLabel.setText("网络请求失败，请检查连接");
+                    ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage());
                 });
             }
         });
@@ -151,7 +160,7 @@ public class CourseManagementController {
             loadCourses();
             return;
         }
-        statusLabel.setText("正在搜索...");
+        statusLabel.setText("加载中…");
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
         if (semesterFilter.getValue() != null && !"全部".equals(semesterFilter.getValue())) {
@@ -171,17 +180,17 @@ public class CourseManagementController {
                         List<Course> list = gson.fromJson(arr, listType);
                         Platform.runLater(() -> {
                             courseList.setAll(list);
-                            statusLabel.setText("搜索到 " + list.size() + " 门课程");
+                            statusLabel.setText("共 " + list.size() + " 条");
                         });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                Platform.runLater(() -> statusLabel.setText("数据加载失败"));
             }
         });
     }
@@ -206,11 +215,11 @@ public class CourseManagementController {
 
     private void reviewCourse(Course course, boolean approve) {
         String action = approve ? "通过" : "拒绝";
-        boolean confirmed = ShowMessage.showConfirmMessage("确认审核",
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要" + action + "课程 " + course.getCode() + " 吗？");
         if (!confirmed) return;
 
-        statusLabel.setText("正在提交审核...");
+        statusLabel.setText("加载中…");
         Map<String, Object> body = new HashMap<>();
         body.put("courseId", course.getCode());
         body.put("status", approve ? "APPROVED" : "REJECTED");
@@ -223,12 +232,12 @@ public class CourseManagementController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
-                            ShowMessage.showInfoMessage("成功", "课程已" + action);
+                            ShowMessage.showInfoMessage("成功", "已成功更新");
                             loadCourses();
                         });
                     } else {
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("审核失败",
-                                res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误",
+                                res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试"));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析响应失败"));
@@ -238,8 +247,8 @@ public class CourseManagementController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    statusLabel.setText("审核失败");
-                    ShowMessage.showErrorMessage("审核失败", e.getMessage());
+                    statusLabel.setText("数据加载失败");
+                    ShowMessage.showErrorMessage("错误", "操作失败，请稍后重试");
                 });
             }
         });

@@ -10,7 +10,7 @@ public class ResUtil {
             if (idx >= 0) {
                 String json = errorBody.substring(idx);
                 JsonObject obj = new com.google.gson.Gson().fromJson(json, JsonObject.class);
-                return obj.has("msg") ? obj.get("msg").getAsString() : "未知错误";
+                return obj.has("msg") ? obj.get("msg").getAsString() : "操作失败，请稍后重试";
             }
         } catch (Exception ignored) {}
         return errorBody;

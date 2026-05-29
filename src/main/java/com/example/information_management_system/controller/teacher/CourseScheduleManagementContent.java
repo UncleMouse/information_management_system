@@ -3,6 +3,7 @@ package com.example.information_management_system.controller.teacher;
 import com.example.information_management_system.model.CourseRow;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,19 @@ public class CourseScheduleManagementContent {
 
     @FXML
     public void initialize() {
+        scheduleTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        // 列宽按比例铺满表格
+        final double[] ratios = {1.0, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3};
+        final double totalRatio = Arrays.stream(ratios).sum();
+        scheduleTable.widthProperty().addListener((obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < ratios.length && i < scheduleTable.getColumns().size(); i++)
+                scheduleTable.getColumns().get(i).setPrefWidth(w * ratios[i] / totalRatio);
+        });
+        // 始终5行：fixedCellSize 直接绑定到表格高度
+        scheduleTable.fixedCellSizeProperty().bind(
+            scheduleTable.heightProperty().subtract(28).divide(5).map(v -> Math.max(40, v.doubleValue()))
+        );
         setupColumns();
         scheduleTable.setItems(scheduleData);
 
@@ -66,6 +81,10 @@ public class CourseScheduleManagementContent {
 
         updateWeekLabel();
         loadSchedule();
+    }
+
+    private void updateRowHeight() {
+        scheduleTable.setFixedCellSize(Math.max(40, (scheduleTable.getHeight() - 28) / 5.0));
     }
 
     private void setupColumns() {
@@ -103,13 +122,13 @@ public class CourseScheduleManagementContent {
                         });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("加载失败", "课表数据解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("加载失败", "获取课表失败"));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据加载失败"));
             }
         });
     }

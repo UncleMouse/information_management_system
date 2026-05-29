@@ -128,7 +128,7 @@ public class TeacherHomePageController {
                 Platform.runLater(() -> {
                     if (recentCoursesBox != null) {
                         recentCoursesBox.getChildren().clear();
-                        Label err = new Label("  加载失败");
+                        Label err = new Label("  数据加载失败");
                         err.setStyle("-fx-font-size: 14px; -fx-text-fill: #ef4444;");
                         recentCoursesBox.getChildren().add(err);
                     }

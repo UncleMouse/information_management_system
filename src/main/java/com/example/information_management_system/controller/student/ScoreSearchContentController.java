@@ -5,6 +5,7 @@ import com.example.information_management_system.model.ScoreRecord;
 import com.example.information_management_system.util.ExportUtils;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,6 +19,7 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,14 @@ public class ScoreSearchContentController {
 
     @FXML
     public void initialize() {
+        scoreTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        final double[] ratios = {0.5, 2.0, 0.7, 0.9, 1.0, 0.8, 0.7, 0.7, 0.9, 0.9};
+        final double totalRatio = Arrays.stream(ratios).sum();
+        scoreTable.widthProperty().addListener((obs, oldW, newW) -> {
+            double w = newW.doubleValue() - 2;
+            for (int i = 0; i < ratios.length && i < scoreTable.getColumns().size(); i++)
+                scoreTable.getColumns().get(i).setPrefWidth(w * ratios[i] / totalRatio);
+        });
         setupColumns();
 
         termSelector.setItems(Data.getInstance().getSemesterList());
@@ -144,8 +154,8 @@ public class ScoreSearchContentController {
             @Override
             public void onFailure(Exception e) {
                 Platform.runLater(() -> {
-                    avgGpaLabel.setText("加载失败");
-                    totalCreditLabel.setText("加载失败");
+                    avgGpaLabel.setText("数据加载失败");
+                    totalCreditLabel.setText("数据加载失败");
                 });
             }
         });
@@ -153,7 +163,7 @@ public class ScoreSearchContentController {
 
     private void handleExport() {
         if (scoreRecords.isEmpty()) {
-            ShowMessage.showWarningMessage("导出失败", "没有成绩数据可导出");
+            ShowMessage.showWarningMessage("提示", "暂无数据");
             return;
         }
 
@@ -185,9 +195,9 @@ public class ScoreSearchContentController {
         Platform.runLater(() -> {
             try {
                 ExportUtils.exportToExcel(file.getAbsolutePath(), headers, data, "成绩单");
-                ShowMessage.showInfoMessage("导出成功", "成绩单已导出到: " + file.getAbsolutePath());
+                ShowMessage.showInfoMessage("成功", "已成功导出至: " + file.getName());
             } catch (Exception e) {
-                ShowMessage.showErrorMessage("导出失败", e.getMessage());
+                ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
             }
         });
     }

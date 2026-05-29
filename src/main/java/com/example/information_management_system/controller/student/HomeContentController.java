@@ -35,7 +35,7 @@ public class HomeContentController {
         String username = UserSession.getInstance().getUsername();
         welcomeLabel.setText(username != null ? "欢迎回来，" + username : "欢迎回来");
 
-        currentTermLabel.setText("加载中...");
+        currentTermLabel.setText("加载中…");
         selectedCourseCountLabel.setText("-");
         earnedCreditLabel.setText("-");
         gpaRankLabel.setText("-");
@@ -97,7 +97,7 @@ public class HomeContentController {
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> selectedCourseCountLabel.setText("加载失败"));
+                Platform.runLater(() -> selectedCourseCountLabel.setText("数据加载失败"));
             }
         });
     }
@@ -139,7 +139,7 @@ public class HomeContentController {
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> earnedCreditLabel.setText("加载失败"));
+                Platform.runLater(() -> earnedCreditLabel.setText("数据加载失败"));
             }
         });
     }
@@ -155,13 +155,13 @@ public class HomeContentController {
                         Platform.runLater(() -> currentTermLabel.setText(term));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> currentTermLabel.setText("加载失败"));
+                    Platform.runLater(() -> currentTermLabel.setText("数据加载失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> currentTermLabel.setText("加载失败"));
+                Platform.runLater(() -> currentTermLabel.setText("数据加载失败"));
             }
         });
     }
@@ -230,9 +230,10 @@ public class HomeContentController {
             if (area != null) {
                 area.getChildren().clear();
                 area.getChildren().add(content);
+                javafx.scene.layout.VBox.setVgrow(content, javafx.scene.layout.Priority.ALWAYS);
             }
         } catch (Exception e) {
-            ShowMessage.showErrorMessage("导航失败", "无法加载页面");
+            ShowMessage.showErrorMessage("错误", "页面加载失败，请重启应用");
         }
     }
 
