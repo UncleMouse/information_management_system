@@ -1,83 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.teacher.PersonalCenterContent"
-      styleClass="page-root" spacing="20"
-      stylesheets="@../css/teacher/PersonalCenterContent.css">
-
-    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+      styleClass="page-root" stylesheets="@../css/teacher/PersonalCenterContent.css" spacing="20">
+    <padding><Insets top="28" right="32" bottom="28" left="32"/></padding>
 
     <Label text="个人中心" styleClass="page-title">
-        <font><Font name="System Bold" size="20"/></font>
+        <font><Font name="System Bold" size="22"/></font>
     </Label>
 
-    <HBox spacing="24">
-        <VBox styleClass="info-card" spacing="16" HBox.hgrow="ALWAYS">
-            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
-            <Label text="基本信息" styleClass="card-title"/>
-
-            <GridPane hgap="12" vgap="12">
-                <columnConstraints>
-                    <ColumnConstraints percentWidth="30"/>
-                    <ColumnConstraints percentWidth="70"/>
-                </columnConstraints>
-
-                <Label text="姓名" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                <Label fx:id="nameLabel" text="-" styleClass="info-value" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                <Label text="工号" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                <Label fx:id="userIdLabel" text="-" styleClass="info-value" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                <Label text="学院" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                <Label fx:id="collegeLabel" text="-" styleClass="info-value" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                <Label text="统一认证号" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                <Label fx:id="sduidLabel" text="-" styleClass="info-value" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                <Label text="手机号" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                <TextField fx:id="phoneField" promptText="请输入手机号" styleClass="form-field"
-                           GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-
-                <Label text="邮箱" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                <TextField fx:id="emailField" promptText="请输入邮箱" styleClass="form-field"
-                           GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-            </GridPane>
-
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="saveInfoButton" text="保存修改" styleClass="primary-button"/>
+    <!-- 头像和基本信息头部 -->
+    <HBox styleClass="profile-header" spacing="20" alignment="CENTER_LEFT">
+        <StackPane styleClass="avatar-wrapper">
+            <Label fx:id="avatarLabel" text="教" styleClass="avatar-text"/>
+        </StackPane>
+        <VBox spacing="6" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Label fx:id="nameLabel" text="-" styleClass="profile-name"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label fx:id="roleBadge" text="教师" styleClass="role-tag"/>
+                <Label fx:id="idLabel" text="工号: -" styleClass="id-text"/>
             </HBox>
         </VBox>
-
-        <VBox styleClass="info-card" spacing="16" HBox.hgrow="ALWAYS">
-            <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
-            <Label text="修改密码" styleClass="card-title"/>
-
-            <VBox spacing="12">
-                <VBox spacing="4">
-                    <Label text="原密码" styleClass="field-label"/>
-                    <PasswordField fx:id="oldPasswordField" promptText="请输入原密码" styleClass="form-field"/>
-                </VBox>
-
-                <VBox spacing="4">
-                    <Label text="新密码" styleClass="field-label"/>
-                    <PasswordField fx:id="newPasswordField" promptText="请输入新密码（至少6位）" styleClass="form-field"/>
-                </VBox>
-
-                <VBox spacing="4">
-                    <Label text="确认新密码" styleClass="field-label"/>
-                    <PasswordField fx:id="confirmPasswordField" promptText="请再次输入新密码" styleClass="form-field"/>
-                </VBox>
-            </VBox>
-
-            <HBox alignment="CENTER_RIGHT">
-                <Button fx:id="changePasswordButton" text="修改密码" styleClass="primary-button"/>
-            </HBox>
-        </VBox>
+        <Button fx:id="btnEditInfo" text="编辑资料" styleClass="btn-primary"/>
     </HBox>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="scroll-pane">
+    <VBox spacing="16">
+        <!-- 基本信息卡片（含手机号、邮箱） -->
+        <VBox styleClass="info-card" spacing="0">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+            <Label text="基本信息" styleClass="card-title"/>
+            <VBox spacing="0" styleClass="info-list">
+                <HBox styleClass="info-row">
+                    <Label text="工号" styleClass="info-label"/>
+                    <Label fx:id="sduidLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="姓名" styleClass="info-label"/>
+                    <Label fx:id="nameLabel2" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="学院" styleClass="info-label"/>
+                    <Label fx:id="collegeLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="手机号" styleClass="info-label"/>
+                    <Label fx:id="phoneLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="邮箱" styleClass="info-label"/>
+                    <Label fx:id="emailLabel" text="-" styleClass="info-value"/>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- 修改密码卡片 -->
+        <VBox styleClass="info-card" spacing="12">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+            <Label text="修改密码" styleClass="card-title"/>
+            <GridPane hgap="20" vgap="12" style="-fx-padding: 8 0 0 0;">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="33"/>
+                    <ColumnConstraints percentWidth="33"/>
+                    <ColumnConstraints percentWidth="33"/>
+                </columnConstraints>
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="旧密码" styleClass="field-label"/>
+                    <PasswordField fx:id="oldPasswordField" promptText="旧密码" styleClass="info-field"/>
+                </VBox>
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="新密码" styleClass="field-label"/>
+                    <PasswordField fx:id="newPasswordField" promptText="新密码" styleClass="info-field"/>
+                </VBox>
+                <VBox spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                    <Label text="确认密码" styleClass="field-label"/>
+                    <PasswordField fx:id="confirmPasswordField" promptText="再次输入" styleClass="info-field"/>
+                </VBox>
+            </GridPane>
+            <HBox alignment="CENTER_RIGHT" style="-fx-padding: 8 0 0 0;">
+                <Button fx:id="changePasswordButton" text="修改密码" styleClass="btn-outline"/>
+            </HBox>
+        </VBox>
+    </VBox>
+    </ScrollPane>
 </VBox>

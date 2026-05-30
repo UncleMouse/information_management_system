@@ -330,11 +330,33 @@ public class AddNewAnnouncementController {
     }
 
     private void viewNotice(NoticeItem item) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("查看公告");
-        alert.setHeaderText(item.getTitle());
-        alert.setContentText(item.getContent());
-        alert.showAndWait();
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("查看公告");
+        dialog.getDialogPane().getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
+
+        VBox box = new VBox(12);
+        box.setPrefWidth(500);
+        box.setStyle("-fx-padding: 16;");
+
+        Label titleLbl = new Label(item.getTitle());
+        titleLbl.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-wrap-text: true;");
+
+        String info = "发布者: " + (item.getCreatorName() != null ? item.getCreatorName() : "未知")
+                + "    时间: " + formatTime(item.getPublishTime());
+        Label infoLbl = new Label(info);
+        infoLbl.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;");
+
+        Separator sep = new Separator();
+
+        TextArea contentArea = new TextArea(item.getContent() != null ? item.getContent() : "");
+        contentArea.setEditable(false);
+        contentArea.setWrapText(true);
+        contentArea.setPrefRowCount(15);
+        contentArea.setStyle("-fx-font-size: 14px; -fx-text-fill: #334155; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-background-radius: 6;");
+
+        box.getChildren().addAll(titleLbl, infoLbl, sep, contentArea);
+        dialog.getDialogPane().setContent(box);
+        dialog.showAndWait();
     }
 
     public static class NoticeItem {

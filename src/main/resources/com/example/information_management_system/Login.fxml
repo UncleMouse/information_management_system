@@ -61,13 +61,12 @@
                        visible="false" wrapText="true"/>
 
                 <!-- 登录按钮 -->
-                <Button fx:id="loginButton" text="登  录" styleClass="login-button"
+                <Button fx:id="loginBtn" text="登  录" styleClass="login-button"
                         maxWidth="Infinity"/>
             </VBox>
 
             <!-- 切换登录方式 -->
-            <Hyperlink fx:id="toggleLoginLink" text="统一认证登录" styleClass="toggle-link"
-                       onAction="#handleToggleLogin"/>
+            <Hyperlink fx:id="toggleLoginLink" text="统一认证登录" styleClass="toggle-link"/>
 
             <!-- 快捷测试 -->
             <HBox spacing="12" alignment="CENTER">

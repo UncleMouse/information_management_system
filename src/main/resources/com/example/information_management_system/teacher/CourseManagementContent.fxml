@@ -2,7 +2,6 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Font?>
 
@@ -15,15 +14,15 @@
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <Label text="课程管理" styleClass="page-title">
-        <font><Font name="System Bold" size="20"/></font>
+        <font><Font name="System Bold" size="22"/></font>
     </Label>
 
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="搜索课程名称或类型..." styleClass="search-field"
-                   HBox.hgrow="ALWAYS"/>
-        <Button fx:id="applyNewCourseButton" text="申请新课" styleClass="primary-button"/>
-        <Button fx:id="editCourseButton" text="编辑" styleClass="outline-button"/>
-        <Button fx:id="viewStudentsButton" text="查看学生名单" styleClass="outline-button"/>
+    <!-- 工具栏：搜索 + 操作按钮 -->
+    <HBox styleClass="toolbar" spacing="12" alignment="CENTER_LEFT">
+        <TextField fx:id="searchField" promptText="搜索课程名称或类型..." styleClass="search-field" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="applyNewCourseButton" text="＋ 申请新课" styleClass="btn-primary"/>
+        <Button fx:id="editCourseButton" text="编辑课程" styleClass="btn-outline"/>
+        <Button fx:id="viewStudentsButton" text="学生名单" styleClass="btn-outline"/>
     </HBox>
 
     <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="ALWAYS">

@@ -46,8 +46,8 @@
                   GridPane.rowIndex="3" GridPane.columnIndex="1" />
 
         <Label text="年级" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-        <TextField fx:id="gradeField" promptText="如：2024" styleClass="form-field"
-                   GridPane.rowIndex="4" GridPane.columnIndex="1" />
+        <ComboBox fx:id="gradeCombo" styleClass="form-combo" prefWidth="260" promptText="选择年级"
+                  GridPane.rowIndex="4" GridPane.columnIndex="1" />
 
         <Label text="班级" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
         <ComboBox fx:id="classCombo" styleClass="form-combo" prefWidth="260" promptText="请选择班级"

@@ -32,6 +32,7 @@ public class AdminBaseViewController {
         addNavBtn("教师管理", "TeacherManagement.fxml");
         addNavBtn("课程管理", "CourseManagement.fxml");
         addNavBtn("班级管理", "ClassManagement.fxml");
+        addNavBtn("学期设置", "TermManagement.fxml");
         addNavBtn("通知管理", "AddNewAnnouncement.fxml");
         addNavBtn("个人中心", "PersonalCenter.fxml");
 

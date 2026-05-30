@@ -3,6 +3,8 @@ package com.example.information_management_system.controller.student;
 import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -188,8 +190,9 @@ public class HomeContentController {
                                     String content = notice.has("content") ? notice.get("content").getAsString() : "";
                                     Label noticeLabel = new Label(title);
                                     noticeLabel.setStyle("-fx-text-fill: #4f6ef7; -fx-font-size: 13px; -fx-padding: 4 0; -fx-cursor: hand;");
+                                    final String nt = title, nc = content;
                                     noticeLabel.setOnMouseClicked(e -> {
-                                        if (!content.isEmpty()) ShowMessage.showInfoMessage(title, content);
+                                        showNoticeDialog(nt, nc);
                                     });
                                     noticesContainer.getChildren().add(noticeLabel);
                                 }
@@ -258,5 +261,21 @@ public class HomeContentController {
             if (obj.has(key) && !obj.get(key).isJsonNull()) return obj.get(key).getAsString();
         }
         return "";
+    }
+
+    private void showNoticeDialog(String title, String content) {
+        Dialog<Void> d = new Dialog<>();
+        d.setTitle("查看公告");
+        d.getDialogPane().getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
+        VBox box = new VBox(10);
+        box.setPrefWidth(500); box.setStyle("-fx-padding: 16;");
+        Label t = new Label(title != null ? title : "");
+        t.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-wrap-text: true;");
+        TextArea ta = new TextArea(content != null ? content : "");
+        ta.setEditable(false); ta.setWrapText(true); ta.setPrefRowCount(15);
+        ta.setStyle("-fx-font-size: 14px; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 6;");
+        box.getChildren().addAll(t, new Separator(), ta);
+        d.getDialogPane().setContent(box);
+        d.showAndWait();
     }
 }

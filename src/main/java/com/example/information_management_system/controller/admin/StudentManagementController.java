@@ -146,11 +146,13 @@ public class StudentManagementController {
                             s.setSduid(JsonUtil.safeGetString(obj, "sduid"));
                             s.setName(JsonUtil.safeGetString(obj, "username"));
                             s.setGender(JsonUtil.safeGetString(obj, "sex"));
-                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setMajor(mapMajor(JsonUtil.safeGetString(obj, "major")));
                             s.setClassName(JsonUtil.safeGetString(obj, "section"));
                             s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);
                         }
+                        list.sort((a, b) -> a.getSduid().compareTo(b.getSduid()));
                         Platform.runLater(() -> {
                             studentList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
@@ -208,11 +210,13 @@ public class StudentManagementController {
                             s.setSduid(JsonUtil.safeGetString(obj, "sduid"));
                             s.setName(JsonUtil.safeGetString(obj, "username"));
                             s.setGender(JsonUtil.safeGetString(obj, "sex"));
-                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
+                            s.setMajor(mapMajor(JsonUtil.safeGetString(obj, "major")));
                             s.setClassName(JsonUtil.safeGetString(obj, "section"));
                             s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);
                         }
+                        list.sort((a, b) -> a.getSduid().compareTo(b.getSduid()));
                         Platform.runLater(() -> {
                             studentList.setAll(list);
                             statusLabel.setText("共 " + list.size() + " 条");
@@ -383,6 +387,17 @@ public class StudentManagementController {
                     });
                 }
             });
+        }
+    }
+
+    private String mapMajor(String v) {
+        if (v == null) return "";
+        switch (v) {
+            case "MAJOR_0": case "0": return "软件工程";
+            case "MAJOR_1": case "1": return "数字媒体技术";
+            case "MAJOR_2": case "2": return "大数据";
+            case "MAJOR_3": case "3": return "AI";
+            default: return v; // 可能是后端直接返回的中文
         }
     }
 }

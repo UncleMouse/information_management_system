@@ -1,30 +1,36 @@
-.page-root {
-    -fx-background-color: #f1f5f9;
-}
+/* === 页面基底 === */
+.page-root { -fx-background-color: #f0f4f8; }
+.page-title { -fx-font-weight: bold; -fx-text-fill: #1e293b; }
 
-.page-title {
-    -fx-font-size: 20px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
-}
-
-.search-field {
+/* === 工具栏 === */
+.toolbar {
     -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-padding: 12 16;
+    -fx-border-color: #e8ecf0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+}
+
+/* === 搜索框 === */
+.search-field {
+    -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-padding: 10 14;
-    -fx-font-size: 14px;
-    -fx-pref-width: 300;
-    -fx-max-width: 400;
+    -fx-font-size: 13px;
+    -fx-pref-width: 280;
+    -fx-max-width: 360;
 }
-
 .search-field:focused {
-    -fx-border-color: #4f6ef7;
+    -fx-border-color: #6366f1;
+    -fx-background-color: #ffffff;
 }
 
+/* === 按钮 === */
 .btn-primary {
-    -fx-background-color: #4f6ef7;
+    -fx-background-color: #4f46e5;
     -fx-text-fill: #ffffff;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -32,58 +38,58 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
-.btn-primary:hover { -fx-background-color: #3d5bd5; }
+.btn-primary:hover { -fx-background-color: #4338ca; }
 
 .btn-outline {
     -fx-background-color: #ffffff;
-    -fx-text-fill: #4f6ef7;
+    -fx-text-fill: #4f46e5;
     -fx-font-size: 13px;
+    -fx-font-weight: bold;
     -fx-padding: 10 20;
     -fx-background-radius: 8;
-    -fx-border-color: #4f6ef7;
+    -fx-border-color: #c7d2fe;
     -fx-border-radius: 8;
     -fx-cursor: hand;
 }
 .btn-outline:hover { -fx-background-color: #eef2ff; }
 
+/* === 数据表格 === */
 .data-table {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 8;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 8;
-    -fx-table-cell-border-color: #e8ecf0;
-    -fx-fixed-cell-size: 42px;
+    -fx-background-radius: 12;
+    -fx-border-color: #e8ecf0;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-table-cell-border-color: transparent;
+    -fx-fixed-cell-size: 44px;
 }
 .data-table .column-header-background {
-    -fx-background-color: #f1f5f9;
-    -fx-background-radius: 8 8 0 0;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 1;
-    -fx-border-radius: 8 8 0 0;
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 12 12 0 0;
+    -fx-border-color: #e8ecf0;
+    -fx-border-width: 0 0 1 0;
 }
 .data-table .column-header {
     -fx-background-color: transparent;
     -fx-padding: 0 16;
-    -fx-border-color: #dde4ee;
-    -fx-border-width: 0 1 1 0;
 }
 .data-table .column-header .label {
-    -fx-font-size: 13px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #334155;
+    -fx-text-fill: #64748b;
     -fx-alignment: CENTER;
 }
 .data-table .table-cell {
     -fx-font-size: 13px;
-    -fx-text-fill: #1e293b;
+    -fx-text-fill: #334155;
     -fx-padding: 0 16;
     -fx-alignment: CENTER;
 }
 .data-table .table-row-cell {
     -fx-background-color: #ffffff;
-    -fx-border-color: #f0f2f5;
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 0 0 1 0;
 }
-.data-table .table-row-cell:odd { -fx-background-color: #f8fafc; }
-.data-table .table-row-cell:selected { -fx-background-color: #eef2ff; }
+.data-table .table-row-cell:odd { -fx-background-color: #fafbfc; }
+.data-table .table-row-cell:selected { -fx-background-color: #eef2ff; -fx-text-fill: #1e293b; }
 .data-table .table-row-cell:hover { -fx-background-color: #f1f5f9; }

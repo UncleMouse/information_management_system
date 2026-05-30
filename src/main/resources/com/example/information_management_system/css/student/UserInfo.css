@@ -1,87 +1,164 @@
-.page-root {
-    -fx-background-color: #f1f5f9;
+/* === 页面基底 === */
+.page-root { -fx-background-color: #f0f4f8; }
+.page-title { -fx-font-weight: bold; -fx-text-fill: #1e293b; }
+
+/* === 头部个人信息卡片 === */
+.profile-header {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-padding: 24 28 24 28;
+    -fx-border-color: #e8ecf0;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
 }
 
-.page-title {
+.avatar-wrapper {
+    -fx-min-width: 64; -fx-min-height: 64;
+    -fx-max-width: 64; -fx-max-height: 64;
+    -fx-background-radius: 32;
+    -fx-background-color: linear-gradient(to bottom right, #6366f1, #ec4899);
+    -fx-alignment: CENTER;
+}
+
+.avatar-text {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.profile-name {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-text-fill: #1e293b;
 }
 
+.role-tag {
+    -fx-background-color: #eef2ff;
+    -fx-text-fill: #4f46e5;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 12;
+}
+
+.id-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #94a3b8;
+}
+
+/* === 滚动区域 === */
 .scroll-pane {
+    -fx-background: transparent;
     -fx-background-color: transparent;
-    -fx-padding: 0;
-    -fx-border-width: 0;
-}
-
-.scroll-pane .viewport {
-    -fx-background-color: transparent;
-}
-
-.content-container {
+    -fx-background-insets: 0;
     -fx-padding: 0;
 }
+.scroll-pane > .viewport { -fx-background-color: transparent; }
+.scroll-pane > .corner { -fx-background-color: transparent; }
+/* 完全隐藏滚动条（仍可鼠标滚轮滚动） */
+.scroll-pane > .scroll-bar:vertical,
+.scroll-pane > .scroll-bar:horizontal {
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-min-width: 0;
+    -fx-min-height: 0;
+    -fx-max-width: 0;
+    -fx-max-height: 0;
+    -fx-opacity: 0;
+}
+.scroll-pane > .scroll-bar:vertical .thumb,
+.scroll-pane > .scroll-bar:horizontal .thumb,
+.scroll-pane > .scroll-bar:vertical .track,
+.scroll-pane > .scroll-bar:horizontal .track,
+.scroll-pane > .scroll-bar .increment-button,
+.scroll-pane > .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-opacity: 0;
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+}
 
-/* Card */
+/* === 信息卡片 === */
 .info-card {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 12;
-    -fx-padding: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0, 0, 2);
+    -fx-background-radius: 16;
+    -fx-border-color: #e8ecf0;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
 }
 
 .card-title {
     -fx-font-size: 15px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
-    -fx-padding: 16 20 12 20;
-    -fx-border-color: transparent transparent #e2e8f0 transparent;
+    -fx-text-fill: #334155;
+    -fx-padding: 0 0 14 0;
+    -fx-border-color: #f1f5f9;
     -fx-border-width: 0 0 1 0;
 }
 
-.info-grid {
-    -fx-padding: 16 20;
+/* === 信息行 === */
+.info-row {
+    -fx-padding: 12 0 12 0;
+    -fx-border-color: #f8fafc;
+    -fx-border-width: 0 0 1 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-spacing: 24;
 }
 
 .info-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
-    -fx-min-width: 70;
+    -fx-text-fill: #94a3b8;
+    -fx-min-width: 72px;
 }
 
 .info-value {
     -fx-font-size: 14px;
     -fx-text-fill: #1e293b;
-    -fx-min-width: 120;
+    -fx-font-weight: 600;
 }
 
-/* Input fields */
-.input-field {
-    -fx-background-color: #ffffff;
+/* === 表单字段 === */
+.field-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #94a3b8;
+    -fx-font-weight: 600;
+}
+
+.info-field {
+    -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
+    -fx-padding: 10 14 10 14;
     -fx-font-size: 13px;
-    -fx-padding: 10 12;
-    -fx-pref-width: 260;
+    -fx-text-fill: #1e293b;
+}
+.info-field:focused {
+    -fx-border-color: #6366f1;
+    -fx-background-color: #ffffff;
 }
 
-.input-field:focused {
-    -fx-border-color: #4f6ef7;
-}
-
-/* Save button */
-.save-btn {
-    -fx-background-color: #4f6ef7;
+/* === 按钮 === */
+.btn-primary {
+    -fx-background-color: #4f46e5;
     -fx-text-fill: #ffffff;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-padding: 10 24;
-    -fx-background-radius: 8;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
-    -fx-border-width: 0;
 }
+.btn-primary:hover { -fx-background-color: #4338ca; }
 
-.save-btn:hover {
-    -fx-background-color: #3d5bd5;
+.btn-outline {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #4f46e5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 22;
+    -fx-background-radius: 10;
+    -fx-border-color: #c7d2fe;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
 }
+.btn-outline:hover { -fx-background-color: #eef2ff; }

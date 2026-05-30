@@ -16,7 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -85,7 +85,8 @@ public class CourseManagementContent {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        // data 可能是对象 {list:[], total:0, ...} 或直接是数组
+                        JsonArray arr = extractArray(res, "data");
                         ObservableList<Course> list = FXCollections.observableArrayList();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
@@ -119,6 +120,17 @@ public class CourseManagementContent {
         });
     }
 
+    /** 兼容后端返回 data 为对象 {list:[],...} 或直接为数组 */
+    private JsonArray extractArray(JsonObject res, String key) {
+        if (res.get(key).isJsonArray()) return res.getAsJsonArray(key);
+        if (res.get(key).isJsonObject()) {
+            JsonObject obj = res.getAsJsonObject(key);
+            if (obj.has("list")) return obj.getAsJsonArray("list");
+            if (obj.has("records")) return obj.getAsJsonArray("records");
+        }
+        return new JsonArray();
+    }
+
     private void filterCourses() {
         String query = searchField.getText().toLowerCase().trim();
         if (query.isEmpty()) {
@@ -138,7 +150,7 @@ public class CourseManagementContent {
 
     private void openApplyNewCourse() {
         try {
-            StackPane contentArea = findContentArea();
+            Pane contentArea = findContentArea();
             if (contentArea != null) {
                 FXMLLoader loader = new FXMLLoader(
                         Objects.requireNonNull(getClass().getResource(
@@ -161,7 +173,7 @@ public class CourseManagementContent {
             return;
         }
         try {
-            StackPane contentArea = findContentArea();
+            Pane contentArea = findContentArea();
             if (contentArea != null) {
                 FXMLLoader loader = new FXMLLoader(
                         Objects.requireNonNull(getClass().getResource(
@@ -186,7 +198,7 @@ public class CourseManagementContent {
             return;
         }
         try {
-            StackPane contentArea = findContentArea();
+            Pane contentArea = findContentArea();
             if (contentArea != null) {
                 FXMLLoader loader = new FXMLLoader(
                         Objects.requireNonNull(getClass().getResource(
@@ -204,9 +216,9 @@ public class CourseManagementContent {
         }
     }
 
-    private StackPane findContentArea() {
+    private Pane findContentArea() {
         if (courseTable != null && courseTable.getScene() != null) {
-            return (StackPane) courseTable.getScene().lookup("#contentArea");
+            return (Pane) courseTable.getScene().lookup("#contentArea");
         }
         return null;
     }

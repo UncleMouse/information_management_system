@@ -16,7 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -145,7 +145,7 @@ public class StudentListViewController {
 
     private void navigateBack() {
         try {
-            StackPane contentArea = findContentArea();
+            Pane contentArea = findContentArea();
             if (contentArea != null) {
                 FXMLLoader loader = new FXMLLoader(
                         Objects.requireNonNull(getClass().getResource(
@@ -160,9 +160,9 @@ public class StudentListViewController {
         }
     }
 
-    private StackPane findContentArea() {
+    private Pane findContentArea() {
         if (studentTable != null && studentTable.getScene() != null) {
-            return (StackPane) studentTable.getScene().lookup("#contentArea");
+            return (Pane) studentTable.getScene().lookup("#contentArea");
         }
         return null;
     }

@@ -12,52 +12,38 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
+import javafx.application.Platform;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginController {
 
     private final Gson gson = new Gson();
+    private boolean isOAuthMode = false;
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private Button loginButton;
-    @FXML private Label errorMessageLabel;
-    @FXML private Hyperlink toggleLoginLink;
+    @FXML private Button loginBtn;
     @FXML private Hyperlink studentQuickLogin;
     @FXML private Hyperlink teacherQuickLogin;
     @FXML private Hyperlink adminQuickLogin;
-
-    private boolean isOAuthMode = false;
+    @FXML private Label errorMessageLabel;
 
     @FXML
     public void initialize() {
-        if (errorMessageLabel != null) errorMessageLabel.setVisible(false);
-        if (loginButton != null) loginButton.setOnAction(this::handleLogin);
-
-        usernameField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER || event.getCode() == KeyCode.DOWN) {
-                passwordField.requestFocus();
-            }
-        });
-        passwordField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                doLogin();
-            }
-        });
+        loginBtn.setOnAction(e -> handleLogin());
+        usernameField.setOnAction(e -> passwordField.requestFocus());
+        passwordField.setOnAction(e -> handleLogin());
     }
 
-    private void handleLogin(javafx.event.ActionEvent event) {
-        doLogin();
-    }
-
-    private void doLogin() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        if (StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
-            showErrorMessage("请输入用户名和密码");
+    private void handleLogin() {
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+        if (username.isEmpty() || password.isEmpty()) {
+            showErrorMessage("请输入账号和密码");
             return;
         }
         authenticateUser(username, password);
@@ -229,27 +215,15 @@ public class LoginController {
     }
 
     @FXML
-    public void handleToggleLogin(javafx.event.ActionEvent event) {
-        isOAuthMode = !isOAuthMode;
-        if (isOAuthMode) {
-            usernameField.setPromptText("请输入统一认证账号");
-            toggleLoginLink.setText("普通密码登录");
-        } else {
-            usernameField.setPromptText("请输入学号或工号");
-            toggleLoginLink.setText("统一认证登录");
-        }
-    }
-
-    @FXML
     public void studentQuickLogin(javafx.event.ActionEvent event) {
-        usernameField.setText("202400000001");
+        usernameField.setText("202500000001");
         passwordField.setText("123456");
         doLogin();
     }
 
     @FXML
     public void teacherQuickLogin(javafx.event.ActionEvent event) {
-        usernameField.setText("190100000000");
+        usernameField.setText("20250001");
         passwordField.setText("123456");
         doLogin();
     }
@@ -260,4 +234,6 @@ public class LoginController {
         passwordField.setText("admin123");
         doLogin();
     }
+
+    private void doLogin() { handleLogin(); }
 }

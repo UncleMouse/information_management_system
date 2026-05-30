@@ -1,5 +1,6 @@
 package com.example.information_management_system.controller.admin;
 
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
@@ -25,101 +26,129 @@ public class TermManagementController {
     @FXML private TableColumn<TermItem, String> colTerm;
     @FXML private TableColumn<TermItem, String> colSelectionStatus;
     @FXML private TableColumn<TermItem, String> colCurrentStatus;
-    @FXML private TableColumn<TermItem, String> colActions;
+    @FXML private TableColumn<TermItem, Void> colActions;
 
-    @FXML private TextField newTermField;
     @FXML private Button btnAddTerm;
+    @FXML private Button btnEditTerm;
+    @FXML private Button btnDeleteTerm;
+    @FXML private Button btnRefresh;
     @FXML private Label statusLabel;
 
     @FXML
     public void initialize() {
-        setupTableColumns();
-        termTable.setItems(termList);
-        btnAddTerm.setOnAction(e -> handleAddTerm());
-        loadTerms();
-    }
+        termTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-    private void setupTableColumns() {
         colTerm.setCellValueFactory(new PropertyValueFactory<>("term"));
         colSelectionStatus.setCellValueFactory(new PropertyValueFactory<>("selectionStatus"));
         colCurrentStatus.setCellValueFactory(new PropertyValueFactory<>("currentStatus"));
 
-        colSelectionStatus.setCellFactory(column -> new TableCell<TermItem, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
+        // 列居中
+        colTerm.setCellFactory(col -> new TableCell<TermItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+
+        // 选课状态 彩色 + 居中
+        colSelectionStatus.setCellFactory(col -> new TableCell<TermItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    if ("已开放".equals(item)) {
-                        setStyle("-fx-text-fill: #10b981; -fx-font-weight: bold;");
-                    } else if ("已关闭".equals(item)) {
-                        setStyle("-fx-text-fill: #f59e0b; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("-fx-text-fill: #64748b;");
-                    }
-                }
+                if (empty || item == null) { setText(null); setStyle(""); return; }
+                setText(item);
+                setStyle("已开放".equals(item) ? "-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-alignment: CENTER;"
+                        : "-fx-text-fill: #f59e0b; -fx-font-weight: bold; -fx-alignment: CENTER;");
             }
         });
 
-        colCurrentStatus.setCellFactory(column -> new TableCell<TermItem, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
+        // 当前学期 彩色 + 居中
+        colCurrentStatus.setCellFactory(col -> new TableCell<TermItem, String>() {
+            @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    if ("当前学期".equals(item)) {
-                        setStyle("-fx-text-fill: #3b82f6; -fx-font-weight: bold;");
-                    } else {
-                        setStyle("-fx-text-fill: #64748b;");
-                    }
-                }
+                if (empty || item == null) { setText(null); setStyle(""); return; }
+                setText(item.isEmpty() ? "—" : item);
+                setStyle(item.isEmpty() ? "-fx-alignment: CENTER;" : "-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-alignment: CENTER;");
             }
         });
 
-        colActions.setCellFactory(col -> new TableCell<TermItem, String>() {
-            private final Button toggleBtn = new Button();
-            private final Button currentBtn = new Button();
-
+        // 操作列
+        colActions.setCellFactory(col -> new TableCell<TermItem, Void>() {
+            private final Button actionBtn = new Button();
             {
-                toggleBtn.getStyleClass().add("action-btn-small");
-                toggleBtn.setOnAction(e -> {
-                    TermItem item = getTableView().getItems().get(getIndex());
-                    handleToggleSelection(item);
-                });
+                String base = "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-min-width: 90;";
+                actionBtn.setStyle("-fx-background-color: #4f6ef7; " + base);
+                actionBtn.setOnAction(e -> { TermItem item = getTableView().getItems().get(getIndex()); handleTermAction(item); });
             }
-
-            {
-                currentBtn.getStyleClass().add("action-btn-small");
-                currentBtn.setOnAction(e -> {
-                    TermItem item = getTableView().getItems().get(getIndex());
-                    handleSetCurrent(item);
-                });
-            }
-
-            @Override
-            protected void updateItem(String item, boolean empty) {
+            @Override protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
+                if (empty) { setGraphic(null); return; }
+                TermItem it = getTableView().getItems().get(getIndex());
+                boolean isCur = "当前学期".equals(it.getCurrentStatus());
+                if (isCur) {
+                    actionBtn.setText("取消当前");
+                    actionBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-min-width: 90;");
                 } else {
-                    TermItem termItem = getTableView().getItems().get(getIndex());
-                    HBox hbox = new HBox(5);
-                    hbox.setStyle("-fx-alignment: CENTER;");
-
-                    String toggleText = "已开放".equals(termItem.getSelectionStatus()) ? "关闭选课" : "开放选课";
-                    toggleBtn.setText(toggleText);
-                    currentBtn.setText("设为当前");
-
-                    hbox.getChildren().addAll(toggleBtn, currentBtn);
-                    setGraphic(hbox);
+                    actionBtn.setText("设为当前");
+                    actionBtn.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-min-width: 90;");
                 }
+                HBox hbox = new HBox(actionBtn);
+                hbox.setStyle("-fx-alignment: CENTER;");
+                setGraphic(hbox);
             }
+        });
+
+        termTable.setItems(termList);
+        btnAddTerm.setOnAction(e -> showTermDialog(null));
+        btnEditTerm.setOnAction(e -> {
+            TermItem sel = termTable.getSelectionModel().getSelectedItem();
+            if (sel != null) showTermDialog(sel.getTerm());
+        });
+        btnDeleteTerm.setOnAction(e -> {
+            TermItem sel = termTable.getSelectionModel().getSelectedItem();
+            if (sel != null) ShowMessage.showErrorMessage("提示", "后端暂不支持删除学期");
+        });
+        btnRefresh.setOnAction(e -> loadTerms());
+        termTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            boolean has = newV != null;
+            btnEditTerm.setDisable(!has);
+            btnDeleteTerm.setDisable(!has);
+        });
+        loadTerms();
+    }
+
+    private void showTermDialog(String oldTerm) {
+        TextInputDialog dialog = new TextInputDialog(oldTerm != null ? oldTerm : "");
+        dialog.setTitle(oldTerm != null ? "编辑学期" : "添加学期");
+        dialog.setHeaderText(oldTerm != null ? "修改学期名称" : "输入新学期名称");
+        dialog.setContentText("格式: 2025-2026-1");
+        dialog.showAndWait().ifPresent(input -> {
+            String term = input.trim();
+            if (term.isEmpty()) return;
+            if (!term.matches("\\d{4}-\\d{4}-[12]")) {
+                ShowMessage.showWarningMessage("提示", "格式: 2025-2026-1");
+                return;
+            }
+            Map<String, String> params = new HashMap<>();
+            params.put("term", term);
+            NetworkUtils.postWithQueryParams("/term/addTerm", params, new NetworkUtils.Callback<String>() {
+                @Override
+                public void onSuccess(String result) {
+                    try {
+                        JsonObject res = gson.fromJson(result, JsonObject.class);
+                        Platform.runLater(() -> {
+                            if (res.has("code") && res.get("code").getAsInt() == 200) {
+                                ShowMessage.showInfoMessage("成功", (oldTerm != null ? "编辑" : "添加") + "成功");
+                                loadTerms();
+                            } else {
+                                ShowMessage.showErrorMessage("错误", res.has("msg") ? res.get("msg").getAsString() : "操作失败");
+                            }
+                        });
+                    } catch (Exception e) {
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析失败"));
+                    }
+                }
+                @Override
+                public void onFailure(Exception e) {
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", e.getMessage()));
+                }
+            });
         });
     }
 
@@ -131,89 +160,45 @@ public class TermManagementController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         Platform.runLater(() -> {
                             termList.clear();
                             for (int i = 0; i < arr.size(); i++) {
                                 JsonObject obj = arr.get(i).getAsJsonObject();
                                 TermItem item = new TermItem();
-                                item.setTerm(obj.has("term") ? obj.get("term").getAsString() : "");
-
-                                boolean selectionOpen = obj.has("selectionOpen") && obj.get("selectionOpen").getAsBoolean();
-                                item.setSelectionStatus(selectionOpen ? "已开放" : "已关闭");
-
-                                boolean isCurrent = obj.has("isCurrent") && obj.get("isCurrent").getAsBoolean();
-                                item.setCurrentStatus(isCurrent ? "当前学期" : "");
-
+                                item.setTerm(JsonUtil.safeGetString(obj, "term"));
+                                boolean selOpen = obj.has("open") && !obj.get("open").isJsonNull() && obj.get("open").getAsBoolean();
+                                item.setSelectionStatus(selOpen ? "已开放" : "已关闭");
+                                boolean isCur = obj.has("current") && !obj.get("current").isJsonNull() && obj.get("current").getAsBoolean();
+                                item.setCurrentStatus(isCur ? "当前学期" : "");
                                 termList.add(item);
                             }
                             statusLabel.setText("共 " + termList.size() + " 个学期");
                         });
+                    } else {
+                        Platform.runLater(() -> statusLabel.setText("加载失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                    Platform.runLater(() -> statusLabel.setText("解析失败"));
                 }
             }
-
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> statusLabel.setText("网络请求失败"));
+                Platform.runLater(() -> statusLabel.setText("网络失败"));
             }
         });
     }
 
-    private void handleAddTerm() {
-        String term = newTermField.getText().trim();
-        if (term.isEmpty()) {
-            ShowMessage.showWarningMessage("提示", "请输入学期名称");
-            return;
-        }
+    private void handleTermAction(TermItem item) {
+        boolean isCurrent = "当前学期".equals(item.getCurrentStatus());
+        String action = isCurrent ? "取消当前学期" : "设为当前学期";
+        if (!ShowMessage.showConfirmMessage("确认", action + "？")) return;
 
-        if (!term.matches("\\d{4}-\\d{4}-[12]")) {
-            ShowMessage.showWarningMessage("提示", "格式应为: 2023-2024-1");
-            return;
-        }
-
-        Map<String, String> params = new HashMap<>();
-        params.put("term", term);
-
-        NetworkUtils.postWithQueryParams("/term/addTerm", params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    Platform.runLater(() -> {
-                        if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("成功", "学期添加成功");
-                            newTermField.clear();
-                            loadTerms();
-                        } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "添加失败";
-                            ShowMessage.showErrorMessage("错误", msg);
-                        }
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败"));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败"));
-            }
-        });
-    }
-
-    private void handleToggleSelection(TermItem item) {
-        String action = "已开放".equals(item.getSelectionStatus()) ? "关闭" : "开放";
-        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要" + action + "选课吗？");
-        if (!confirmed) return;
-
-        boolean newStatus = !"已开放".equals(item.getSelectionStatus());
         Map<String, String> params = new HashMap<>();
         params.put("term", item.getTerm());
-        params.put("open", String.valueOf(newStatus));
-        params.put("current", "当前学期".equals(item.getCurrentStatus()) ? "true" : "false");
+        params.put("current", isCurrent ? "false" : "true");
+        // 设为当前时自动开放选课，取消当前时保持原有开放状态
+        params.put("open", isCurrent ? "false" : "true");
 
         NetworkUtils.postWithQueryParams("/term/editSelection", params, new NetworkUtils.Callback<String>() {
             @Override
@@ -222,70 +207,30 @@ public class TermManagementController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     Platform.runLater(() -> {
                         if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("成功", action + "选课成功");
+                            ShowMessage.showInfoMessage("成功", action + "成功");
                             loadTerms();
                         } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败";
-                            ShowMessage.showErrorMessage("错误", msg);
+                            ShowMessage.showErrorMessage("错误", res.has("msg")?res.get("msg").getAsString():"操作失败");
                         }
                     });
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析失败"));
                 }
             }
-
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败"));
-            }
-        });
-    }
-
-    private void handleSetCurrent(TermItem item) {
-        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要设为当前学期吗？");
-        if (!confirmed) return;
-
-        Map<String, String> params = new HashMap<>();
-        params.put("term", item.getTerm());
-        params.put("open", "已开放".equals(item.getSelectionStatus()) ? "true" : "false");
-        params.put("current", "true");
-
-        NetworkUtils.postWithQueryParams("/term/editSelection", params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    Platform.runLater(() -> {
-                        if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            ShowMessage.showInfoMessage("成功", "已设为当前学期");
-                            loadTerms();
-                        } else {
-                            String msg = res.has("msg") ? res.get("msg").getAsString() : "操作失败";
-                            ShowMessage.showErrorMessage("错误", msg);
-                        }
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败"));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败"));
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", e.getMessage()));
             }
         });
     }
 
     public static class TermItem {
-        private String term;
-        private String selectionStatus;
-        private String currentStatus;
-
+        private String term, selectionStatus, currentStatus;
         public String getTerm() { return term; }
-        public void setTerm(String term) { this.term = term; }
+        public void setTerm(String t) { term = t; }
         public String getSelectionStatus() { return selectionStatus; }
-        public void setSelectionStatus(String selectionStatus) { this.selectionStatus = selectionStatus; }
+        public void setSelectionStatus(String s) { selectionStatus = s; }
         public String getCurrentStatus() { return currentStatus; }
-        public void setCurrentStatus(String currentStatus) { this.currentStatus = currentStatus; }
+        public void setCurrentStatus(String s) { currentStatus = s; }
     }
 }

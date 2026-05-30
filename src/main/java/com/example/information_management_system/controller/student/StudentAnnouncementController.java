@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 
 public class StudentAnnouncementController {
 
@@ -51,10 +52,7 @@ public class StudentAnnouncementController {
             private final Button viewBtn = new Button("查看");
             {
                 viewBtn.setStyle("-fx-background-color: #4f6ef7; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 6 18; -fx-background-radius: 6; -fx-cursor: hand;");
-                viewBtn.setOnAction(e -> {
-                    AnnouncementItem item = getTableView().getItems().get(getIndex());
-                    ShowMessage.showInfoMessage(item.getTitle(), item.getContent() != null ? item.getContent() : "暂无内容");
-                });
+                viewBtn.setOnAction(e -> viewNotice(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Void v, boolean empty) { super.updateItem(v, empty); setGraphic(empty ? null : viewBtn); setStyle("-fx-alignment: CENTER;"); }
         });
@@ -99,6 +97,25 @@ public class StudentAnnouncementController {
                 Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage()));
             }
         });
+    }
+
+    private void viewNotice(AnnouncementItem item) {
+        Dialog<Void> d = new Dialog<>();
+        d.setTitle("查看公告");
+        d.getDialogPane().getButtonTypes().add(new ButtonType("关闭", ButtonBar.ButtonData.CANCEL_CLOSE));
+        VBox box = new VBox(10);
+        box.setPrefWidth(500); box.setStyle("-fx-padding: 16;");
+        Label t = new Label(item.getTitle());
+        t.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-wrap-text: true;");
+        Label i = new Label("发布者: " + (item.getCreatorName() != null ? item.getCreatorName() : "未知")
+                + "    时间: " + (item.getPublishTime() != null ? item.getPublishTime().replace("T", " ") : ""));
+        i.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;");
+        TextArea ta = new TextArea(item.getContent() != null ? item.getContent() : "");
+        ta.setEditable(false); ta.setWrapText(true); ta.setPrefRowCount(15);
+        ta.setStyle("-fx-font-size: 14px; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 6;");
+        box.getChildren().addAll(t, i, new Separator(), ta);
+        d.getDialogPane().setContent(box);
+        d.showAndWait();
     }
 
     private String getStr(JsonObject obj, String key) {

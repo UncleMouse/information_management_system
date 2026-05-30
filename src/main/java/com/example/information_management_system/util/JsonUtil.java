@@ -16,6 +16,7 @@ public class JsonUtil {
             if (dataObj.has("user")) return dataObj.getAsJsonArray("user");
             if (dataObj.has("data")) return dataObj.getAsJsonArray("data");
             if (dataObj.has("records")) return dataObj.getAsJsonArray("records");
+            if (dataObj.has("section")) return dataObj.getAsJsonArray("section");
         }
         return new JsonArray();
     }

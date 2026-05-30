@@ -105,10 +105,12 @@ public class ClassManagementController {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             Section s = new Section();
                             s.setId(JsonUtil.safeGetInt(obj, "id"));
-                            s.setClassName(JsonUtil.safeGetString(obj, "className"));
+                            String clsNum = JsonUtil.safeGetString(obj, "number");
+                            s.setClassName(clsNum.endsWith("班") ? clsNum : clsNum + "班");
                             s.setMajor(JsonUtil.safeGetString(obj, "major"));
-                            s.setGrade(JsonUtil.safeGetString(obj, "grade"));
-                            s.setNumber(JsonUtil.safeGetInt(obj, "number"));
+                            String grd = JsonUtil.safeGetString(obj, "grade");
+                            s.setGrade(grd.length() >= 4 ? grd.substring(0, 4) : grd);
+                            s.setNumber(JsonUtil.safeGetInt(obj, "studentCount"));
                             list.add(s);
                         }
                         Platform.runLater(() -> {
@@ -151,10 +153,12 @@ public class ClassManagementController {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             Section s = new Section();
                             s.setId(JsonUtil.safeGetInt(obj, "id"));
-                            s.setClassName(JsonUtil.safeGetString(obj, "className"));
+                            String clsNum = JsonUtil.safeGetString(obj, "number");
+                            s.setClassName(clsNum.endsWith("班") ? clsNum : clsNum + "班");
                             s.setMajor(JsonUtil.safeGetString(obj, "major"));
-                            s.setGrade(JsonUtil.safeGetString(obj, "grade"));
-                            s.setNumber(JsonUtil.safeGetInt(obj, "number"));
+                            String grd = JsonUtil.safeGetString(obj, "grade");
+                            s.setGrade(grd.length() >= 4 ? grd.substring(0, 4) : grd);
+                            s.setNumber(JsonUtil.safeGetInt(obj, "studentCount"));
                             list.add(s);
                         }
                         Platform.runLater(() -> {
@@ -293,4 +297,5 @@ public class ClassManagementController {
         dialog.getDialogPane().setContent(tv);
         dialog.showAndWait();
     }
+
 }

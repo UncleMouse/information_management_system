@@ -3,41 +3,34 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.admin.TermManagementController"
-      spacing="20" style="-fx-background-color: #f8fafc; -fx-padding: 24;">
-    <padding><Insets top="0" right="0" bottom="0" left="0"/></padding>
+      stylesheets="@../css/admin/studentManagement.css"
+      styleClass="page-root" spacing="16">
 
-    <!-- 页面标题 -->
-    <Label text="学期管理" style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
-    <!-- 添加学期区域 -->
-    <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-        <Label text="添加新学期" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
-        <HBox spacing="12" alignment="CENTER_LEFT">
-            <TextField fx:id="newTermField" promptText="格式: 2023-2024-1" prefWidth="200"
-                       style="-fx-background-radius: 4; -fx-border-radius: 4;"/>
-            <Button fx:id="btnAddTerm" text="添加学期" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-background-radius: 4; -fx-padding: 8 16;"/>
-        </HBox>
-        <Label text="格式说明: 年份-年份-学期(1为上学期, 2为下学期)" style="-fx-font-size: 12; -fx-text-fill: #64748b;"/>
-    </VBox>
+    <Label text="学期设置" styleClass="page-title">
+        <font><Font name="System Bold" size="20"/></font>
+    </Label>
 
-    <!-- 学期列表 -->
-    <VBox spacing="12" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
-        <HBox alignment="CENTER_LEFT" spacing="12">
-            <Label text="学期列表" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="statusLabel" text="" style="-fx-font-size: 12; -fx-text-fill: #64748b;"/>
-        </HBox>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button fx:id="btnAddTerm" text="+ 添加学期" styleClass="btn-primary"/>
+        <Button fx:id="btnEditTerm" text="编辑选中" styleClass="btn-outline" disable="true"/>
+        <Button fx:id="btnDeleteTerm" text="删除选中" styleClass="btn-danger" disable="true"/>
+        <Button fx:id="btnRefresh" text="刷新" styleClass="btn-secondary"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="statusLabel" text="" styleClass="status-label"/>
+    </HBox>
 
-        <TableView fx:id="termTable" VBox.vgrow="ALWAYS" style="-fx-background-radius: 4;">
-            <columns>
-                <TableColumn fx:id="colTerm" text="学期" prefWidth="150"/>
-                <TableColumn fx:id="colSelectionStatus" text="选课状态" prefWidth="120"/>
-                <TableColumn fx:id="colCurrentStatus" text="当前状态" prefWidth="120"/>
-                <TableColumn fx:id="colActions" text="操作" prefWidth="200"/>
-            </columns>
-        </TableView>
-    </VBox>
+    <TableView fx:id="termTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colTerm" text="学期" prefWidth="200"/>
+            <TableColumn fx:id="colSelectionStatus" text="选课状态" prefWidth="120"/>
+            <TableColumn fx:id="colCurrentStatus" text="当前标记" prefWidth="120"/>
+            <TableColumn fx:id="colActions" text="操作" prefWidth="120"/>
+        </columns>
+    </TableView>
 </VBox>

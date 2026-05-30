@@ -313,6 +313,10 @@ public class NetworkUtils {
                                       Map<String, String> headers, String body) throws IOException {
         HttpURLConnection connection = null;
         try {
+            System.out.println("[NetworkUtils] >>> " + method + " " + urlString);
+            if (body != null && !body.isEmpty()) {
+                System.out.println("[NetworkUtils] Body: " + body);
+            }
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method.name());
@@ -336,6 +340,7 @@ public class NetworkUtils {
                 }
             }
             int code = connection.getResponseCode();
+            System.out.println("[NetworkUtils] HTTP Status: " + code);
             InputStream is = (code >= 200 && code < 300) ? connection.getInputStream() : connection.getErrorStream();
             StringBuilder response = new StringBuilder();
             if (is != null) {
@@ -344,11 +349,36 @@ public class NetworkUtils {
                     while ((line = br.readLine()) != null) response.append(line);
                 }
             }
-            if (code >= 400) throw new IOException("HTTP " + code + ": " + response);
+            System.out.println("[NetworkUtils] Response: " + response);
+            if (code >= 400) throw new IOException(mapHttpError(code, response.toString()));
             return response.toString();
+        } catch (IOException e) {
+            System.out.println("[NetworkUtils] 网络异常: " + e.getMessage());
+            throw e;
         } finally {
             if (connection != null) connection.disconnect();
         }
+    }
+
+    private static String mapHttpError(int code, String body) {
+        String prefix;
+        switch (code) {
+            case 401: prefix = "登录验证失效，请重新登录"; break;
+            case 403: prefix = "登录验证失效，请重新登录"; break;
+            case 404: prefix = "请求的资源不存在"; break;
+            case 500: prefix = "服务器内部错误，请稍后重试"; break;
+            default:  prefix = "请求失败 (HTTP " + code + ")"; break;
+        }
+        // 如果有后端返回的提示信息，拼接到后面
+        if (body != null && !body.isEmpty()) {
+            try {
+                com.google.gson.JsonObject obj = new com.google.gson.Gson().fromJson(body, com.google.gson.JsonObject.class);
+                if (obj.has("msg")) {
+                    return prefix + ": " + obj.get("msg").getAsString();
+                }
+            } catch (Exception ignored) {}
+        }
+        return prefix;
     }
 
     public static void shutdown() {

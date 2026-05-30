@@ -10,6 +10,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PasswordChangeController {
 
     private final Gson gson = new Gson();
@@ -56,11 +59,11 @@ public class PasswordChangeController {
             return;
         }
 
-        JsonObject body = new JsonObject();
-        body.addProperty("oldPassword", oldPassword);
-        body.addProperty("newPassword", newPassword);
+        Map<String, String> params = new HashMap<>();
+        params.put("oldPassword", oldPassword);
+        params.put("newPassword", newPassword);
 
-        NetworkUtils.post("/user/updatePassword", gson.toJson(body), new NetworkUtils.Callback<String>() {
+        NetworkUtils.postWithQueryParams("/user/updatePassword", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

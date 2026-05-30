@@ -1,9 +1,11 @@
 package com.example.information_management_system.controller.admin;
 
 import com.example.information_management_system.model.Student;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -15,24 +17,18 @@ import java.util.Map;
 
 public class AddNewStudentController {
 
-    private static final Map<String, String> MAJOR_ENUM_MAP = new HashMap<>();
-    static {
-        MAJOR_ENUM_MAP.put("软件工程", "MAJOR_0");
-        MAJOR_ENUM_MAP.put("数字媒体技术", "MAJOR_1");
-        MAJOR_ENUM_MAP.put("数据科学与大数据技术", "MAJOR_2");
-        MAJOR_ENUM_MAP.put("人工智能", "MAJOR_3");
-    }
-
     private final Gson gson = new Gson();
     private Student editingStudent;
     private Runnable onStudentAddedListener;
+    private final Map<String, Integer> sectionIdMap = new HashMap<>(); // 班级名 → sectionId
+    private final Map<Integer, String> sectionNameMap = new HashMap<>(); // sectionId → 班级名
 
     @FXML private Label dialogTitle;
     @FXML private TextField sduidField;
     @FXML private TextField nameField;
     @FXML private ComboBox<String> genderCombo;
     @FXML private ComboBox<String> majorCombo;
-    @FXML private TextField gradeField;
+    @FXML private ComboBox<String> gradeCombo;
     @FXML private ComboBox<String> classCombo;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
@@ -41,16 +37,60 @@ public class AddNewStudentController {
     public void initialize() {
         genderCombo.getItems().addAll("男", "女");
         genderCombo.getSelectionModel().selectFirst();
-
-        majorCombo.getItems().addAll(
-                "计算机科学与技术", "软件工程", "信息安全", "数据科学与大数据技术",
-                "人工智能", "电子信息工程", "通信工程", "自动化",
-                "数学与应用数学", "物理学", "化学", "生物科学",
-                "经济学", "金融学", "会计学", "工商管理"
-        );
+        majorCombo.getItems().addAll("软件工程", "数字媒体技术", "大数据", "AI");
+        majorCombo.getSelectionModel().selectFirst();
+        gradeCombo.getItems().addAll("2021", "2022", "2023", "2024", "2025", "2026");
+        gradeCombo.getSelectionModel().select("2025");
 
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> closeDialog());
+
+        // 每次打开对话框时重新加载班级列表
+        loadSections();
+    }
+
+    /** 从后端实时加载班级列表 */
+    private void loadSections() {
+        Map<String, String> p = new HashMap<>();
+        p.put("page", "1");
+        p.put("size", "200");
+        NetworkUtils.get("/section/getSectionListAll", p, new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
+                        Platform.runLater(() -> {
+                            classCombo.getItems().clear();
+                            sectionIdMap.clear();
+                            sectionNameMap.clear();
+                            for (int i = 0; i < arr.size(); i++) {
+                                JsonObject obj = arr.get(i).getAsJsonObject();
+                                int id = JsonUtil.safeGetInt(obj, "id");
+                                String major = JsonUtil.safeGetString(obj, "major");
+                                String number = JsonUtil.safeGetString(obj, "number");
+                                String name = major + number + "班";
+                                sectionIdMap.put(name, id);
+                                sectionNameMap.put(id, name);
+                                classCombo.getItems().add(name);
+                            }
+                            if (editingStudent != null && editingStudent.getClassName() != null) {
+                                String clsName = editingStudent.getClassName();
+                                // 学生列表返回的 className 是 sectionId 数字，通过反向映射获取显示名
+                                try {
+                                    int sid = Integer.parseInt(clsName);
+                                    String displayName = sectionNameMap.get(sid);
+                                    if (displayName != null) clsName = displayName;
+                                } catch (NumberFormatException ignored) {}
+                                classCombo.setValue(clsName);
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+            @Override public void onFailure(Exception ignored) {}
+        });
     }
 
     public void setEditMode(Student student) {
@@ -60,35 +100,30 @@ public class AddNewStudentController {
         if (nameField != null) nameField.setText(student.getName());
         if (genderCombo != null) genderCombo.setValue(student.getGender());
         if (majorCombo != null) majorCombo.setValue(student.getMajor());
-        if (gradeField != null) gradeField.setText(student.getGrade());
-        if (classCombo != null) classCombo.setValue(student.getClassName());
+        if (gradeCombo != null) gradeCombo.setValue(student.getGrade());
+        // 班级由 loadSections 异步设置：学生列表返回的是 sectionId，需在加载完成后通过反向映射设置
     }
 
-    public void setOnStudentAddedListener(Runnable listener) {
-        this.onStudentAddedListener = listener;
-    }
+    public void setOnStudentAddedListener(Runnable listener) { this.onStudentAddedListener = listener; }
 
     private void handleSubmit() {
         String sduid = sduidField.getText().trim();
         String name = nameField.getText().trim();
         String gender = genderCombo.getValue();
         String major = majorCombo.getValue();
-        String grade = gradeField.getText().trim();
+        String grade = gradeCombo.getValue();
         String className = classCombo.getValue();
 
-        if (sduid == null || sduid.isEmpty() || name == null || name.isEmpty()) {
-            ShowMessage.showWarningMessage("提示", "学号和姓名不能为空");
-            return;
-        }
+        if (sduid.isEmpty() || name.isEmpty()) { ShowMessage.showWarningMessage("提示", "学号和姓名不能为空"); return; }
+        if (!sduid.matches("\\d{5,12}")) { ShowMessage.showWarningMessage("提示", "学号须为5-12位数字"); return; }
 
         Map<String, String> params = new HashMap<>();
         params.put("SDUId", sduid);
         params.put("username", name);
         params.put("sex", gender != null ? gender : "男");
-        // major 必须填有效的枚举值，null 会报400
-        String majorValue = MAJOR_ENUM_MAP.getOrDefault(major, "MAJOR_0");
-        params.put("major", majorValue);
-        params.put("password", "123456");
+        params.put("major", major != null ? major : "软件工程");
+        // 仅在新增时设置初始密码，编辑时不修改密码
+        if (editingStudent == null) params.put("password", "123456");
         if (grade != null && !grade.isEmpty()) params.put("grade", grade);
         params.put("permission", "2");
         params.put("college", "软件学院");
@@ -98,57 +133,76 @@ public class AddNewStudentController {
         params.put("email", sduid + "@sdu.edu.cn");
         params.put("phone", "");
         if (className != null && !className.isEmpty()) {
-            params.put("section", className);
+            Integer sid = sectionIdMap.get(className);
+            if (sid != null && sid > 0) params.put("sectionId", String.valueOf(sid));
         }
 
-        if (editingStudent != null) {
-            params.put("id", String.valueOf(editingStudent.getId()));
-        }
+        if (editingStudent != null) params.put("id", String.valueOf(editingStudent.getId()));
 
         String endpoint = editingStudent != null ? "/admin/updateUser" : "/admin/addUser";
-
+        // 新增学生时，若选了班级，需要在 addUser 后再次调用 updateUser 写入班级
+        final Integer sidForNew = (editingStudent == null && className != null) ? sectionIdMap.get(className) : null;
         btnSubmit.setDisable(true);
+
         NetworkUtils.postWithQueryParams(endpoint, params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        Platform.runLater(() -> {
-                            ShowMessage.showInfoMessage("成功",
-                                    editingStudent != null ? "已成功更新" : "已成功添加");
-                            if (onStudentAddedListener != null) {
-                                onStudentAddedListener.run();
-                            }
-                            closeDialog();
-                        });
+                        if (sidForNew != null && sidForNew > 0) {
+                            // 搜索新用户获取 ID，然后调用 updateUser 写入班级
+                            Map<String, String> q = new HashMap<>();
+                            q.put("keyword", sduid);
+                            q.put("permission", "2");
+                            NetworkUtils.get("/admin/searchSdu", q, new NetworkUtils.Callback<String>() {
+                                @Override public void onSuccess(String r2) {
+                                    try {
+                                        JsonArray arr = JsonUtil.extractArray(gson.fromJson(r2, JsonObject.class), "data");
+                                        if (arr.size() > 0) {
+                                            int uid = JsonUtil.safeGetInt(arr.get(0).getAsJsonObject(), "id");
+                                            if (uid > 0) {
+                                                // 复用 addUser 的参数，补上 id 和 sectionId（移除密码避免明文覆盖 Bcrypt 密文）
+                                                Map<String, String> up = new HashMap<>(params);
+                                                up.remove("password");
+                                                up.put("id", String.valueOf(uid));
+                                                up.put("sectionId", String.valueOf(sidForNew));
+                                                NetworkUtils.postWithQueryParams("/admin/updateUser", up, new NetworkUtils.Callback<String>() {
+                                                    @Override public void onSuccess(String r3) { closeAndNotify(); }
+                                                    @Override public void onFailure(Exception e) { closeAndNotify(); }
+                                                });
+                                                return;
+                                            }
+                                        }
+                                    } catch (Exception ignored) {}
+                                    closeAndNotify();
+                                }
+                                @Override public void onFailure(Exception e) { closeAndNotify(); }
+                            });
+                        } else {
+                            closeAndNotify();
+                        }
                     } else {
-                        Platform.runLater(() -> {
-                            ShowMessage.showErrorMessage("错误",
-                                    res.has("msg") ? res.get("msg").getAsString() : "操作失败");
-                            btnSubmit.setDisable(false);
-                        });
+                        Platform.runLater(() -> { ShowMessage.showErrorMessage("错误", res.has("msg")?res.get("msg").getAsString():"操作失败"); btnSubmit.setDisable(false); });
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
-                        btnSubmit.setDisable(false);
-                    });
+                    Platform.runLater(() -> { ShowMessage.showErrorMessage("错误", "解析失败"); btnSubmit.setDisable(false); });
                 }
             }
-
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> {
-                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
-                    btnSubmit.setDisable(false);
-                });
+                Platform.runLater(() -> { ShowMessage.showErrorMessage("错误", e.getMessage()); btnSubmit.setDisable(false); });
             }
         });
     }
 
-    private void closeDialog() {
-        Stage stage = (Stage) btnSubmit.getScene().getWindow();
-        stage.close();
+    private void closeAndNotify() {
+        Platform.runLater(() -> {
+            ShowMessage.showInfoMessage("成功", editingStudent != null ? "已更新" : "已添加");
+            if (onStudentAddedListener != null) onStudentAddedListener.run();
+            closeDialog();
+        });
     }
+
+    private void closeDialog() { ((Stage) btnSubmit.getScene().getWindow()).close(); }
 }
