@@ -53,6 +53,16 @@
 }
 .btn-outline:hover { -fx-background-color: #eef2ff; }
 
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4f46e5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 12 8 0;
+}
+.btn-back:hover { -fx-text-fill: #4338ca; }
+
 /* === 数据表格 === */
 .data-table {
     -fx-background-color: #ffffff;

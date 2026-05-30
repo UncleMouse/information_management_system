@@ -193,7 +193,9 @@ public class AdminHomePageController {
     }
 
     private void loadRecentNotices() {
-        NetworkUtils.get("/notice/getAdminNoticeList", new NetworkUtils.Callback<String>() {
+        Map<String, String> params = new java.util.HashMap<>();
+        params.put("Status", "1");  // 1=已发布公告
+        NetworkUtils.get("/notice/getAdminNoticeList", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

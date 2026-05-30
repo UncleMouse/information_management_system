@@ -194,7 +194,6 @@ public class NetworkUtils {
         headers.put("Content-Type", "application/x-www-form-urlencoded");
         headers.put("Authorization", "Bearer " + UserSession.getInstance().getToken());
         String fullUrl = appendQueryParams(urlString, params);
-        System.out.println("POST URL: " + fullUrl);
         request(fullUrl, HttpMethod.POST, headers, null, callback);
     }
 
@@ -313,10 +312,6 @@ public class NetworkUtils {
                                       Map<String, String> headers, String body) throws IOException {
         HttpURLConnection connection = null;
         try {
-            System.out.println("[NetworkUtils] >>> " + method + " " + urlString);
-            if (body != null && !body.isEmpty()) {
-                System.out.println("[NetworkUtils] Body: " + body);
-            }
             URL url = new URL(urlString);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod(method.name());
@@ -340,7 +335,6 @@ public class NetworkUtils {
                 }
             }
             int code = connection.getResponseCode();
-            System.out.println("[NetworkUtils] HTTP Status: " + code);
             InputStream is = (code >= 200 && code < 300) ? connection.getInputStream() : connection.getErrorStream();
             StringBuilder response = new StringBuilder();
             if (is != null) {
@@ -349,12 +343,8 @@ public class NetworkUtils {
                     while ((line = br.readLine()) != null) response.append(line);
                 }
             }
-            System.out.println("[NetworkUtils] Response: " + response);
             if (code >= 400) throw new IOException(mapHttpError(code, response.toString()));
             return response.toString();
-        } catch (IOException e) {
-            System.out.println("[NetworkUtils] 网络异常: " + e.getMessage());
-            throw e;
         } finally {
             if (connection != null) connection.disconnect();
         }

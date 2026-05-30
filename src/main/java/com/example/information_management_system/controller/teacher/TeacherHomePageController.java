@@ -1,6 +1,7 @@
 package com.example.information_management_system.controller.teacher;
 
 import com.example.information_management_system.entity.UserSession;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -12,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -51,7 +53,7 @@ public class TeacherHomePageController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         int totalCourses = arr.size();
                         int totalStudents = 0;
                         int pendingScore = 0;
@@ -92,7 +94,7 @@ public class TeacherHomePageController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<String> courseNames = FXCollections.observableArrayList();
                         int count = Math.min(arr.size(), 5);
                         for (int i = 0; i < count; i++) {
@@ -170,10 +172,10 @@ public class TeacherHomePageController {
                         "/com/example/information_management_system/" + fxmlPath))
         );
         if (recentCoursesBox != null && recentCoursesBox.getScene() != null) {
-            javafx.scene.layout.StackPane contentArea = (javafx.scene.layout.StackPane)
+            Pane contentArea = (Pane)
                     recentCoursesBox.getScene().lookup("#contentArea");
             if (contentArea == null) {
-                contentArea = (javafx.scene.layout.StackPane)
+                contentArea = (Pane)
                         recentCoursesBox.getScene().lookup(".content-area");
             }
             if (contentArea != null) {

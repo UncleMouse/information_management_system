@@ -306,3 +306,89 @@
 .data-table:focused {
     -fx-background-insets: 0 !important;
 }
+
+/* ===== 个人中心头部 ===== */
+.profile-header {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+.profile-name { -fx-text-fill: #e2e8f0 !important; }
+.role-tag { -fx-background-color: #1e3a5f !important; }
+.id-text { -fx-text-fill: #94a3b8 !important; }
+.status-dot { -fx-text-fill: #10b981 !important; }
+
+/* ===== 信息行 ===== */
+.info-row { -fx-border-color: #334155 !important; }
+
+/* ===== 信息字段 ===== */
+.info-field {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-prompt-text-fill: #64748b !important;
+}
+.info-field:focused {
+    -fx-border-color: #4f6ef7 !important;
+    -fx-background-color: #0f172a !important;
+}
+
+/* ===== 工具栏 ===== */
+.toolbar {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== ComboBox 通用暗色 ===== */
+.combo-box {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+}
+.combo-box .list-cell {
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-background-color: #020617 !important;
+}
+.combo-box .list-view {
+    -fx-background-color: #1e293b !important;
+}
+.combo-box .list-cell:hover {
+    -fx-background-color: #334155 !important;
+}
+.combo-box:focused {
+    -fx-border-color: #4f6ef7 !important;
+}
+
+/* ===== PasswordField 暗色 ===== */
+.password-field {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-prompt-text-fill: #64748b !important;
+}
+.password-field:focused {
+    -fx-border-color: #4f6ef7 !important;
+    -fx-background-color: #0f172a !important;
+}
+
+/* ===== TextArea 暗色 ===== */
+.text-area {
+    -fx-background-color: #020617 !important;
+    -fx-border-color: #475569 !important;
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-prompt-text-fill: #64748b !important;
+}
+.text-area .content {
+    -fx-background-color: #020617 !important;
+}
+.text-area:focused {
+    -fx-border-color: #4f6ef7 !important;
+}
+
+/* ===== 轮询/进度条 ===== */
+.progress-bar .track {
+    -fx-background-color: #334155 !important;
+}
+
+/* ===== ScrollPane 角标 ===== */
+.scroll-pane > .corner {
+    -fx-background-color: transparent !important;
+}

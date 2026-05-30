@@ -14,7 +14,7 @@
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="16">
-        <Button fx:id="backButton" text="← 返回" styleClass="back-button"/>
+        <Button fx:id="backButton" text="← 返回" styleClass="btn-back"/>
         <Label fx:id="courseNameLabel" text="学生名单" styleClass="page-title">
             <font><Font name="System Bold" size="20"/></font>
         </Label>

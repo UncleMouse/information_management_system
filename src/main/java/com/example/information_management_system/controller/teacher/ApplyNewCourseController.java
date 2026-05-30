@@ -143,51 +143,32 @@ public class ApplyNewCourseController {
         bodyMap.put("finalRatio", Double.parseDouble(finalRatioField.getText().trim()) / 100.0);
         bodyMap.put("intro", introTextArea.getText() != null ? introTextArea.getText().trim() : "");
         bodyMap.put("college", college != null ? college : "软件学院");
-        // 尝试送整数序号：0=必修 1=限选 2=任选
-        bodyMap.put("type", mapCourseTypeToOrdinal(categoryComboBox.getValue()));
+        bodyMap.put("type", mapTypeEnum(categoryComboBox.getValue()));
         bodyMap.put("classNum", "");   // DB class_num NOT NULL，暂填空值，审批时分配
 
         String jsonBody = gson.toJson(bodyMap);
-        String requestUrl = NetworkUtils.BaseUrl + "/class/create";
-        System.out.println("========== 申请新课 请求开始 ==========");
-        System.out.println("URL: " + requestUrl);
-        System.out.println("Body: " + jsonBody);
-        System.out.println("========================================");
 
         NetworkUtils.post("/class/create", jsonBody, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
-                System.out.println("========== 申请新课 响应成功 ==========");
-                System.out.println("Response: " + result);
-                System.out.println("========================================");
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
-                    int code = res.has("code") ? res.get("code").getAsInt() : -1;
-                    System.out.println("code: " + code);
-                    if (code == 200) {
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> {
                             ShowMessage.showInfoMessage("成功", "已成功添加");
                             navigateBack();
                         });
                     } else {
                         String msg = res.has("msg") ? res.get("msg").getAsString() : "申请失败";
-                        System.out.println("业务错误 msg: " + msg);
                         Platform.runLater(() -> ShowMessage.showErrorMessage("错误", msg));
                     }
                 } catch (Exception e) {
-                    System.out.println("JSON解析异常: " + e.getMessage());
-                    e.printStackTrace();
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "响应处理失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                System.out.println("========== 申请新课 请求失败 ==========");
-                System.out.println("异常类型: " + e.getClass().getName());
-                System.out.println("异常信息: " + e.getMessage());
-                e.printStackTrace();
-                System.out.println("========================================");
                 Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });
@@ -264,12 +245,12 @@ public class ApplyNewCourseController {
         return true;
     }
 
-    private int mapCourseTypeToOrdinal(String label) {
-        if (label == null) return 2;
+    private String mapTypeEnum(String label) {
+        if (label == null) return "ELECTIVE";
         switch (label) {
-            case "必修": return 0;
-            case "限选": return 1;
-            default: return 2;
+            case "必修": return "REQUIRED";
+            case "限选": return "RESTRICTED_ELECTIVE";
+            default: return "ELECTIVE";
         }
     }
 

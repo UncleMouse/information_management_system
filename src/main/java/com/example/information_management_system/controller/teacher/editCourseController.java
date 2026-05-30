@@ -154,7 +154,7 @@ public class editCourseController {
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("name", courseNameField.getText().trim());
         bodyMap.put("category", categoryComboBox.getValue());
-        bodyMap.put("type", mapCourseTypeToEnum(categoryComboBox.getValue()));
+        bodyMap.put("type", mapTypeEnum(categoryComboBox.getValue()));
         bodyMap.put("point", Double.parseDouble(creditField.getText().trim()));
         if (classroomComboBox.getValue() != null) {
             bodyMap.put("classroom", classroomComboBox.getValue());
@@ -252,7 +252,7 @@ public class editCourseController {
         return true;
     }
 
-    private String mapCourseTypeToEnum(String label) {
+    private String mapTypeEnum(String label) {
         if (label == null) return "ELECTIVE";
         switch (label) {
             case "必修": return "REQUIRED";

@@ -65,9 +65,6 @@
                         maxWidth="Infinity"/>
             </VBox>
 
-            <!-- 切换登录方式 -->
-            <Hyperlink fx:id="toggleLoginLink" text="统一认证登录" styleClass="toggle-link"/>
-
             <!-- 快捷测试 -->
             <HBox spacing="12" alignment="CENTER">
                 <Hyperlink fx:id="studentQuickLogin" text="学生登录(测试)"

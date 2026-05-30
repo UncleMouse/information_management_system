@@ -3,6 +3,7 @@ package com.example.information_management_system.controller.teacher;
 import com.example.information_management_system.model.CourseForScoreInput;
 import com.example.information_management_system.model.ScoreEntry;
 import com.example.information_management_system.util.ExportUtils;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.example.information_management_system.util.StringUtil;
@@ -107,7 +108,7 @@ public class ScoreInputController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<String> courseNames = FXCollections.observableArrayList();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
@@ -161,7 +162,7 @@ public class ScoreInputController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<ScoreEntry> list = FXCollections.observableArrayList();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();

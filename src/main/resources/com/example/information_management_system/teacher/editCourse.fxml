@@ -14,7 +14,7 @@
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
     <HBox alignment="CENTER_LEFT" spacing="16">
-        <Button fx:id="backButton" text="← 返回" styleClass="back-button"/>
+        <Button fx:id="backButton" text="← 返回" styleClass="btn-back"/>
         <Label fx:id="pageTitleLabel" text="编辑课程" styleClass="page-title">
             <font><Font name="System Bold" size="20"/></font>
         </Label>
@@ -98,8 +98,8 @@
             </VBox>
 
             <HBox spacing="12" alignment="CENTER_RIGHT">
-                <Button fx:id="cancelButton" text="取消" styleClass="outline-button"/>
-                <Button fx:id="submitButton" text="保存修改" styleClass="primary-button"/>
+                <Button fx:id="cancelButton" text="取消" styleClass="btn-outline"/>
+                <Button fx:id="submitButton" text="保存修改" styleClass="btn-primary"/>
             </HBox>
         </VBox>
     </ScrollPane>

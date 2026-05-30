@@ -4,7 +4,6 @@ import com.example.information_management_system.MainApplication;
 import com.example.information_management_system.entity.Data;
 import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.util.NetworkUtils;
-import com.example.information_management_system.util.StringUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -22,7 +21,6 @@ import java.util.Map;
 public class LoginController {
 
     private final Gson gson = new Gson();
-    private boolean isOAuthMode = false;
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
@@ -55,9 +53,7 @@ public class LoginController {
         body.put("password", password);
         String json = gson.toJson(body);
 
-        String endpoint = isOAuthMode ? "/login/SDULogin" : "/login/simpleLogin";
-
-        NetworkUtils.post(endpoint, json, new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/login/simpleLogin", json, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
