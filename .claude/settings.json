@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(find \"C:/Users/sunshine/Desktop/Java期末\" -type f | sort 2>/dev/null)",
-      "Read(//c/Users/sunshine/Desktop/Java期末/**)",
-      "Bash(./mvnw compile *)"
-    ]
-  }
-}
