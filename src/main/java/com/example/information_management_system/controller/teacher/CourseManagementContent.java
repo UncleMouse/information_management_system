@@ -1,6 +1,7 @@
 package com.example.information_management_system.controller.teacher;
 
 import com.example.information_management_system.model.Course;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 
@@ -15,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
@@ -36,6 +36,7 @@ public class CourseManagementContent {
     @FXML private Button applyNewCourseButton;
     @FXML private Button editCourseButton;
     @FXML private Button viewStudentsButton;
+    @FXML private Button deleteCourseButton;
 
     private ObservableList<Course> courseList = FXCollections.observableArrayList();
 
@@ -54,6 +55,9 @@ public class CourseManagementContent {
         if (viewStudentsButton != null) {
             viewStudentsButton.setOnAction(e -> handleViewStudents());
         }
+        if (deleteCourseButton != null) {
+            deleteCourseButton.setOnAction(e -> handleDeleteCourse());
+        }
         if (searchField != null) {
             searchField.textProperty().addListener((obs, old, val) -> filterCourses());
         }
@@ -62,20 +66,18 @@ public class CourseManagementContent {
     }
 
     private void setupTableColumns() {
-        nameColumn.setCellValueFactory(cell -> {
-            String code = cell.getValue().getCode();
-            String teacherName = cell.getValue().getTeacherName();
-            String displayName = code;
-            return new SimpleStringProperty(displayName != null ? displayName : "");
-        });
-        codeColumn.setCellValueFactory(cell -> {
-            String name = cell.getValue().getCode();
-            return new SimpleStringProperty(name != null ? name : "");
-        });
-        creditColumn.setCellValueFactory(new PropertyValueFactory<>("credit"));
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-        peopleNumColumn.setCellValueFactory(new PropertyValueFactory<>("peopleNum"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        nameColumn.setCellValueFactory(cell ->
+            new SimpleStringProperty(cell.getValue().getTeacherName()));
+        codeColumn.setCellValueFactory(cell ->
+            new SimpleStringProperty(cell.getValue().getCode()));
+        creditColumn.setCellValueFactory(cell ->
+            new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getCredit()).asObject());
+        typeColumn.setCellValueFactory(cell ->
+            new SimpleStringProperty(cell.getValue().getType()));
+        peopleNumColumn.setCellValueFactory(cell ->
+            new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getPeopleNum()).asObject());
+        statusColumn.setCellValueFactory(cell ->
+            new SimpleStringProperty(cell.getValue().getStatus()));
     }
 
     private void fetchCourses() {
@@ -91,18 +93,21 @@ public class CourseManagementContent {
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             Course course = new Course();
-                            if (obj.has("id")) course.setId(obj.get("id").getAsInt());
-                            if (obj.has("name")) course.setCode(obj.get("name").getAsString());
-                            if (obj.has("code")) course.setCode(obj.get("code").getAsString());
-                            if (obj.has("name")) course.setTeacherName(obj.get("name").getAsString());
-                            if (obj.has("credit")) course.setCredit(obj.get("credit").getAsDouble());
-                            if (obj.has("type")) course.setType(obj.get("type").getAsString());
-                            if (obj.has("peopleNum")) course.setPeopleNum(obj.get("peopleNum").getAsInt());
-                            if (obj.has("status")) course.setStatus(obj.get("status").getAsString());
-                            if (obj.has("classNum")) course.setClassNum(obj.get("classNum").getAsInt());
-                            if (obj.has("term")) course.setTerm(obj.get("term").getAsString());
-                            if (obj.has("teacher")) course.setTeacher(obj.get("teacher").getAsString());
-                            if (obj.has("department")) course.setDepartment(obj.get("department").getAsString());
+                            course.setId(JsonUtil.safeGetInt(obj, "id"));
+                            course.setTeacherName(JsonUtil.safeGetString(obj, "name"));
+                            String cn = JsonUtil.safeGetString(obj, "classNum");
+                            if (!cn.isEmpty()) {
+                                try { course.setClassNum(Integer.parseInt(cn)); }
+                                catch (NumberFormatException e) { course.setClassNum(0); }
+                                course.setCode(cn);
+                            }
+                            course.setCredit(obj.has("point") && !obj.get("point").isJsonNull() ? obj.get("point").getAsDouble() : 0.0);
+                            course.setType(JsonUtil.safeGetString(obj, "type"));
+                            course.setPeopleNum(JsonUtil.safeGetInt(obj, "peopleNum"));
+                            course.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            course.setTerm(JsonUtil.safeGetString(obj, "term"));
+                            course.setTeacher(JsonUtil.safeGetString(obj, "teacherName"));
+                            course.setDepartment(JsonUtil.safeGetString(obj, "college"));
                             list.add(course);
                         }
                         Platform.runLater(() -> courseList.setAll(list));
@@ -189,6 +194,35 @@ public class CourseManagementContent {
             e.printStackTrace();
             ShowMessage.showErrorMessage("错误", "无法打开编辑课程页面");
         }
+    }
+
+    private void handleDeleteCourse() {
+        Course selected = courseTable.getSelectionModel().getSelectedItem();
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一门课程"); return; }
+        boolean confirmed = ShowMessage.showConfirmMessage("确认删除",
+                "确定要删除课程 \"" + selected.getTeacherName() + "\" 吗？\n此操作不可撤销。");
+        if (!confirmed) return;
+
+        NetworkUtils.post("/class/delete/" + selected.getId(), "", new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        Platform.runLater(() -> { ShowMessage.showInfoMessage("成功", "已删除"); fetchCourses(); });
+                    } else {
+                        String msg = res.has("msg") ? res.get("msg").getAsString() : "删除失败";
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", msg));
+                    }
+                } catch (Exception e) {
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "操作失败"));
+                }
+            }
+            @Override
+            public void onFailure(Exception e) {
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
+            }
+        });
     }
 
     private void handleViewStudents() {

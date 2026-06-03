@@ -38,6 +38,7 @@
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Button fx:id="btnApprove" text="审核通过" styleClass="btn-approve" disable="true" />
         <Button fx:id="btnReject" text="审核拒绝" styleClass="btn-danger" disable="true" />
+        <Button fx:id="btnSchedule" text="进行排课" styleClass="btn-success" />
         <Button fx:id="btnRefresh" text="刷新" styleClass="btn-secondary" />
         <Region HBox.hgrow="ALWAYS" />
         <Label fx:id="statusLabel" text="" styleClass="status-label" />

@@ -1,6 +1,7 @@
 package com.example.information_management_system.controller.teacher;
 
 import com.example.information_management_system.model.Student;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 
@@ -15,12 +16,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class StudentListViewController {
@@ -37,100 +35,71 @@ public class StudentListViewController {
     @FXML private TableColumn<Student, String> majorColumn;
     @FXML private TableColumn<Student, String> gradeColumn;
     @FXML private TableColumn<Student, String> classNameColumn;
-    @FXML private TableColumn<Student, String> statusColumn;
     @FXML private Button backButton;
     @FXML private Label studentCountLabel;
 
     private ObservableList<Student> studentList = FXCollections.observableArrayList();
-    private String currentCourseName;
 
     @FXML
     public void initialize() {
         studentTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         setupTableColumns();
         studentTable.setItems(studentList);
-
-        if (searchField != null) {
-            searchField.textProperty().addListener((obs, old, val) -> filterStudents());
-        }
-        if (backButton != null) {
-            backButton.setOnAction(e -> navigateBack());
-        }
+        if (searchField != null) searchField.textProperty().addListener((obs, old, val) -> filterStudents());
+        if (backButton != null) backButton.setOnAction(e -> navigateBack());
     }
 
     private void setupTableColumns() {
-        sduidColumn.setCellValueFactory(new PropertyValueFactory<>("sduid"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        genderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
-        departmentColumn.setCellValueFactory(new PropertyValueFactory<>("department"));
-        majorColumn.setCellValueFactory(new PropertyValueFactory<>("major"));
-        gradeColumn.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        classNameColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+        sduidColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
+        nameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        genderColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGender()));
+        departmentColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getDepartment()));
+        majorColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMajor()));
+        gradeColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGrade()));
+        classNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getClassName()));
     }
 
     public void loadStudentsForCourse(int courseId, String courseName) {
-        this.currentCourseName = courseName;
-        if (courseNameLabel != null) {
-            courseNameLabel.setText("学生名单 - " + (courseName != null ? courseName : ""));
-        }
+        if (courseNameLabel != null) courseNameLabel.setText("学生名单 - " + (courseName != null ? courseName : ""));
         fetchStudents(courseId, courseName);
     }
 
     private void fetchStudents(int courseId, String courseName) {
-        Map<String, String> params = new HashMap<>();
-        params.put("courseName", courseName);
-
-        NetworkUtils.get("/class/" + courseId + "/students", params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
+        NetworkUtils.get("/class/" + courseId + "/students", new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<Student> list = FXCollections.observableArrayList();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
-                            Student student = new Student();
-                            if (obj.has("sduid")) student.setSduid(obj.get("sduid").getAsString());
-                            if (obj.has("name")) student.setName(obj.get("name").getAsString());
-                            if (obj.has("gender")) student.setGender(obj.get("gender").getAsString());
-                            if (obj.has("department")) student.setDepartment(obj.get("department").getAsString());
-                            if (obj.has("major")) student.setMajor(obj.get("major").getAsString());
-                            if (obj.has("grade")) student.setGrade(obj.get("grade").getAsString());
-                            if (obj.has("className")) student.setClassName(obj.get("className").getAsString());
-                            if (obj.has("status")) student.setStatus(obj.get("status").getAsString());
-                            if (obj.has("id")) student.setId(obj.get("id").getAsInt());
-                            list.add(student);
+                            Student s = new Student();
+                            // API: sduid, username, sectionNumber, major, number
+                            String sduid = obj.has("sduid") ? obj.get("sduid").getAsString() : "";
+                            if (!sduid.isEmpty()) { s.setSduid(sduid); s.setGrade(sduid.length()>=4 ? sduid.substring(0,4) : "-"); }
+                            else s.setSduid("-");
+                            if (obj.has("username")) s.setName(obj.get("username").getAsString());
+                            if (obj.has("major")) { s.setMajor(obj.get("major").getAsString()); s.setDepartment(obj.get("major").getAsString()); }
+                            if (obj.has("number")) s.setClassName(obj.get("number").getAsString());
+                            else if (obj.has("sectionNumber") && obj.get("sectionNumber").getAsInt() > 0) s.setClassName(String.valueOf(obj.get("sectionNumber").getAsInt()));
+                            s.setGender("-"); s.setStatus("-");
+                            list.add(s);
                         }
                         Platform.runLater(() -> {
                             studentList.setAll(list);
-                            if (studentCountLabel != null) {
-                                studentCountLabel.setText("共 " + list.size() + " 条");
-                            }
+                            if (studentCountLabel != null) studentCountLabel.setText("共 " + list.size() + " 条");
                         });
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Platform.runLater(() ->
-                            ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
-                }
+                } catch (Exception e) { Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败")); }
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() ->
-                        ShowMessage.showErrorMessage("错误", "数据加载失败: " + e.getMessage()));
-            }
+            @Override public void onFailure(Exception e) { Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据加载失败")); }
         });
     }
 
     private void filterStudents() {
         String query = searchField.getText().toLowerCase().trim();
-        if (query.isEmpty()) {
-            studentTable.setItems(studentList);
-            return;
-        }
+        if (query.isEmpty()) { studentTable.setItems(studentList); return; }
         ObservableList<Student> filtered = FXCollections.observableArrayList();
         for (Student s : studentList) {
             if ((s.getName() != null && s.getName().toLowerCase().contains(query))
@@ -148,22 +117,17 @@ public class StudentListViewController {
             Pane contentArea = findContentArea();
             if (contentArea != null) {
                 FXMLLoader loader = new FXMLLoader(
-                        Objects.requireNonNull(getClass().getResource(
-                                "/com/example/information_management_system/teacher/CourseManagementContent.fxml"))
-                );
+                    Objects.requireNonNull(getClass().getResource("/com/example/information_management_system/teacher/CourseManagementContent.fxml")));
                 Parent view = loader.load();
                 contentArea.getChildren().clear();
                 contentArea.getChildren().add(view);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     private Pane findContentArea() {
-        if (studentTable != null && studentTable.getScene() != null) {
+        if (studentTable != null && studentTable.getScene() != null)
             return (Pane) studentTable.getScene().lookup("#contentArea");
-        }
         return null;
     }
 }

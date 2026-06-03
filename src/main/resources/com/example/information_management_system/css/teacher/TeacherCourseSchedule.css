@@ -1,105 +1,46 @@
-.page-root {
-    -fx-background-color: #f1f5f9;
-}
+/* === 页面基底 === */
+.page-root { -fx-background-color: #f0f4f8; }
+.page-title { -fx-font-weight: bold; -fx-text-fill: #1e293b; }
 
-.page-title {
-    -fx-text-fill: #1e293b;
-    -fx-font-weight: bold;
-}
-
-.field-label {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-}
+.field-label { -fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #94a3b8; }
 
 .form-combo {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-font-size: 13px;
+    -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-size: 13px;
 }
-
-.form-combo:focused {
-    -fx-border-color: #4f6ef7;
-}
+.form-combo:focused { -fx-border-color: #6366f1; }
 
 .btn-outline {
-    -fx-background-color: #ffffff;
-    -fx-text-fill: #4f6ef7;
-    -fx-font-size: 13px;
-    -fx-padding: 8 16;
-    -fx-background-radius: 8;
-    -fx-border-color: #4f6ef7;
-    -fx-border-radius: 8;
-    -fx-cursor: hand;
+    -fx-background-color: #fff; -fx-text-fill: #4f46e5; -fx-font-size: 13px;
+    -fx-padding: 8 16; -fx-background-radius: 8; -fx-border-color: #c7d2fe; -fx-border-radius: 8; -fx-cursor: hand;
 }
+.btn-outline:hover { -fx-background-color: #eef2ff; }
 
-.btn-outline:hover {
-    -fx-background-color: #eef2ff;
-}
+.week-label { -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b; }
 
-.week-label {
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1e293b;
-    -fx-min-width: 80;
-    -fx-alignment: center;
-}
-
+/* === 课表 === */
 .schedule-table {
     -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 8;
-    -fx-background-radius: 8;
-    -fx-padding: 0;
-    -fx-fixed-cell-size: 72px;
-    -fx-fixed-cell-size: 72px;
+    -fx-border-color: #e8ecf0; -fx-border-width: 1;
+    -fx-border-radius: 12; -fx-background-radius: 12;
+    -fx-table-cell-border-color: #f1f5f9;
 }
-
 .schedule-table .column-header-background {
     -fx-background-color: #f8fafc;
-    -fx-background-radius: 8 8 0 0;
+    -fx-border-color: #e8ecf0; -fx-border-width: 0 0 1 0;
 }
-
 .schedule-table .column-header {
-    -fx-background-color: transparent;
-    -fx-padding: 14 16;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 0 1 1 0;
+    -fx-background-color: transparent; -fx-padding: 10 12;
 }
-
 .schedule-table .column-header .label {
-    -fx-text-fill: #475569;
-    -fx-font-weight: bold;
-    -fx-font-size: 13px;
-    -fx-alignment: center;
+    -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 12px; -fx-alignment: CENTER;
 }
-
 .schedule-table .table-cell {
-    -fx-padding: 8 12;
-    -fx-font-size: 12px;
-    -fx-text-fill: #334155;
-    -fx-alignment: top-left;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 0 1 1 0;
-    -fx-wrap-text: true;
+    -fx-padding: 6 10; -fx-font-size: 13px; -fx-text-fill: #000000;
+    -fx-font-weight: bold; -fx-alignment: CENTER; -fx-wrap-text: true;
 }
-
 .schedule-table .table-row-cell {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #f1f5f9;
+    -fx-background-color: #ffffff; -fx-border-color: #f1f5f9;
 }
-
-.schedule-table .table-row-cell:odd {
-    -fx-background-color: #f8fafc;
-}
-
-.schedule-table .table-row-cell:selected {
-    -fx-background-color: #eef2ff;
-}
-
-.schedule-table .table-cell:selected {
-    -fx-text-fill: #1e293b;
-}
+.schedule-table .table-row-cell:odd { -fx-background-color: #fafbfc; }
+.schedule-table .table-row-cell:selected { -fx-background-color: #eef2ff; }

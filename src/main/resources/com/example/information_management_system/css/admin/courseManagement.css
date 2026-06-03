@@ -27,12 +27,16 @@
     -fx-font-weight: bold;
 }
 
-.filter-combo {
-    -fx-background-color: #ffffff;
+.filter-combo, .form-combo {
+    -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
+    -fx-font-size: 13px;
 }
+.filter-combo:hover, .form-combo:hover { -fx-border-color: #c7d2fe; }
+.filter-combo:focused, .form-combo:focused { -fx-border-color: #6366f1; -fx-background-color: #ffffff; }
+.filter-combo .list-cell, .form-combo .list-cell { -fx-text-fill: #1e293b; }
 
 .btn-primary {
     -fx-background-color: #4f6ef7;
@@ -154,3 +158,24 @@
     -fx-text-fill: #94a3b8;
     -fx-font-size: 14px;
 }
+
+.btn-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4f46e5;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 8 12 8 0;
+}
+.btn-back:hover { -fx-text-fill: #4338ca; }
+
+.btn-success {
+    -fx-background-color: #10b981;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-success:hover { -fx-background-color: #059669; }

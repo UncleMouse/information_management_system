@@ -40,7 +40,6 @@
             <TableColumn fx:id="regularScoreColumn" text="平时成绩" prefWidth="100"/>
             <TableColumn fx:id="finalScoreColumn" text="期末成绩" prefWidth="100"/>
             <TableColumn fx:id="totalScoreColumn" text="总成绩" prefWidth="100"/>
-            <TableColumn fx:id="statusColumn" text="状态" prefWidth="80"/>
             <TableColumn fx:id="remarksColumn" text="备注" prefWidth="150"/>
         </columns>
         <columnResizePolicy>

@@ -80,10 +80,18 @@ public class TeacherBaseViewController {
     }
 
     private void handleLogout() {
-        com.example.information_management_system.MainApplication.stopTokenRefreshTimer();
-        UserSession.getInstance().clearSession();
-        try {
-            com.example.information_management_system.MainApplication.changeView("Login.fxml", "css/Login.css");
-        } catch (IOException e) { e.printStackTrace(); }
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        alert.setTitle("确认退出");
+        alert.setHeaderText(null);
+        alert.setContentText("确定要退出登录吗？");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                com.example.information_management_system.MainApplication.stopTokenRefreshTimer();
+                UserSession.getInstance().clearSession();
+                try {
+                    com.example.information_management_system.MainApplication.changeView("Login.fxml", "css/Login.css");
+                } catch (IOException e) { e.printStackTrace(); }
+            }
+        });
     }
 }

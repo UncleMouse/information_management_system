@@ -17,7 +17,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -39,7 +38,6 @@ public class ScoreInputController {
     @FXML private TableColumn<ScoreEntry, Double> regularScoreColumn;
     @FXML private TableColumn<ScoreEntry, Double> finalScoreColumn;
     @FXML private TableColumn<ScoreEntry, Double> totalScoreColumn;
-    @FXML private TableColumn<ScoreEntry, String> statusColumn;
     @FXML private TableColumn<ScoreEntry, String> remarksColumn;
     @FXML private Button saveButton;
     @FXML private Button publishButton;
@@ -47,6 +45,7 @@ public class ScoreInputController {
 
     private ObservableList<ScoreEntry> scoreList = FXCollections.observableArrayList();
     private Map<String, Integer> courseNameToId = new HashMap<>();
+    private Map<Integer, String> courseIdToTerm = new HashMap<>();
     private String selectedCourseCode;
 
     @FXML
@@ -76,24 +75,27 @@ public class ScoreInputController {
     }
 
     private void setupTableColumns() {
-        sduidColumn.setCellValueFactory(new PropertyValueFactory<>("sduid"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-        classNameColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
-        regularScoreColumn.setCellValueFactory(new PropertyValueFactory<>("regularScore"));
+        sduidColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
+        nameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        classNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getClassName()));
+        regularScoreColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getRegularScore()).asObject());
         regularScoreColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         regularScoreColumn.setOnEditCommit(event -> {
             ScoreEntry entry = event.getRowValue();
             entry.setRegularScore(event.getNewValue());
+            entry.setTotalScore(event.getNewValue() + entry.getFinalScore());
+            scoreTable.refresh();
         });
-        finalScoreColumn.setCellValueFactory(new PropertyValueFactory<>("finalScore"));
+        finalScoreColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getFinalScore()).asObject());
         finalScoreColumn.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
         finalScoreColumn.setOnEditCommit(event -> {
             ScoreEntry entry = event.getRowValue();
             entry.setFinalScore(event.getNewValue());
+            entry.setTotalScore(entry.getRegularScore() + event.getNewValue());
+            scoreTable.refresh();
         });
-        totalScoreColumn.setCellValueFactory(new PropertyValueFactory<>("totalScore"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-        remarksColumn.setCellValueFactory(new PropertyValueFactory<>("remarks"));
+        totalScoreColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getTotalScore()).asObject());
+        remarksColumn.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getRemarks()));
         remarksColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         remarksColumn.setOnEditCommit(event -> {
             ScoreEntry entry = event.getRowValue();
@@ -110,6 +112,7 @@ public class ScoreInputController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<String> courseNames = FXCollections.observableArrayList();
+                        courseNames.add("全部");
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             String name = obj.has("name") ? obj.get("name").getAsString() :
@@ -117,10 +120,12 @@ public class ScoreInputController {
                             int id = obj.has("id") ? obj.get("id").getAsInt() : 0;
                             courseNames.add(name);
                             courseNameToId.put(name, id);
+                            if (obj.has("term")) courseIdToTerm.put(id, obj.get("term").getAsString());
                         }
                         Platform.runLater(() -> {
                             if (courseComboBox != null) {
                                 courseComboBox.setItems(courseNames);
+                                courseComboBox.setValue("全部");
                             }
                         });
                     }
@@ -141,7 +146,46 @@ public class ScoreInputController {
         String selected = courseComboBox.getValue();
         if (selected == null) return;
         selectedCourseCode = selected;
+        if ("全部".equals(selected)) {
+            fetchAllScores();
+            return;
+        }
         fetchScoresForCourse(selected);
+    }
+
+    private void fetchAllScores() {
+        scoreList.clear();
+        if (courseNameToId.isEmpty()) return;
+        final int[] done = {0};
+        for (Map.Entry<String, Integer> entry : courseNameToId.entrySet()) {
+            Integer cid = entry.getValue();
+            if (cid == 0) { done[0]++; continue; }
+            NetworkUtils.get("/class/" + cid + "/students", new NetworkUtils.Callback<String>() {
+                @Override public void onSuccess(String result) {
+                    try {
+                        JsonObject res = gson.fromJson(result, JsonObject.class);
+                        if (res.has("code") && res.get("code").getAsInt() == 200) {
+                            JsonArray arr = JsonUtil.extractArray(res, "data");
+                            for (int i = 0; i < arr.size(); i++) {
+                                JsonObject obj = arr.get(i).getAsJsonObject();
+                                ScoreEntry e = new ScoreEntry();
+                                if (obj.has("sduid")) e.setSduid(obj.get("sduid").getAsString());
+                                if (obj.has("username")) e.setName(obj.get("username").getAsString());
+                                if (obj.has("number")) e.setClassName(obj.get("number").getAsString());
+                                if (obj.has("id")) e.setStudentId(obj.get("id").getAsInt());
+                                if (obj.has("regular")) e.setRegularScore(obj.get("regular").getAsDouble());
+                                if (obj.has("finalScore")) e.setFinalScore(obj.get("finalScore").getAsDouble());
+                                if (obj.has("grade")) e.setTotalScore(obj.get("grade").getAsDouble());
+                                e.setCourseName(entry.getKey());
+                                Platform.runLater(() -> scoreList.add(e));
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    done[0]++;
+                }
+                @Override public void onFailure(Exception e) { done[0]++; }
+            });
+        }
     }
 
     private void fetchScoresForCourse(String courseName) {
@@ -167,18 +211,17 @@ public class ScoreInputController {
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             ScoreEntry entry = new ScoreEntry();
+                            // API: sduid, username, number/sectionNumber, id, regular, finalScore, grade
                             if (obj.has("sduid")) entry.setSduid(obj.get("sduid").getAsString());
-                            if (obj.has("name")) entry.setName(obj.get("name").getAsString());
-                            if (obj.has("className")) entry.setClassName(obj.get("className").getAsString());
-                            if (obj.has("studentId") || obj.has("id")) {
-                                int sid = obj.has("studentId") ? obj.get("studentId").getAsInt() : obj.get("id").getAsInt();
-                                entry.setStudentId(sid);
-                            }
-                            if (obj.has("regularScore")) entry.setRegularScore(obj.get("regularScore").getAsDouble());
+                            if (obj.has("username")) entry.setName(obj.get("username").getAsString());
+                            if (obj.has("number")) entry.setClassName(obj.get("number").getAsString());
+                            else if (obj.has("sectionNumber")) entry.setClassName(String.valueOf(obj.get("sectionNumber").getAsInt()));
+                            if (obj.has("id")) entry.setStudentId(obj.get("id").getAsInt());
+                            if (obj.has("regular")) entry.setRegularScore(obj.get("regular").getAsDouble());
                             if (obj.has("finalScore")) entry.setFinalScore(obj.get("finalScore").getAsDouble());
-                            if (obj.has("totalScore")) entry.setTotalScore(obj.get("totalScore").getAsDouble());
-                            if (obj.has("status")) entry.setStatus(obj.get("status").getAsString());
-                            if (obj.has("remarks")) entry.setRemarks(obj.get("remarks").getAsString());
+                            if (obj.has("grade")) entry.setTotalScore(obj.get("grade").getAsDouble());
+                            entry.setStatus("");
+                            entry.setRemarks("");
                             entry.setCourseName(courseName);
                             list.add(entry);
                         }
@@ -221,21 +264,34 @@ public class ScoreInputController {
         }
 
         Integer courseId = courseNameToId.get(selectedCourseCode);
+        final int[] done = {0};
+        final int total = scoreList.size();
         for (ScoreEntry entry : scoreList) {
             Map<String, String> params = new HashMap<>();
             params.put("studentId", String.valueOf(entry.getStudentId()));
-            if (courseId != null) params.put("courseId", String.valueOf(courseId));
+            if (courseId != null) {
+                params.put("courseId", String.valueOf(courseId));
+                String term = courseIdToTerm.get(courseId);
+                if (term != null) params.put("term", term);
+            }
             params.put("regular", String.valueOf((int) entry.getRegularScore()));
             params.put("finalScore", String.valueOf((int) entry.getFinalScore()));
             params.put("grade", String.valueOf((int) entry.getTotalScore()));
-            NetworkUtils.post("/grade/setGrade", params, "", new NetworkUtils.Callback<String>() {
-                @Override
-                public void onSuccess(String result) { /* 逐条保存，不弹窗 */ }
-                @Override
-                public void onFailure(Exception e) { /* 忽略单条失败 */ }
+            params.put("rank", "0");
+            NetworkUtils.postWithQueryParams("/grade/setGrade", params, new NetworkUtils.Callback<String>() {
+                @Override public void onSuccess(String result) { done[0]++; checkAllSaved(done, total); }
+                @Override public void onFailure(Exception e) { done[0]++; checkAllSaved(done, total); }
             });
         }
-        ShowMessage.showInfoMessage("成功", "已成功更新");
+    }
+
+    private void checkAllSaved(int[] done, int total) {
+        if (done[0] >= total) {
+            Platform.runLater(() -> {
+                ShowMessage.showInfoMessage("成功", "已保存 " + total + " 条");
+                fetchScoresForCourse(selectedCourseCode);
+            });
+        }
     }
 
     private void handlePublishScores() {

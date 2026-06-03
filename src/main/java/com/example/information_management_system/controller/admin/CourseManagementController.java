@@ -13,9 +13,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.io.IOException;
 import java.util.*;
 
 public class CourseManagementController {
@@ -38,6 +39,7 @@ public class CourseManagementController {
     @FXML private Button btnSearch;
     @FXML private Button btnApprove;
     @FXML private Button btnReject;
+    @FXML private Button btnSchedule;
     @FXML private Button btnRefresh;
     @FXML private Label statusLabel;
 
@@ -51,6 +53,7 @@ public class CourseManagementController {
         btnSearch.setOnAction(e -> searchCourses());
         btnApprove.setOnAction(e -> handleApprove());
         btnReject.setOnAction(e -> handleReject());
+        if (btnSchedule != null) btnSchedule.setOnAction(e -> handleAutoSchedule());
         btnRefresh.setOnAction(e -> loadCourses());
 
         searchField.setOnKeyPressed(e -> {
@@ -72,12 +75,12 @@ public class CourseManagementController {
         colCode.setCellFactory(col -> new TableCell<Course, String>() {
             @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
         });
-        colName.setCellValueFactory(new PropertyValueFactory<>("code"));
-        colTeacher.setCellValueFactory(new PropertyValueFactory<>("teacherName"));
-        colCredit.setCellValueFactory(new PropertyValueFactory<>("credit"));
-        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        colTerm.setCellValueFactory(new PropertyValueFactory<>("term"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCode()));
+        colTeacher.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTeacherName()));
+        colCredit.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getCredit()).asObject());
+        colType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getType()));
+        colTerm.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTerm()));
+        colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
 
         colCredit.setCellFactory(col -> new TableCell<Course, Double>() {
             @Override protected void updateItem(Double item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:String.valueOf(item)); setStyle("-fx-alignment: CENTER;"); }
@@ -109,137 +112,98 @@ public class CourseManagementController {
 
     private void setupFilters() {
         semesterFilter.setItems(Data.getInstance().getSemesterList());
-        if (!semesterFilter.getItems().isEmpty()) {
-            semesterFilter.getSelectionModel().selectFirst();
-        }
+        semesterFilter.getItems().add(0, "全部");
+        semesterFilter.getSelectionModel().selectFirst();
+        semesterFilter.setOnAction(e -> applyFilters());
         ObservableList<String> statusOptions = FXCollections.observableArrayList(
-                "全部", "待审核", "已通过", "已拒绝");
+                "全部", "待审核", "已通过");
         statusFilter.setItems(statusOptions);
         statusFilter.getSelectionModel().selectFirst();
+        statusFilter.setOnAction(e -> applyFilters());
+    }
+
+    private void applyFilters() {
+        String term = semesterFilter.getValue();
+        String statusVal = statusFilter.getValue();
+        ObservableList<Course> filtered = FXCollections.observableArrayList();
+        for (Course c : courseList) {
+            boolean termOk = term == null || "全部".equals(term) ||
+                    (c.getTerm() != null && c.getTerm().equals(term));
+            boolean statusOk = statusVal == null || "全部".equals(statusVal) ||
+                    ("待审核".equals(statusVal) && "PENDING".equalsIgnoreCase(c.getStatus())) ||
+                    ("已通过".equals(statusVal) && "APPROVED".equalsIgnoreCase(c.getStatus()));
+            if (termOk && statusOk) filtered.add(c);
+        }
+        courseTable.setItems(filtered);
     }
 
     private void loadCourses() {
         statusLabel.setText("加载中…");
-        Map<String, String> params = new HashMap<>();
-        params.put("pageNum", "1");
-        params.put("pageSize", "100");
+        // 并行加载两个接口，合并去重
+        new Thread(() -> {
+            Map<Integer, Course> map = new HashMap<>();
+            int[] done = {0};
 
-        NetworkUtils.get("/class/list", params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = JsonUtil.extractArray(res, "data");
-                        List<Course> list = new ArrayList<>();
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            Course c = new Course();
-                            // 使用 name 作为课程名（显示在 code 字段）
-                            if (obj.has("name")) {
-                                c.setCode(obj.get("name").getAsString());
-                            } else if (obj.has("courseId")) {
-                                c.setCode(String.valueOf(obj.get("courseId").getAsInt()));
-                            }
-                            c.setTeacherName(obj.has("teacherName") ? obj.get("teacherName").getAsString() : "");
-                            c.setCredit(obj.has("credit") ? obj.get("credit").getAsDouble() : 0.0);
-                            c.setType(obj.has("type") ? obj.get("type").getAsString() : "");
-                            c.setTerm(obj.has("term") ? obj.get("term").getAsString() : "");
-                            c.setStatus(obj.has("status") ? obj.get("status").getAsString() : "");
-                            list.add(c);
-                        }
-                        Platform.runLater(() -> {
-                            courseList.setAll(list);
-                            statusLabel.setText("共 " + list.size() + " 条");
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            statusLabel.setText("数据加载失败");
-                            ShowMessage.showErrorMessage("错误", "数据加载失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
-                        });
+            NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+                @Override public void onSuccess(String result) { parseAndMerge(result, map, done); }
+                @Override public void onFailure(Exception e) { checkDone(map, done); }
+            });
+            NetworkUtils.get("/class/pending", new NetworkUtils.Callback<String>() {
+                @Override public void onSuccess(String result) { parseAndMerge(result, map, done); }
+                @Override public void onFailure(Exception e) { checkDone(map, done); }
+            });
+        }).start();
+    }
+
+    private void parseAndMerge(String result, Map<Integer, Course> map, int[] done) {
+        try {
+            JsonObject res = gson.fromJson(result, JsonObject.class);
+            if (res.has("code") && res.get("code").getAsInt() == 200) {
+                JsonArray arr = JsonUtil.extractArray(res, "data");
+                synchronized (map) {
+                    for (int i = 0; i < arr.size(); i++) {
+                        JsonObject obj = arr.get(i).getAsJsonObject();
+                        int id = JsonUtil.safeGetInt(obj, "id");
+                        if (map.containsKey(id)) continue;
+                        Course c = new Course();
+                        c.setId(id);
+                        c.setCode(JsonUtil.safeGetString(obj, "name"));
+                        c.setTeacherName(JsonUtil.safeGetString(obj, "teacherName"));
+                        c.setCredit(obj.has("point") && !obj.get("point").isJsonNull() ? obj.get("point").getAsDouble() : 0.0);
+                        c.setType(JsonUtil.safeGetString(obj, "type"));
+                        c.setTerm(JsonUtil.safeGetString(obj, "term"));
+                        c.setStatus(JsonUtil.safeGetString(obj, "status"));
+                        map.put(id, c);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Platform.runLater(() -> {
-                        statusLabel.setText("数据解析失败");
-                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
-                    });
                 }
             }
+        } catch (Exception ignored) {}
+        checkDone(map, done);
+    }
 
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
-                });
-            }
+    private void checkDone(Map<Integer, Course> map, int[] done) {
+        synchronized (done) { done[0]++; if (done[0] < 2) return; }
+        Platform.runLater(() -> {
+            courseList.setAll(FXCollections.observableArrayList(map.values()));
+            statusLabel.setText("共 " + map.size() + " 条");
         });
     }
 
     private void searchCourses() {
-        String keyword = searchField.getText().trim();
+        String keyword = searchField.getText().trim().toLowerCase();
         if (keyword.isEmpty()) {
-            loadCourses();
+            courseTable.setItems(courseList);
             return;
         }
-        statusLabel.setText("加载中…");
-        Map<String, String> params = new HashMap<>();
-        params.put("keyword", keyword);
-        params.put("pageNum", "1");
-        params.put("pageSize", "100");
-        if (semesterFilter.getValue() != null && !"全部".equals(semesterFilter.getValue())) {
-            params.put("term", semesterFilter.getValue());
+        ObservableList<Course> filtered = FXCollections.observableArrayList();
+        for (Course c : courseList) {
+            if ((c.getCode() != null && c.getCode().toLowerCase().contains(keyword))
+                    || (c.getTeacherName() != null && c.getTeacherName().toLowerCase().contains(keyword))
+                    || (c.getType() != null && c.getType().toLowerCase().contains(keyword))) {
+                filtered.add(c);
+            }
         }
-        NetworkUtils.get("/class/list", params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = JsonUtil.extractArray(res, "data");
-                        List<Course> list = new ArrayList<>();
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            Course c = new Course();
-                            if (obj.has("name")) {
-                                c.setCode(obj.get("name").getAsString());
-                            } else if (obj.has("courseId")) {
-                                c.setCode(String.valueOf(obj.get("courseId").getAsInt()));
-                            }
-                            c.setTeacherName(obj.has("teacherName") ? obj.get("teacherName").getAsString() : "");
-                            c.setCredit(obj.has("credit") ? obj.get("credit").getAsDouble() : 0.0);
-                            c.setType(obj.has("type") ? obj.get("type").getAsString() : "");
-                            c.setTerm(obj.has("term") ? obj.get("term").getAsString() : "");
-                            c.setStatus(obj.has("status") ? obj.get("status").getAsString() : "");
-                            list.add(c);
-                        }
-                        Platform.runLater(() -> {
-                            courseList.setAll(list);
-                            statusLabel.setText("共 " + list.size() + " 条");
-                        });
-                    } else {
-                        Platform.runLater(() -> {
-                            statusLabel.setText("搜索失败");
-                            ShowMessage.showErrorMessage("错误", "搜索失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
-                        });
-                    }
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("数据解析失败");
-                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
-                    });
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
-                });
-            }
-        });
+        courseTable.setItems(filtered);
     }
 
     private void handleApprove() {
@@ -249,6 +213,22 @@ public class CourseManagementController {
             return;
         }
         reviewCourse(selected, true);
+    }
+
+    private void handleAutoSchedule() {
+        try {
+            javafx.scene.layout.Pane contentArea = (javafx.scene.layout.Pane)
+                    statusLabel.getScene().lookup("#contentArea");
+            if (contentArea != null) {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/com/example/information_management_system/admin/ScheduleManagement.fxml"));
+                javafx.scene.Parent view = loader.load();
+                contentArea.getChildren().clear();
+                contentArea.getChildren().add(view);
+            }
+        } catch (IOException e) {
+            ShowMessage.showErrorMessage("错误", "无法打开排课界面");
+        }
     }
 
     private void handleReject() {

@@ -9,7 +9,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.information_management_system.controller.teacher.editCourseController"
       styleClass="page-root" spacing="16"
-      stylesheets="@../css/teacher/courseManagementContent.css">
+      stylesheets="@../css/teacher/ApplyNewCourse.css">
 
     <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
@@ -46,7 +46,7 @@
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <Label text="教室" styleClass="field-label"/>
+                    <Label text="教室 *" styleClass="field-label"/>
                     <ComboBox fx:id="classroomComboBox" promptText="请选择教室" styleClass="form-combo"/>
                 </VBox>
 
@@ -56,17 +56,17 @@
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                    <Label text="学期" styleClass="field-label"/>
+                    <Label text="学期 *" styleClass="field-label"/>
                     <ComboBox fx:id="termComboBox" promptText="请选择学期" styleClass="form-combo"/>
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                    <Label text="起始周" styleClass="field-label"/>
+                    <Label text="起始周 *" styleClass="field-label"/>
                     <TextField fx:id="weekStartField" promptText="例如: 1" styleClass="form-field"/>
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                    <Label text="结束周" styleClass="field-label"/>
+                    <Label text="结束周 *" styleClass="field-label"/>
                     <TextField fx:id="weekEndField" promptText="例如: 16" styleClass="form-field"/>
                 </VBox>
 
@@ -76,18 +76,28 @@
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                    <Label text="考试方式" styleClass="field-label"/>
+                    <Label text="考试方式 *" styleClass="field-label"/>
                     <ComboBox fx:id="examinationComboBox" promptText="请选择考试方式" styleClass="form-combo"/>
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="5">
-                    <Label text="平时成绩比例(%)" styleClass="field-label"/>
+                    <Label text="平时成绩比例(%) *" styleClass="field-label"/>
                     <TextField fx:id="regularRatioField" promptText="例如: 30" styleClass="form-field"/>
                 </VBox>
 
                 <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                    <Label text="期末成绩比例(%)" styleClass="field-label"/>
+                    <Label text="期末成绩比例(%) *" styleClass="field-label"/>
                     <TextField fx:id="finalRatioField" promptText="例如: 70" styleClass="form-field"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="6">
+                    <Label text="开课学院" styleClass="field-label"/>
+                    <TextField fx:id="collegeField" promptText="例如: 软件学院" styleClass="form-field"/>
+                </VBox>
+
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                    <Label text="课序号" styleClass="field-label"/>
+                    <TextField fx:id="classNumField" promptText="例如: 001" styleClass="form-field"/>
                 </VBox>
             </GridPane>
 

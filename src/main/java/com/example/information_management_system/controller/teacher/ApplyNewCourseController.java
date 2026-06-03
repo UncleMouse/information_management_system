@@ -27,15 +27,15 @@ public class ApplyNewCourseController {
     @FXML private TextField courseNameField;
     @FXML private ComboBox<String> categoryComboBox;
     @FXML private TextField creditField;
-    @FXML private ComboBox<String> classroomComboBox;
     @FXML private TextField capacityField;
     @FXML private TextField weekStartField;
     @FXML private TextField weekEndField;
-    @FXML private TextField timeField;
     @FXML private ComboBox<String> termComboBox;
     @FXML private ComboBox<String> examinationComboBox;
     @FXML private TextField regularRatioField;
     @FXML private TextField finalRatioField;
+    @FXML private TextField collegeField;
+    @FXML private TextField classNumField;
     @FXML private TextArea introTextArea;
     @FXML private Button submitButton;
     @FXML private Button cancelButton;
@@ -46,9 +46,6 @@ public class ApplyNewCourseController {
         if (categoryComboBox != null) {
             categoryComboBox.getItems().setAll("必修", "限选", "任选");
             categoryComboBox.setValue("任选");
-        }
-        if (classroomComboBox != null) {
-            fetchClassrooms();
         }
         if (termComboBox != null) {
             fetchTerms();
@@ -66,33 +63,6 @@ public class ApplyNewCourseController {
         if (backButton != null) {
             backButton.setOnAction(e -> navigateBack());
         }
-    }
-
-    private void fetchClassrooms() {
-        NetworkUtils.get("/Teacher/getClassRoom", new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
-                        javafx.collections.ObservableList<String> list = javafx.collections.FXCollections.observableArrayList();
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            if (obj.has("location")) list.add(obj.get("location").getAsString());
-                        }
-                        Platform.runLater(() -> {
-                            classroomComboBox.setItems(list);
-                            Data.getInstance().getClassRoomList().setAll(list);
-                        });
-                    }
-                } catch (Exception ignored) {}
-            }
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> classroomComboBox.setItems(Data.getInstance().getClassRoomList()));
-            }
-        });
     }
 
     private void fetchTerms() {
@@ -125,26 +95,28 @@ public class ApplyNewCourseController {
 
         int weekStart = Integer.parseInt(weekStartField.getText().trim());
         int weekEnd = Integer.parseInt(weekEndField.getText().trim());
-        String college = UserSession.getInstance().getCollege();
+        String college = collegeField.getText().trim();
+        if (college.isEmpty()) college = UserSession.getInstance().getCollege();
+        if (college == null || college.isEmpty()) college = "软件学院";
+        String classNum = classNumField.getText().trim();
 
         Map<String, Object> bodyMap = new HashMap<>();
         bodyMap.put("name", courseNameField.getText().trim());
         bodyMap.put("category", categoryComboBox.getValue());
         bodyMap.put("point", Double.parseDouble(creditField.getText().trim()));
-        bodyMap.put("classroom", classroomComboBox.getValue());
         bodyMap.put("capacity", Integer.parseInt(capacityField.getText().trim()));
         bodyMap.put("weekStart", weekStart);
         bodyMap.put("weekEnd", weekEnd);
-        bodyMap.put("period", weekEnd - weekStart + 1);      // 课时 = 周数
-        bodyMap.put("time", timeField.getText().trim());
+        bodyMap.put("period", weekEnd - weekStart + 1);
+        bodyMap.put("time", "1");
         bodyMap.put("term", termComboBox.getValue());
         bodyMap.put("examination", examinationComboBox.getValue().equals("考试") ? 1 : 0);
         bodyMap.put("regularRatio", Double.parseDouble(regularRatioField.getText().trim()) / 100.0);
         bodyMap.put("finalRatio", Double.parseDouble(finalRatioField.getText().trim()) / 100.0);
         bodyMap.put("intro", introTextArea.getText() != null ? introTextArea.getText().trim() : "");
-        bodyMap.put("college", college != null ? college : "软件学院");
-        bodyMap.put("type", mapTypeEnum(categoryComboBox.getValue()));
-        bodyMap.put("classNum", "");   // DB class_num NOT NULL，暂填空值，审批时分配
+        bodyMap.put("college", college);
+        bodyMap.put("type", categoryComboBox.getValue());
+        bodyMap.put("classNum", classNum.isEmpty() ? "" : classNum);
 
         String jsonBody = gson.toJson(bodyMap);
 
@@ -197,10 +169,6 @@ public class ApplyNewCourseController {
             ShowMessage.showWarningMessage("提示", "请输入有效的学分");
             return false;
         }
-        if (classroomComboBox.getValue() == null) {
-            ShowMessage.showWarningMessage("提示", "请选择教室");
-            return false;
-        }
         if (StringUtil.isEmpty(capacityField.getText())) {
             ShowMessage.showWarningMessage("提示", "请输入容量");
             return false;
@@ -217,10 +185,6 @@ public class ApplyNewCourseController {
         }
         if (StringUtil.isEmpty(weekStartField.getText()) || StringUtil.isEmpty(weekEndField.getText())) {
             ShowMessage.showWarningMessage("提示", "请输入起止周");
-            return false;
-        }
-        if (StringUtil.isEmpty(timeField.getText())) {
-            ShowMessage.showWarningMessage("提示", "请输入上课时间");
             return false;
         }
         if (termComboBox.getValue() == null) {
@@ -243,15 +207,6 @@ public class ApplyNewCourseController {
             return false;
         }
         return true;
-    }
-
-    private String mapTypeEnum(String label) {
-        if (label == null) return "ELECTIVE";
-        switch (label) {
-            case "必修": return "REQUIRED";
-            case "限选": return "RESTRICTED_ELECTIVE";
-            default: return "ELECTIVE";
-        }
     }
 
     private void navigateBack() {

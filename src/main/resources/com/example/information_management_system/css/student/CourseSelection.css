@@ -1,45 +1,33 @@
-.page-root {
-    -fx-background-color: #f1f5f9;
-}
+/* === 页面基底 === */
+.page-root { -fx-background-color: #f0f4f8; }
+.page-title { -fx-font-weight: bold; -fx-text-fill: #1e293b; }
 
-.page-title {
-    -fx-text-fill: #1e293b;
-    -fx-font-weight: bold;
-}
-
-.field-label {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #475569;
-}
+/* === 筛选区 === */
+.field-label { -fx-font-size: 12px; -fx-font-weight: 600; -fx-text-fill: #94a3b8; }
 
 .form-combo {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-font-size: 13px;
 }
-
-.form-combo:focused {
-    -fx-border-color: #4f6ef7;
-}
+.form-combo:hover { -fx-border-color: #c7d2fe; }
+.form-combo:focused { -fx-border-color: #6366f1; -fx-background-color: #ffffff; }
+.form-combo .list-cell { -fx-text-fill: #1e293b; }
 
 .search-field {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #f8fafc;
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-font-size: 13px;
     -fx-padding: 10 14;
 }
-
-.search-field:focused {
-    -fx-border-color: #4f6ef7;
-}
+.search-field:focused { -fx-border-color: #6366f1; -fx-background-color: #ffffff; }
 
 .btn-primary {
-    -fx-background-color: #4f6ef7;
+    -fx-background-color: #4f46e5;
     -fx-text-fill: #ffffff;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -47,110 +35,80 @@
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
+.btn-primary:hover { -fx-background-color: #4338ca; }
 
-.btn-primary:hover {
-    -fx-background-color: #3d5bd5;
-}
-
-/* TabPane */
-.course-tab-pane {
-    -fx-background-color: transparent;
-    -fx-tab-min-width: 100;
-    -fx-tab-max-height: 40;
-}
-
-.course-tab-pane .tab-header-area {
-    -fx-padding: 0 0 0 0;
-    -fx-background-color: transparent;
-}
-
+/* === TabPane === */
+.course-tab-pane { -fx-background-color: transparent; }
+.course-tab-pane .tab-header-area { -fx-padding: 0; -fx-background-color: transparent; }
+.course-tab-pane .tab-header-background { -fx-background-color: transparent; }
 .course-tab-pane .tab {
     -fx-background-color: transparent;
     -fx-background-radius: 8 8 0 0;
     -fx-padding: 8 20;
     -fx-border-color: transparent;
-    -fx-focus-color: transparent;
-    -fx-faint-focus-color: transparent;
 }
-
 .course-tab-pane .tab:selected {
     -fx-background-color: #ffffff;
-    -fx-border-color: #e2e8f0 #e2e8f0 transparent #e2e8f0;
+    -fx-border-color: #e8ecf0 #e8ecf0 transparent #e8ecf0;
     -fx-border-radius: 8 8 0 0;
 }
-
-.course-tab-pane .tab .tab-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #64748b;
-}
-
-.course-tab-pane .tab:selected .tab-label {
-    -fx-text-fill: #4f6ef7;
-    -fx-font-weight: bold;
-}
-
+.course-tab-pane .tab .tab-label { -fx-font-size: 13px; -fx-text-fill: #64748b; }
+.course-tab-pane .tab:selected .tab-label { -fx-text-fill: #4f46e5; -fx-font-weight: bold; }
 .course-tab-pane .tab-content-area {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 0 0 12 12;
-    -fx-border-color: #e2e8f0;
-    -fx-border-radius: 0 0 12 12;
+    -fx-background-radius: 0 12 12 12;
+    -fx-border-color: #e8ecf0;
+    -fx-border-radius: 0 12 12 12;
 }
 
-/* Data Table */
+/* === 数据表格 === */
 .data-table {
     -fx-background-color: #ffffff;
     -fx-border-color: #e2e8f0;
-    -fx-border-radius: 0;
-    -fx-background-radius: 0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
     -fx-padding: 0;
-    -fx-fixed-cell-size: 40px;
-    -fx-table-cell-border-color: transparent;
+    -fx-table-cell-border-color: #e8ecf0;
+    -fx-fixed-cell-size: 42px;
 }
-
 .data-table .column-header-background {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 8 8 0 0;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8 8 0 0;
 }
-
 .data-table .column-header {
     -fx-background-color: transparent;
-    -fx-padding: 12 16;
-    -fx-border-color: #e2e8f0;
-    -fx-border-width: 0 0 1 0;
+    -fx-padding: 0 16;
+    -fx-border-color: #dde4ee;
+    -fx-border-width: 0 1 1 0;
 }
-
 .data-table .column-header .label {
-    -fx-text-fill: #475569;
+    -fx-text-fill: #334155;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
+    -fx-alignment: CENTER;
+    -fx-padding: 8 0;
 }
-
 .data-table .table-cell {
+    -fx-padding: 0 16;
     -fx-font-size: 13px;
+    -fx-alignment: CENTER;
     -fx-text-fill: #1e293b;
-    -fx-padding: 10 16;
 }
-
 .data-table .table-row-cell {
     -fx-background-color: #ffffff;
-    -fx-border-color: #f1f5f9;
+    -fx-border-color: #f0f2f5;
+    -fx-border-width: 0 0 1 0;
 }
+.data-table .table-row-cell:odd { -fx-background-color: #f8fafc; }
+.data-table .table-row-cell:selected { -fx-background-color: #eef2ff; }
+.data-table .table-row-cell:hover { -fx-background-color: #f1f5f9; }
 
-.data-table .table-row-cell:odd {
-    -fx-background-color: #f8fafc;
-}
-
-.data-table .table-row-cell:selected {
-    -fx-background-color: #eef2ff;
-    -fx-text-fill: #1e293b;
-}
-
-.data-table .table-row-cell:hover {
-    -fx-background-color: #f1f5f9;
-}
-
-/* Action buttons in table */
+/* === 操作按钮 === */
 .action-btn-select {
-    -fx-background-color: #4f6ef7;
+    -fx-background-color: #4f46e5;
     -fx-text-fill: #ffffff;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
@@ -158,10 +116,7 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
-
-.action-btn-select:hover {
-    -fx-background-color: #3d5bd5;
-}
+.action-btn-select:hover { -fx-background-color: #4338ca; }
 
 .action-btn-drop {
     -fx-background-color: #ef4444;
@@ -172,7 +127,4 @@
     -fx-background-radius: 6;
     -fx-cursor: hand;
 }
-
-.action-btn-drop:hover {
-    -fx-background-color: #dc2626;
-}
+.action-btn-drop:hover { -fx-background-color: #dc2626; }

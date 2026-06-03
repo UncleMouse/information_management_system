@@ -53,6 +53,19 @@
 }
 .btn-outline:hover { -fx-background-color: #eef2ff; }
 
+.btn-delete {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #ef4444;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-border-color: #fecaca;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+}
+.btn-delete:hover { -fx-background-color: #fef2f2; }
+
 .btn-back {
     -fx-background-color: transparent;
     -fx-text-fill: #4f46e5;

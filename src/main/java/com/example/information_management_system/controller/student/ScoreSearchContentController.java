@@ -3,6 +3,7 @@ package com.example.information_management_system.controller.student;
 import com.example.information_management_system.entity.Data;
 import com.example.information_management_system.model.ScoreRecord;
 import com.example.information_management_system.util.ExportUtils;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 
@@ -14,7 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -50,13 +51,33 @@ public class ScoreSearchContentController {
         scoreTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         setupColumns();
 
-        termSelector.setItems(Data.getInstance().getSemesterList());
-        String currentTerm = Data.getInstance().getCurrentTerm();
-        if (currentTerm != null && !currentTerm.isEmpty()) {
-            termSelector.setValue(currentTerm);
-        } else if (!termSelector.getItems().isEmpty()) {
-            termSelector.setValue(termSelector.getItems().get(0));
+        if (!Data.getInstance().getSemesterList().isEmpty()) {
+            termSelector.setItems(Data.getInstance().getSemesterList());
+            String ct = Data.getInstance().getCurrentTerm();
+            termSelector.setValue(ct != null && !ct.isEmpty() ? ct : termSelector.getItems().get(0));
         }
+        NetworkUtils.get("/term/getTermList", new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
+                        javafx.collections.ObservableList<String> list = FXCollections.observableArrayList();
+                        for (int i = 0; i < arr.size(); i++)
+                            list.add(arr.get(i).getAsJsonObject().get("term").getAsString());
+                        Platform.runLater(() -> {
+                            termSelector.setItems(list);
+                            Data.getInstance().getSemesterList().setAll(list);
+                            if (termSelector.getValue() == null && !list.isEmpty()) {
+                                termSelector.setValue(list.get(0));
+                                loadScores();
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+            @Override public void onFailure(Exception ignored) {}
+        });
 
         termSelector.setOnAction(e -> loadScores());
         scoreTable.setItems(scoreRecords);
@@ -69,16 +90,16 @@ public class ScoreSearchContentController {
     }
 
     private void setupColumns() {
-        colIndex.setCellValueFactory(new PropertyValueFactory<>("index"));
-        colCourseName.setCellValueFactory(new PropertyValueFactory<>("courseName"));
-        colPoint.setCellValueFactory(new PropertyValueFactory<>("point"));
-        colType.setCellValueFactory(new PropertyValueFactory<>("type"));
-        colTeacher.setCellValueFactory(new PropertyValueFactory<>("teacher"));
-        colGrade.setCellValueFactory(new PropertyValueFactory<>("grade"));
-        colGpa.setCellValueFactory(new PropertyValueFactory<>("gpa"));
-        colRank.setCellValueFactory(new PropertyValueFactory<>("rank"));
-        colRegular.setCellValueFactory(new PropertyValueFactory<>("regular"));
-        colFinal.setCellValueFactory(new PropertyValueFactory<>("finalScore"));
+        colIndex.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getIndex()).asObject());
+        colCourseName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCourseName()));
+        colPoint.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getPoint()).asObject());
+        colType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getType()));
+        colTeacher.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTeacher()));
+        colGrade.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGrade()));
+        colGpa.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getGpa()).asObject());
+        colRank.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getRank()).asObject());
+        colRegular.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getRegular()).asObject());
+        colFinal.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getFinalScore()).asObject());
     }
 
     private void loadScores() {
@@ -94,7 +115,7 @@ public class ScoreSearchContentController {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         Platform.runLater(() -> {
                             scoreRecords.clear();
                             double totalGpa = 0;
@@ -106,7 +127,8 @@ public class ScoreSearchContentController {
                                 ScoreRecord record = new ScoreRecord();
                                 record.setIndex(i + 1);
                                 if (obj.has("id")) record.setId(obj.get("id").getAsInt());
-                                if (obj.has("courseName")) record.setCourseName(obj.get("courseName").getAsString());
+                                // API: className=课程名, point=学分, type=类型, teacher=教师, grade=成绩(整数), rank=排名, regular=平时, finalScore=期末
+                                if (obj.has("className")) record.setCourseName(obj.get("className").getAsString());
                                 if (obj.has("point")) {
                                     double point = obj.get("point").getAsDouble();
                                     record.setPoint(point);
@@ -114,13 +136,11 @@ public class ScoreSearchContentController {
                                 }
                                 if (obj.has("type")) record.setType(obj.get("type").getAsString());
                                 if (obj.has("teacher")) record.setTeacher(obj.get("teacher").getAsString());
-                                if (obj.has("grade")) record.setGrade(obj.get("grade").getAsString());
-                                if (obj.has("gpa") && !obj.get("gpa").isJsonNull()) {
-                                    double gpa = obj.get("gpa").getAsDouble();
-                                    record.setGpa(gpa);
-                                    totalGpa += gpa;
-                                    gpaCount++;
-                                }
+                                if (obj.has("grade")) record.setGrade(String.valueOf(obj.get("grade").getAsInt()));
+                                double gpa = obj.has("grade") ? Math.max(0, (obj.get("grade").getAsInt() - 50) / 10.0) : 0;
+                                record.setGpa(gpa);
+                                totalGpa += gpa;
+                                gpaCount++;
                                 if (obj.has("rank")) record.setRank(obj.get("rank").getAsInt());
                                 if (obj.has("regular")) record.setRegular(obj.get("regular").getAsDouble());
                                 if (obj.has("finalScore")) record.setFinalScore(obj.get("finalScore").getAsDouble());

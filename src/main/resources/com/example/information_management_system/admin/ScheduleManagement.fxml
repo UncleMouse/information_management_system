@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.information_management_system.controller.admin.ScheduleManagementController"
+      stylesheets="@../css/admin/courseManagement.css"
+      styleClass="page-root" spacing="16">
+
+    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+
+    <HBox alignment="CENTER_LEFT" spacing="16">
+        <Button fx:id="backButton" text="← 返回" styleClass="btn-back"/>
+        <Label text="排课管理" styleClass="page-title">
+            <font><Font name="System Bold" size="20"/></font>
+        </Label>
+    </HBox>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="学期:" styleClass="filter-label"/>
+        <ComboBox fx:id="termSelector" styleClass="filter-combo" prefWidth="150"/>
+        <Button fx:id="btnLoad" text="加载课程" styleClass="btn-primary"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnSaveAll" text="全部保存" styleClass="btn-success"/>
+    </HBox>
+
+    <TableView fx:id="scheduleTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colName" text="课程名称" prefWidth="150"/>
+            <TableColumn fx:id="colTeacher" text="教师" prefWidth="90"/>
+            <TableColumn fx:id="colStatus" text="状态" prefWidth="80"/>
+            <TableColumn fx:id="colDay" text="星期" prefWidth="90"/>
+            <TableColumn fx:id="colTime" text="节次" prefWidth="100"/>
+            <TableColumn fx:id="colClassroom" text="教室" prefWidth="140"/>
+            <TableColumn fx:id="colAction" text="操作" prefWidth="80"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+</VBox>

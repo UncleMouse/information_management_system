@@ -2,6 +2,7 @@ package com.example.information_management_system.controller.student;
 
 import com.example.information_management_system.entity.Data;
 import com.example.information_management_system.model.CourseRow;
+import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
 
@@ -9,15 +10,16 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CourseScheduleContentController {
 
@@ -46,13 +48,22 @@ public class CourseScheduleContentController {
     };
 
     private static final String[] DAYS = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
+    private static final String[] DAY_COLS = {"mon", "tue", "wed", "thu", "fri", "sat", "sun"};
+
+    private static final Color[] PASTEL_COLORS = {
+        Color.web("#fef3c7"), Color.web("#dbeafe"), Color.web("#d1fae5"),
+        Color.web("#fce7f3"), Color.web("#e0e7ff"), Color.web("#ccfbf1"),
+        Color.web("#fef9c3"), Color.web("#dcfce7"), Color.web("#ede9fe"),
+        Color.web("#ffedd5"), Color.web("#e0f2fe"), Color.web("#fae8ff"),
+        Color.web("#ecfccb"), Color.web("#fee2e2"), Color.web("#cffafe"),
+    };
 
     private int currentWeek = 1;
+    private Background defaultBg = new Background(new BackgroundFill(Color.WHITE, null, null));
 
     @FXML
     public void initialize() {
         scheduleTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        // 列宽按比例铺满表格
         final double[] ratios = {1.0, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3};
         final double totalRatio = Arrays.stream(ratios).sum();
         scheduleTable.widthProperty().addListener((obs, oldW, newW) -> {
@@ -60,19 +71,38 @@ public class CourseScheduleContentController {
             for (int i = 0; i < ratios.length && i < scheduleTable.getColumns().size(); i++)
                 scheduleTable.getColumns().get(i).setPrefWidth(w * ratios[i] / totalRatio);
         });
-        // 始终5行：fixedCellSize 直接绑定到表格高度
         scheduleTable.fixedCellSizeProperty().bind(
             scheduleTable.heightProperty().subtract(28).divide(5).map(v -> Math.max(40, v.doubleValue()))
         );
         setupColumns();
 
-        termSelector.setItems(Data.getInstance().getSemesterList());
-        String ct = Data.getInstance().getCurrentTerm();
-        if (ct != null && !ct.isEmpty()) {
-            termSelector.setValue(ct);
-        } else if (!termSelector.getItems().isEmpty()) {
-            termSelector.setValue(termSelector.getItems().get(0));
+        if (!Data.getInstance().getSemesterList().isEmpty()) {
+            termSelector.setItems(Data.getInstance().getSemesterList());
+            String ct = Data.getInstance().getCurrentTerm();
+            termSelector.setValue(ct != null && !ct.isEmpty() ? ct : termSelector.getItems().get(0));
         }
+        NetworkUtils.get("/term/getTermList", new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonArray arr = res.getAsJsonArray("data");
+                        javafx.collections.ObservableList<String> list = FXCollections.observableArrayList();
+                        for (int i = 0; i < arr.size(); i++)
+                            list.add(arr.get(i).getAsJsonObject().get("term").getAsString());
+                        Platform.runLater(() -> {
+                            termSelector.setItems(list);
+                            Data.getInstance().getSemesterList().setAll(list);
+                            if (termSelector.getValue() == null && !list.isEmpty()) {
+                                termSelector.setValue(list.get(0));
+                                loadSchedule();
+                            }
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+            @Override public void onFailure(Exception ignored) {}
+        });
 
         termSelector.setOnAction(e -> loadSchedule());
         btnPrevWeek.setOnAction(e -> { if (currentWeek > 1) { currentWeek--; updateWeekLabel(); loadSchedule(); } });
@@ -82,20 +112,46 @@ public class CourseScheduleContentController {
         loadSchedule();
     }
 
+    @SuppressWarnings("unchecked")
     private void setupColumns() {
-        colTime.setCellValueFactory(new PropertyValueFactory<>("time"));
-        colMon.setCellValueFactory(new PropertyValueFactory<>("monday"));
-        colTue.setCellValueFactory(new PropertyValueFactory<>("tuesday"));
-        colWed.setCellValueFactory(new PropertyValueFactory<>("wednesday"));
-        colThu.setCellValueFactory(new PropertyValueFactory<>("thursday"));
-        colFri.setCellValueFactory(new PropertyValueFactory<>("friday"));
-        colSat.setCellValueFactory(new PropertyValueFactory<>("saturday"));
-        colSun.setCellValueFactory(new PropertyValueFactory<>("sunday"));
+        colTime.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTime()));
+        // Day columns with colored cell factory
+        for (int d = 0; d < 7; d++) {
+            setupDayColumn((TableColumn<CourseRow, String>) scheduleTable.getColumns().get(d + 1), d);
+        }
     }
 
-    private void updateWeekLabel() {
-        weekLabel.setText("第 " + currentWeek + " 周");
+    private void setupDayColumn(TableColumn<CourseRow, String> col, int dayIdx) {
+        col.setCellValueFactory(cell -> {
+            CourseRow row = cell.getValue();
+            String txt = switch(dayIdx) {
+                case 0 -> row.getMonday(); case 1 -> row.getTuesday(); case 2 -> row.getWednesday();
+                case 3 -> row.getThursday(); case 4 -> row.getFriday(); case 5 -> row.getSaturday();
+                default -> row.getSunday();
+            };
+            return new SimpleStringProperty(txt);
+        });
+        col.setCellFactory(c -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null || item.isEmpty()) {
+                    setText(null); setStyle(""); setBackground(defaultBg);
+                    return;
+                }
+                String[] parts = item.split("\\|\\|");
+                setText(parts.length > 0 ? parts[0] : "");
+                if (parts.length > 1) {
+                    setBackground(new Background(new BackgroundFill(Color.web(parts[1]), null, null)));
+                } else {
+                    setBackground(defaultBg);
+                }
+                setTextFill(Color.BLACK);
+                setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-wrap-text: true;");
+            }
+        });
     }
+
+    private void updateWeekLabel() { weekLabel.setText("第 " + currentWeek + " 周"); }
 
     private void loadSchedule() {
         String term = termSelector.getValue();
@@ -106,87 +162,109 @@ public class CourseScheduleContentController {
         params.put("week", String.valueOf(currentWeek));
 
         NetworkUtils.get("/class/getClassSchedule/" + currentWeek, params, new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
+            @Override public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = res.getAsJsonArray("data");
+                        JsonArray arr = JsonUtil.extractArray(res, "data");
                         Platform.runLater(() -> scheduleTable.setItems(buildScheduleRows(arr)));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败，请稍后重试"));
+                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据解析失败"));
                 }
             }
-
-            @Override
-            public void onFailure(Exception e) {
+            @Override public void onFailure(Exception e) {
                 Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "数据加载失败"));
             }
         });
     }
 
     private ObservableList<CourseRow> buildScheduleRows(JsonArray courses) {
-        String[][] grid = new String[TIME_SLOTS.length][7];
-        for (int i = 0; i < TIME_SLOTS.length; i++) {
-            for (int j = 0; j < 7; j++) grid[i][j] = "";
-        }
+        // 为每门课分配随机柔和底色
+        Map<String, String> colorMap = new HashMap<>();
+        int colorIdx = 0;
+
+        String[][] gridText = new String[TIME_SLOTS.length][7];
+        String[][] gridColor = new String[TIME_SLOTS.length][7];
+        for (int i = 0; i < TIME_SLOTS.length; i++)
+            for (int j = 0; j < 7; j++) { gridText[i][j] = ""; gridColor[i][j] = ""; }
 
         for (int i = 0; i < courses.size(); i++) {
             JsonObject c = courses.get(i).getAsJsonObject();
             String name = getStr(c, "name", "courseName");
             String classroom = getStr(c, "classroom", "location");
             String time = getStr(c, "time");
+            if (time == null || time.isEmpty() || name == null) continue;
 
-            if (time == null || time.isEmpty()) continue;
-            int slot = parseTimeSlot(time);
+            // 分配颜色
+            String hex = colorMap.get(name);
+            if (hex == null) {
+                hex = toHex(PASTEL_COLORS[colorIdx % PASTEL_COLORS.length]);
+                colorIdx++;
+                colorMap.put(name, hex);
+            }
+
+            int slot = -1, dayIdx = -1;
+            if (time.matches("\\d{2,3}")) {
+                int t = Integer.parseInt(time);
+                if (t > 100) { dayIdx = (t / 100) - 1; slot = parseTimeSlot(String.valueOf(t % 100)); }
+                else { slot = parseTimeSlot(time); }
+            } else { slot = parseTimeSlot(time); }
             if (slot < 0) continue;
 
+            boolean hasDay = false;
             for (int d = 0; d < 7; d++) {
                 String dv = getStr(c, DAYS[d]);
                 if (dv != null && !dv.isEmpty() && !"null".equals(dv)) {
-                    grid[slot][d] = buildCell(name, classroom);
+                    gridText[slot][d] = name + " @" + classroom;
+                    gridColor[slot][d] = hex;
+                    hasDay = true;
                 }
             }
-
             String dayStr = getStr(c, "day");
-            if (dayStr != null && !dayStr.isEmpty()) {
-                int dayIdx = parseDay(dayStr);
-                if (dayIdx >= 0 && dayIdx < 7) {
-                    grid[slot][dayIdx] = buildCell(name, classroom);
-                }
+            if (dayStr != null && !dayStr.isEmpty() && dayIdx < 0) dayIdx = parseDay(dayStr);
+            if (dayIdx >= 0 && dayIdx < 7) {
+                gridText[slot][dayIdx] = name + " @" + classroom;
+                gridColor[slot][dayIdx] = hex;
+                hasDay = true;
+            }
+            if (!hasDay) {
+                gridText[slot][0] = name + " @" + classroom;
+                gridColor[slot][0] = hex;
             }
         }
 
         ObservableList<CourseRow> rows = FXCollections.observableArrayList();
         for (int i = 0; i < TIME_SLOTS.length; i++) {
             CourseRow row = new CourseRow(TIME_SLOTS[i]);
-            row.setMonday(blank(grid[i][0])); row.setTuesday(blank(grid[i][1]));
-            row.setWednesday(blank(grid[i][2])); row.setThursday(blank(grid[i][3]));
-            row.setFriday(blank(grid[i][4])); row.setSaturday(blank(grid[i][5]));
-            row.setSunday(blank(grid[i][6]));
+            String[] cells = new String[7];
+            for (int d = 0; d < 7; d++) {
+                cells[d] = gridText[i][d].isEmpty() ? null : (gridText[i][d] + "||" + gridColor[i][d]);
+            }
+            row.setMonday(cells[0]); row.setTuesday(cells[1]); row.setWednesday(cells[2]);
+            row.setThursday(cells[3]); row.setFriday(cells[4]); row.setSaturday(cells[5]);
+            row.setSunday(cells[6]);
             rows.add(row);
         }
         return rows;
     }
 
-    private String buildCell(String name, String classroom) {
-        if (name == null) return "";
-        return classroom != null && !classroom.isEmpty() ? name + "\n" + classroom : name;
+    private String toHex(Color c) {
+        return String.format("#%02x%02x%02x", (int)(c.getRed()*255), (int)(c.getGreen()*255), (int)(c.getBlue()*255));
     }
-
-    private String blank(String s) { return (s == null || s.isEmpty()) ? null : s; }
 
     private int parseTimeSlot(String time) {
         if (time == null) return -1;
-        try {
-            int num = Integer.parseInt(time.replaceAll("[^0-9]", ""));
-            if (num >= 1 && num <= 2) return 0;
-            if (num >= 3 && num <= 4) return 1;
-            if (num >= 5 && num <= 6) return 2;
-            if (num >= 7 && num <= 8) return 3;
-            if (num >= 9 && num <= 10) return 4;
-        } catch (NumberFormatException ignored) {}
+        // SET 类型逗号分隔，取第一个有效值
+        for (String part : time.split(",")) {
+            String t = part.trim();
+            try {
+                int num = Integer.parseInt(t);
+                if (num >= 1 && num <= 2) return 0; if (num >= 3 && num <= 4) return 1;
+                if (num >= 5 && num <= 6) return 2; if (num >= 7 && num <= 8) return 3;
+                if (num >= 9 && num <= 10) return 4;
+            } catch (NumberFormatException ignored) {}
+        }
         if (time.contains("1") && time.contains("2")) return 0;
         if (time.contains("3") && time.contains("4")) return 1;
         if (time.contains("5") && time.contains("6")) return 2;
@@ -198,14 +276,10 @@ public class CourseScheduleContentController {
     private int parseDay(String day) {
         if (day == null) return -1;
         return switch (day.trim()) {
-            case "1", "一", "周一", "星期一" -> 0;
-            case "2", "二", "周二", "星期二" -> 1;
-            case "3", "三", "周三", "星期三" -> 2;
-            case "4", "四", "周四", "星期四" -> 3;
-            case "5", "五", "周五", "星期五" -> 4;
-            case "6", "六", "周六", "星期六" -> 5;
-            case "7", "日", "周日", "星期日", "天" -> 6;
-            default -> -1;
+            case "1","一","周一","星期一" -> 0; case "2","二","周二","星期二" -> 1;
+            case "3","三","周三","星期三" -> 2; case "4","四","周四","星期四" -> 3;
+            case "5","五","周五","星期五" -> 4; case "6","六","周六","星期六" -> 5;
+            case "7","日","周日","星期日","天" -> 6; default -> -1;
         };
     }
 
