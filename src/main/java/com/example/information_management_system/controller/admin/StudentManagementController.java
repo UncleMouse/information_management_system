@@ -4,6 +4,7 @@ import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 
+import com.example.information_management_system.util.ExportUtils;
 import com.example.information_management_system.util.ShowMessage;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -295,30 +296,20 @@ public class StudentManagementController {
     }
 
     private void handleExportExcel() {
+        if (studentList.isEmpty()) { ShowMessage.showWarningMessage("提示", "暂无数据"); return; }
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("保存Excel文件");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel文件", "*.xlsx"));
         fileChooser.setInitialFileName("学生信息.xlsx");
         File file = fileChooser.showSaveDialog(studentTable.getScene().getWindow());
         if (file != null) {
-            statusLabel.setText("加载中…");
-            NetworkUtils.get("/admin/exportStudent", new NetworkUtils.Callback<String>() {
-                @Override
-                public void onSuccess(String result) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("已成功导出");
-                        ShowMessage.showInfoMessage("成功", "已成功导出至: " + file.getName());
-                    });
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("数据加载失败");
-                        ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接");
-                    });
-                }
-            });
+            List<String> headers = Arrays.asList("学号","姓名","性别","院系","专业","年级","班级","状态");
+            List<List<String>> data = new ArrayList<>();
+            for (Student s : studentList) {
+                data.add(Arrays.asList(s.getSduid(),s.getName(),s.getGender(),s.getDepartment(),s.getMajor(),s.getGrade(),s.getClassName(),s.getStatus()));
+            }
+            com.example.information_management_system.util.ExportUtils.exportToExcel(file.getAbsolutePath(), headers, data, "学生信息");
+            ShowMessage.showInfoMessage("成功", "已导出至: " + file.getName());
         }
     }
 
