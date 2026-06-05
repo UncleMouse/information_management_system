@@ -27,16 +27,28 @@ public class AddNewTeacherController {
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
+    private final Map<Object, Label> fieldErrors = new HashMap<>();
+
     @FXML
     public void initialize() {
-        genderCombo.getItems().addAll("男", "女");
-        genderCombo.getSelectionModel().selectFirst();
-        collegeCombo.getItems().addAll("软件学院", "计算机科学与技术学院", "数学学院", "物理学院",
-                "外国语学院", "集成电路学院", "文学院", "历史学院", "法学院", "医学院", "生命科学学院");
+        genderCombo.getItems().addAll("男","女"); genderCombo.getSelectionModel().selectFirst();
+        collegeCombo.getItems().addAll("软件学院","计算机科学与技术学院","数学学院","物理学院","外国语学院","集成电路学院","文学院","历史学院","法学院","医学院","生命科学学院");
         collegeCombo.getSelectionModel().selectFirst();
+        btnSubmit.setOnAction(e -> handleSubmit()); btnCancel.setOnAction(e -> closeDialog());
+        addErr(sduidField); addErr(nameField);
+    }
 
-        btnSubmit.setOnAction(e -> handleSubmit());
-        btnCancel.setOnAction(e -> closeDialog());
+    private void addErr(Object f) {
+        javafx.scene.Node n = (javafx.scene.Node) f;
+        if (n == null || n.getParent() == null) return;
+        Label e = new Label(); e.setStyle("-fx-text-fill:#ef4444;-fx-font-size:10px;-fx-padding:2 0 0 0;"); e.setVisible(false);
+        if (n.getParent() instanceof javafx.scene.layout.VBox vb) vb.getChildren().add(e);
+        fieldErrors.put(f, e);
+    }
+    private void setFieldErr(Object f, String m) {
+        Label e = fieldErrors.get(f); if (e == null || f == null) return;
+        if (m == null || m.isEmpty()) { e.setText(""); e.setVisible(false); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle(""); }
+        else { e.setText("⚠ "+m); e.setVisible(true); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle("-fx-border-color:#ef4444;"); }
     }
 
     public void setEditMode(TeacherInfo teacher) {
@@ -56,8 +68,12 @@ public class AddNewTeacherController {
         String contact = contactField.getText().trim();
         String gender = genderCombo.getValue();
 
-        if (sduid.isEmpty() || name.isEmpty()) { ShowMessage.showWarningMessage("提示", "工号和姓名不能为空"); return; }
-        if (!sduid.matches("\\d{5,12}")) { ShowMessage.showWarningMessage("提示", "工号须为5-12位数字"); return; }
+        boolean err = false;
+        setFieldErr(sduidField, null); setFieldErr(nameField, null);
+        if (sduid.isEmpty()) { setFieldErr(sduidField, "必填"); err = true; }
+        else if (!sduid.matches("\\d{5,12}")) { setFieldErr(sduidField, "须5-12位数字"); err = true; }
+        if (name.isEmpty()) { setFieldErr(nameField, "必填"); err = true; }
+        if (err) return;
 
         Map<String, String> params = new HashMap<>();
         params.put("SDUId", sduid);

@@ -44,18 +44,35 @@ public class editCourseController {
     @FXML private Button cancelButton;
     @FXML private Button backButton;
     @FXML private Label pageTitleLabel;
+    @FXML private Label formErrorLabel;
 
     private int currentCourseId;
+    private final Map<Object, Label> fieldErrors = new HashMap<>();
 
     @FXML
     public void initialize() {
-        if (categoryComboBox != null) categoryComboBox.getItems().setAll("必修", "限选", "任选");
+        if (categoryComboBox != null) categoryComboBox.getItems().setAll("必修","限选","任选");
         if (classroomComboBox != null) fetchClassrooms();
         if (termComboBox != null) fetchTerms();
-        if (examinationComboBox != null) examinationComboBox.getItems().setAll("考试", "考查");
+        if (examinationComboBox != null) examinationComboBox.getItems().setAll("考试","考查");
         if (submitButton != null) submitButton.setOnAction(e -> handleUpdate());
         if (cancelButton != null) cancelButton.setOnAction(e -> navigateBack());
         if (backButton != null) backButton.setOnAction(e -> navigateBack());
+        addErr(courseNameField); addErr(categoryComboBox); addErr(creditField);
+        addErr(capacityField);
+    }
+
+    private void addErr(Object f) {
+        javafx.scene.Node n = (javafx.scene.Node) f;
+        if (n == null || n.getParent() == null) return;
+        Label e = new Label(); e.setStyle("-fx-text-fill:#ef4444;-fx-font-size:10px;-fx-padding:2 0 0 0;"); e.setVisible(false);
+        if (n.getParent() instanceof javafx.scene.layout.VBox vb) vb.getChildren().add(e);
+        fieldErrors.put(f, e);
+    }
+    private void setFieldErr(Object f, String m) {
+        Label e = fieldErrors.get(f); if (e == null || f == null) return;
+        if (m == null || m.isEmpty()) { e.setText(""); e.setVisible(false); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle(""); }
+        else { e.setText("⚠ "+m); e.setVisible(true); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle("-fx-border-color:#ef4444;"); }
     }
 
     public void setCourseData(Course course) {
@@ -129,7 +146,9 @@ public class editCourseController {
     }
 
     private void handleUpdate() {
-        if (!validateInputs()) return;
+        String err = validateInputs();
+        if (err != null) { setFormError(err); return; }
+        setFormError(null);
 
         String college = collegeField.getText().trim();
         if (college.isEmpty()) college = UserSession.getInstance().getCollege();
@@ -186,12 +205,22 @@ public class editCourseController {
         });
     }
 
-    private boolean validateInputs() {
-        if (StringUtil.isEmpty(courseNameField.getText())) { ShowMessage.showWarningMessage("提示", "请输入课程名称"); return false; }
-        if (categoryComboBox.getValue() == null) { ShowMessage.showWarningMessage("提示", "请选择课程分类"); return false; }
-        if (StringUtil.isEmpty(creditField.getText())) { ShowMessage.showWarningMessage("提示", "请输入学分"); return false; }
-        if (StringUtil.isEmpty(capacityField.getText())) { ShowMessage.showWarningMessage("提示", "请输入容量"); return false; }
-        return true;
+    private String validateInputs() {
+        fieldErrors.values().forEach(l->{l.setText("");l.setVisible(false);});
+        fieldErrors.keySet().forEach(f->{if(f instanceof TextField tf)tf.setStyle("");});
+        boolean e = false;
+        if (StringUtil.isEmpty(courseNameField.getText())){setFieldErr(courseNameField,"必填");e=true;}
+        if (categoryComboBox.getValue()==null){setFieldErr(categoryComboBox,"必选");e=true;}
+        if (StringUtil.isEmpty(creditField.getText())){setFieldErr(creditField,"必填");e=true;}
+        if (StringUtil.isEmpty(capacityField.getText())){setFieldErr(capacityField,"必填");e=true;}
+        return e?"请修正标红字段":null;
+    }
+
+    private void setFormError(String msg) {
+        if (formErrorLabel != null) {
+            if (msg == null || msg.isEmpty()) { formErrorLabel.setText(""); formErrorLabel.setVisible(false); }
+            else { formErrorLabel.setText("⚠ " + msg); formErrorLabel.setVisible(true); }
+        }
     }
 
     private void fetchClassrooms() {

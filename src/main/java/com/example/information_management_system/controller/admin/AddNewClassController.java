@@ -24,15 +24,20 @@ public class AddNewClassController {
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
+    private Label classNameErr;
+
     @FXML
     public void initialize() {
-        majorCombo.getItems().addAll("软件工程(0)", "数字媒体技术(1)", "大数据(2)", "AI(3)");
-        majorCombo.getSelectionModel().selectFirst();
+        majorCombo.getItems().addAll("软件工程(0)","数字媒体技术(1)","大数据(2)","AI(3)"); majorCombo.getSelectionModel().selectFirst();
         int y = java.time.Year.now().getValue();
-        for (int i = y - 3; i <= y + 1; i++) gradeCombo.getItems().add(String.valueOf(i));
+        for (int i = y-3; i <= y+1; i++) gradeCombo.getItems().add(String.valueOf(i));
         gradeCombo.getSelectionModel().selectLast();
-        btnSubmit.setOnAction(e -> handleSubmit());
-        btnCancel.setOnAction(e -> closeDialog());
+        btnSubmit.setOnAction(e -> handleSubmit()); btnCancel.setOnAction(e -> closeDialog());
+        // 内联错误标签
+        if (classNameField != null && classNameField.getParent() instanceof javafx.scene.layout.VBox vb) {
+            classNameErr = new Label(); classNameErr.setStyle("-fx-text-fill:#ef4444;-fx-font-size:10px;-fx-padding:2 0 0 0;"); classNameErr.setVisible(false);
+            vb.getChildren().add(classNameErr);
+        }
     }
 
     public void setEditMode(Section section) {
@@ -57,7 +62,8 @@ public class AddNewClassController {
     private void handleSubmit() {
         String className = classNameField.getText().trim();
         if (className.endsWith("班")) className = className.substring(0, className.length() - 1);
-        if (className.isEmpty()) { ShowMessage.showWarningMessage("提示", "班级名称不能为空"); return; }
+        if (className.isEmpty()) { setErr(classNameField, classNameErr, "必填"); return; }
+        setErr(classNameField, classNameErr, null);
 
         String major = majorCombo.getValue();
         int paren = major.indexOf("(");
@@ -93,5 +99,10 @@ public class AddNewClassController {
         });
     }
 
+    private void setErr(javafx.scene.control.TextField f, Label l, String m) {
+        if (l == null) return;
+        if (m == null) { l.setText(""); l.setVisible(false); f.setStyle(""); }
+        else { l.setText("⚠ "+m); l.setVisible(true); f.setStyle("-fx-border-color:#ef4444;"); }
+    }
     private void closeDialog() { ((Stage) btnSubmit.getScene().getWindow()).close(); }
 }

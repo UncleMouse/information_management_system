@@ -24,6 +24,8 @@
         <VBox styleClass="form-container" spacing="16">
             <padding><Insets top="20" right="24" bottom="20" left="24"/></padding>
 
+            <Label fx:id="formErrorLabel" text="" style="-fx-text-fill: #ef4444; -fx-font-size: 12px; -fx-padding: 4 0;" visible="false" wrapText="true"/>
+
             <GridPane hgap="16" vgap="14">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="50"/>

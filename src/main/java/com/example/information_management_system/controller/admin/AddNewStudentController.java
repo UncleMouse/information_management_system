@@ -34,20 +34,30 @@ public class AddNewStudentController {
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
+    private final Map<Object, Label> fieldErrors = new HashMap<>();
+
     @FXML
     public void initialize() {
-        genderCombo.getItems().addAll("男", "女");
-        genderCombo.getSelectionModel().selectFirst();
-        majorCombo.getItems().addAll("软件工程", "数字媒体技术", "大数据", "AI");
-        majorCombo.getSelectionModel().selectFirst();
-        gradeCombo.getItems().addAll("2021", "2022", "2023", "2024", "2025", "2026");
-        gradeCombo.getSelectionModel().select("2025");
-
+        genderCombo.getItems().addAll("男","女"); genderCombo.getSelectionModel().selectFirst();
+        majorCombo.getItems().addAll("软件工程","数字媒体技术","大数据","AI"); majorCombo.getSelectionModel().selectFirst();
+        gradeCombo.getItems().addAll("2021","2022","2023","2024","2025","2026"); gradeCombo.getSelectionModel().select("2025");
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> closeDialog());
-
-        // 每次打开对话框时重新加载班级列表
         loadSections();
+        addErr(sduidField); addErr(nameField);
+    }
+
+    private void addErr(Object f) {
+        javafx.scene.Node n = (javafx.scene.Node) f;
+        if (n == null || n.getParent() == null) return;
+        Label e = new Label(); e.setStyle("-fx-text-fill:#ef4444;-fx-font-size:10px;-fx-padding:2 0 0 0;"); e.setVisible(false);
+        if (n.getParent() instanceof javafx.scene.layout.VBox vb) vb.getChildren().add(e);
+        fieldErrors.put(f, e);
+    }
+    private void setFieldErr(Object f, String m) {
+        Label e = fieldErrors.get(f); if (e == null || f == null) return;
+        if (m == null || m.isEmpty()) { e.setText(""); e.setVisible(false); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle(""); }
+        else { e.setText("⚠ "+m); e.setVisible(true); if (f instanceof javafx.scene.control.TextInputControl tf) tf.setStyle("-fx-border-color:#ef4444;"); }
     }
 
     /** 从后端实时加载班级列表 */
@@ -113,8 +123,12 @@ public class AddNewStudentController {
         String grade = gradeCombo.getValue();
         String className = classCombo.getValue();
 
-        if (sduid.isEmpty() || name.isEmpty()) { ShowMessage.showWarningMessage("提示", "学号和姓名不能为空"); return; }
-        if (!sduid.matches("\\d{5,12}")) { ShowMessage.showWarningMessage("提示", "学号须为5-12位数字"); return; }
+        boolean err = false;
+        setFieldErr(sduidField, null); setFieldErr(nameField, null);
+        if (sduid.isEmpty()) { setFieldErr(sduidField, "必填"); err = true; }
+        else if (!sduid.matches("\\d{5,12}")) { setFieldErr(sduidField, "须5-12位数字"); err = true; }
+        if (name.isEmpty()) { setFieldErr(nameField, "必填"); err = true; }
+        if (err) return;
 
         Map<String, String> params = new HashMap<>();
         params.put("SDUId", sduid);
