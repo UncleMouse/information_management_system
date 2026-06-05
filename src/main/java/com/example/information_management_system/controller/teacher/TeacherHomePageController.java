@@ -25,15 +25,30 @@ public class TeacherHomePageController {
     @FXML private VBox recentCoursesBox;
     @FXML private VBox noticesBox;
 
+    private String currentTerm;
+
     @FXML
     public void initialize() {
         String username = UserSession.getInstance().getUsername();
         if (username == null || username.isEmpty()) { username = "教师"; }
         if (welcomeLabel != null) welcomeLabel.setText("欢迎回来，" + username);
-        fetchDashboardData();
-        fetchRecentCourses();
         loadNotices();
-        loadCurrentTerm();
+        // 先加载当前学期，成功后再加载课程数据（需要学期信息过滤）
+        NetworkUtils.get("/term/getCurrentTerm", new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String result) {
+                try { JsonObject r = gson.fromJson(result, JsonObject.class);
+                    if (r.has("code") && r.get("code").getAsInt()==200) currentTerm = r.get("data").getAsString(); }
+                catch (Exception ignored) {}
+                Platform.runLater(() -> {
+                    currentTermLabel.setText(currentTerm != null ? currentTerm : "-");
+                    fetchDashboardData();
+                    fetchRecentCourses();
+                });
+            }
+            @Override public void onFailure(Exception e) {
+                Platform.runLater(() -> { fetchDashboardData(); fetchRecentCourses(); });
+            }
+        });
     }
 
     private void fetchDashboardData() {
@@ -44,36 +59,27 @@ public class TeacherHomePageController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        int totalCourses = arr.size();
-                        int totalStudents = 0;
-                        int pendingScore = 0;
+                        int totalCourses = 0, totalStudents = 0, pendingScore = 0;
                         for (int i = 0; i < arr.size(); i++) {
-                            JsonObject course = arr.get(i).getAsJsonObject();
-                            if (course.has("peopleNum")) {
-                                totalStudents += course.get("peopleNum").getAsInt();
-                            }
-                            String status = course.has("status") ? course.get("status").getAsString() : "";
-                            if ("待录入".equals(status) || "已开课".equals(status)) {
-                                pendingScore++;
-                            }
+                            JsonObject c = arr.get(i).getAsJsonObject();
+                            String status = c.has("status") ? c.get("status").getAsString() : "";
+                            String term = c.has("term") ? c.get("term").getAsString() : "";
+                            if (!"APPROVED".equalsIgnoreCase(status)) continue;
+                            if (currentTerm != null && !currentTerm.equals(term)) continue;
+                            totalCourses++;
+                            if (c.has("peopleNum")) totalStudents += c.get("peopleNum").getAsInt();
+                            if ("待录入".equals(status) || "已开课".equals(status)) pendingScore++;
                         }
-                        final int finalTotalStudents = totalStudents;
-                        final int finalPendingScore = pendingScore;
+                        final int fTotal = totalCourses, fStudents = totalStudents, fPending = pendingScore;
                         Platform.runLater(() -> {
-                            if (courseCountLabel != null) courseCountLabel.setText(String.valueOf(totalCourses));
-                            if (studentCountLabel != null) studentCountLabel.setText(String.valueOf(finalTotalStudents));
-                            if (pendingScoreLabel != null) pendingScoreLabel.setText(String.valueOf(finalPendingScore));
+                            if (courseCountLabel != null) courseCountLabel.setText(String.valueOf(fTotal));
+                            if (studentCountLabel != null) studentCountLabel.setText(String.valueOf(fStudents));
+                            if (pendingScoreLabel != null) pendingScoreLabel.setText(String.valueOf(fPending));
                         });
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                } catch (Exception e) { e.printStackTrace(); }
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                System.err.println("获取仪表盘数据失败: " + e.getMessage());
-            }
+            @Override public void onFailure(Exception e) { System.err.println("获取仪表盘数据失败"); }
         });
     }
 
@@ -86,13 +92,15 @@ public class TeacherHomePageController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<String> courseNames = FXCollections.observableArrayList();
-                        int count = Math.min(arr.size(), 5);
-                        for (int i = 0; i < count; i++) {
-                            JsonObject course = arr.get(i).getAsJsonObject();
-                            String name = course.has("name") ? course.get("name").getAsString() :
-                                    course.has("code") ? course.get("code").getAsString() : "未命名课程";
-                            String termStr = course.has("term") ? " | " + course.get("term").getAsString() : "";
-                            courseNames.add(name + termStr);
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject c = arr.get(i).getAsJsonObject();
+                            String status = c.has("status") ? c.get("status").getAsString() : "";
+                            String term = c.has("term") ? c.get("term").getAsString() : "";
+                            if (!"APPROVED".equalsIgnoreCase(status)) continue;
+                            if (currentTerm != null && !currentTerm.equals(term)) continue;
+                            String name = c.has("name") ? c.get("name").getAsString() : "未命名课程";
+                            courseNames.add(name + " | " + term);
+                            if (courseNames.size() >= 5) break;
                         }
                         Platform.runLater(() -> {
                             if (recentCoursesBox != null) {
@@ -131,16 +139,6 @@ public class TeacherHomePageController {
                     }
                 });
             }
-        });
-    }
-
-    private void loadCurrentTerm() {
-        NetworkUtils.get("/term/getCurrentTerm", new NetworkUtils.Callback<String>() {
-            @Override public void onSuccess(String result) {
-                try { JsonObject r = gson.fromJson(result, JsonObject.class); if (r.has("code") && r.get("code").getAsInt()==200) Platform.runLater(() -> currentTermLabel.setText(r.get("data").getAsString())); }
-                catch (Exception ignored) {}
-            }
-            @Override public void onFailure(Exception ignored) {}
         });
     }
 
