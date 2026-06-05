@@ -296,22 +296,38 @@ public class ScoreInputController {
 
     private void handlePublishScores() {
         if (selectedCourseCode == null || selectedCourseCode.isEmpty()) {
-            ShowMessage.showWarningMessage("提示", "请先选择课程");
+            ShowMessage.showWarningMessage("提示", "请先选择课程"); return;
+        }
+        boolean confirmed = ShowMessage.showConfirmMessage("确认",
+            "全部".equals(selectedCourseCode) ? "确定要发布所有课程的成绩吗？" : "确定要发布该课程的成绩吗？");
+        if (!confirmed) return;
+
+        // "全部"模式下逐门发布
+        if ("全部".equals(selectedCourseCode)) {
+            if (courseNameToId.isEmpty()) { ShowMessage.showWarningMessage("提示", "没有可发布的课程"); return; }
+            final int[] done = {0};
+            final int total = courseNameToId.size();
+            for (Map.Entry<String, Integer> e : courseNameToId.entrySet()) {
+                Integer cid = e.getValue();
+                if (cid == null || cid == 0) { done[0]++; continue; }
+                Map<String, String> p = new HashMap<>();
+                p.put("courseId", String.valueOf(cid));
+                NetworkUtils.post("/grade/releaseGrade", p, "", new NetworkUtils.Callback<String>() {
+                    @Override public void onSuccess(String r) { done[0]++; if (done[0] >= total) Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已全部发布")); }
+                    @Override public void onFailure(Exception ex) { done[0]++; if (done[0] >= total) Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已全部发布")); }
+                });
+            }
             return;
         }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要发布该课程的成绩吗？");
-        if (!confirmed) return;
 
         Integer courseId = courseNameToId.get(selectedCourseCode);
         Map<String, String> params = new HashMap<>();
         if (courseId != null) params.put("courseId", String.valueOf(courseId));
         NetworkUtils.post("/grade/releaseGrade", params, "", new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
+            @Override public void onSuccess(String result) {
                 Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已成功发布"));
             }
-            @Override
-            public void onFailure(Exception e) {
+            @Override public void onFailure(Exception e) {
                 Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
             }
         });

@@ -1,5 +1,6 @@
 package com.example.information_management_system.controller.admin;
 
+import com.example.information_management_system.entity.Data;
 import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
@@ -73,17 +74,15 @@ public class AddNewStudentController {
                                 String name = major + number + "班";
                                 sectionIdMap.put(name, id);
                                 sectionNameMap.put(id, name);
+                                Data.getInstance().getSectionNameMap().put(number, name);
                                 classCombo.getItems().add(name);
                             }
-                            if (editingStudent != null && editingStudent.getClassName() != null) {
-                                String clsName = editingStudent.getClassName();
-                                // 学生列表返回的 className 是 sectionId 数字，通过反向映射获取显示名
-                                try {
-                                    int sid = Integer.parseInt(clsName);
-                                    String displayName = sectionNameMap.get(sid);
-                                    if (displayName != null) clsName = displayName;
-                                } catch (NumberFormatException ignored) {}
-                                classCombo.setValue(clsName);
+                            if (editingStudent != null && editingStudent.getClassName() != null && !editingStudent.getClassName().isEmpty()) {
+                                String clsNum = editingStudent.getClassName();  // API 返回 sec.number，如 "2025-1"
+                                // 在班级下拉选项中模糊匹配编号
+                                for (String item : classCombo.getItems()) {
+                                    if (item.contains(clsNum)) { classCombo.setValue(item); break; }
+                                }
                             }
                         });
                     }

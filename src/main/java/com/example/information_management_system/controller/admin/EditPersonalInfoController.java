@@ -23,19 +23,14 @@ public class EditPersonalInfoController {
 
     @FXML private TextField phoneField;
     @FXML private TextField emailField;
-    @FXML private ComboBox<String> sexCombo;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
     @FXML
     public void initialize() {
-        sexCombo.getItems().addAll("男", "女");
-        sexCombo.getSelectionModel().selectFirst();
-
         UserSession session = UserSession.getInstance();
         if (session.getPhone() != null) phoneField.setText(session.getPhone());
         if (session.getEmail() != null) emailField.setText(session.getEmail());
-        if (session.getSex() != null) sexCombo.setValue(session.getSex());
 
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> closeDialog());
@@ -48,7 +43,6 @@ public class EditPersonalInfoController {
     private void handleSubmit() {
         String phone = phoneField.getText().trim();
         String email = emailField.getText().trim();
-        String sex = sexCombo.getValue();
 
         if (StringUtil.isEmpty(phone) && StringUtil.isEmpty(email)) {
             ShowMessage.showWarningMessage("提示", "请填写需要修改的信息");
@@ -70,7 +64,6 @@ public class EditPersonalInfoController {
                         UserSession session = UserSession.getInstance();
                         if (!StringUtil.isEmpty(phone)) session.setPhone(phone);
                         if (!StringUtil.isEmpty(email)) session.setEmail(email);
-                        session.setSex(sex);
                         ShowMessage.showInfoMessage("成功", "已成功更新");
                         if (onInfoUpdatedListener != null) onInfoUpdatedListener.run();
                         closeDialog();

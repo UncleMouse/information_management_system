@@ -220,7 +220,11 @@ public class CourseManagementContent {
             }
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
+                String msg = e.getMessage();
+                try { int i = msg.indexOf("{"); if (i >= 0) { JsonObject err = gson.fromJson(msg.substring(i), JsonObject.class); msg = err.has("msg") ? err.get("msg").getAsString() : msg; } }
+                catch (Exception ignored) {}
+                final String fm = msg;
+                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", fm));
             }
         });
     }

@@ -36,9 +36,6 @@
         <TextField fx:id="emailField" promptText="请输入邮箱地址" styleClass="form-field"
                    GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
-        <Label text="性别" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-        <ComboBox fx:id="sexCombo" styleClass="form-combo" prefWidth="260"
-                  GridPane.rowIndex="2" GridPane.columnIndex="1" />
     </GridPane>
 
     <HBox spacing="12" alignment="CENTER_RIGHT">

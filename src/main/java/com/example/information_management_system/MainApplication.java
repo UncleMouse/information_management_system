@@ -58,15 +58,9 @@ public class MainApplication extends Application {
     }
 
     private boolean tryAutoLogin() {
-        Preferences prefs = Preferences.userNodeForPackage(MainApplication.class);
-        String token = prefs.get("token", null);
-        if (token == null || token.isEmpty()) return false;
-        UserSession.getInstance().setIdentity(prefs.getInt("identity", 0));
-        UserSession.getInstance().setUsername(prefs.get("username", ""));
-        UserSession.getInstance().setToken(token);
-        UserSession.getInstance().setRefreshToken(prefs.get("refreshToken", ""));
-        startTokenRefreshTimer();
-        return true;
+        // 每次启动清除旧 session，防止过期 token 导致 API 调用失败
+        clearSession();
+        return false;
     }
 
     @Override

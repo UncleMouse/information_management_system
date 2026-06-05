@@ -1,7 +1,9 @@
 package com.example.information_management_system.controller.admin;
 
+import com.example.information_management_system.entity.Data;
 import com.example.information_management_system.model.Student;
 import com.example.information_management_system.util.JsonUtil;
+import javafx.beans.property.SimpleStringProperty;
 import com.example.information_management_system.util.NetworkUtils;
 
 import com.example.information_management_system.util.ExportUtils;
@@ -83,12 +85,12 @@ public class StudentManagementController {
     }
 
     private void setupTableColumns() {
-        colSduid.setCellValueFactory(new PropertyValueFactory<>("sduid"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colGender.setCellValueFactory(new PropertyValueFactory<>("gender"));
-        colMajor.setCellValueFactory(new PropertyValueFactory<>("major"));
-        colClassName.setCellValueFactory(new PropertyValueFactory<>("className"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colSduid.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
+        colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        colGender.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGender()));
+        colMajor.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMajor()));
+        colClassName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getClassName()));
+        colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
 
         // 序号列
         colId.setCellFactory(col -> new TableCell<Student, Integer>() {
@@ -148,7 +150,9 @@ public class StudentManagementController {
                             s.setName(JsonUtil.safeGetString(obj, "username"));
                             s.setGender(JsonUtil.safeGetString(obj, "sex"));
                             s.setMajor(mapMajor(JsonUtil.safeGetString(obj, "major")));
-                            s.setClassName(JsonUtil.safeGetString(obj, "section"));
+                            String secNum = JsonUtil.safeGetString(obj, "section");
+                            String secName = Data.getInstance().getSectionNameMap().get(secNum);
+                            s.setClassName(secName != null ? secName : secNum);
                             s.setStatus(JsonUtil.safeGetString(obj, "status"));
                             s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);
@@ -212,7 +216,9 @@ public class StudentManagementController {
                             s.setName(JsonUtil.safeGetString(obj, "username"));
                             s.setGender(JsonUtil.safeGetString(obj, "sex"));
                             s.setMajor(mapMajor(JsonUtil.safeGetString(obj, "major")));
-                            s.setClassName(JsonUtil.safeGetString(obj, "section"));
+                            String secNum = JsonUtil.safeGetString(obj, "section");
+                            String secName = Data.getInstance().getSectionNameMap().get(secNum);
+                            s.setClassName(secName != null ? secName : secNum);
                             s.setStatus(JsonUtil.safeGetString(obj, "status"));
                             s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);

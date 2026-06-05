@@ -102,7 +102,19 @@ public class TermManagementController {
         });
         btnDeleteTerm.setOnAction(e -> {
             TermItem sel = termTable.getSelectionModel().getSelectedItem();
-            if (sel != null) ShowMessage.showErrorMessage("提示", "后端暂不支持删除学期");
+            if (sel == null) return;
+            if (!ShowMessage.showConfirmMessage("确认", "确定要删除学期 " + sel.getTerm() + " 吗？")) return;
+            Map<String, String> p = new HashMap<>();
+            p.put("term", sel.getTerm());
+            NetworkUtils.postWithQueryParams("/term/deleteTerm", p, new NetworkUtils.Callback<String>() {
+                @Override public void onSuccess(String r) {
+                    try { JsonObject res = gson.fromJson(r, JsonObject.class);
+                        if (res.has("code") && res.get("code").getAsInt()==200) { ShowMessage.showInfoMessage("成功", "已删除"); loadTerms(); }
+                        else ShowMessage.showErrorMessage("错误", res.has("msg")?res.get("msg").getAsString():"删除失败");
+                    } catch (Exception ex) { ShowMessage.showErrorMessage("错误", "解析失败"); }
+                }
+                @Override public void onFailure(Exception ex) { ShowMessage.showErrorMessage("错误", ex.getMessage()); }
+            });
         });
         btnRefresh.setOnAction(e -> loadTerms());
         termTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {

@@ -110,32 +110,34 @@ public class AdminHomePageController {
     }
 
     private void fetchCoursesAndPending() {
+        // 并行查两个接口，list=全部课程数，pending=待审核数
+        final int[] done = {0};
+        final int[] totalVal = {0};
+        final int[] pendingVal = {0};
+
+        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String r) {
+                try { JsonObject res = gson.fromJson(r, JsonObject.class); if (res.has("code") && res.get("code").getAsInt()==200) totalVal[0] = JsonUtil.extractArray(res, "data").size(); }
+                catch (Exception ignored) {}
+                checkDone(done, totalVal, pendingVal);
+            }
+            @Override public void onFailure(Exception e) { checkDone(done, totalVal, pendingVal); }
+        });
         NetworkUtils.get("/class/pending", new NetworkUtils.Callback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        JsonArray arr = JsonUtil.extractArray(res, "data");
-                        final int[] pending = {0};
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            String s = JsonUtil.safeGetString(obj, "status");
-                            if ("PENDING".equalsIgnoreCase(s) || "待审核".equals(s)) pending[0]++;
-                        }
-                        Platform.runLater(() -> {
-                            totalCoursesLabel.setText(String.valueOf(arr.size()));
-                            pendingCoursesLabel.setText(String.valueOf(pending[0]));
-                        });
-                    }
-                } catch (Exception e) {
-                    Platform.runLater(() -> { totalCoursesLabel.setText("--"); pendingCoursesLabel.setText("--"); });
-                }
+            @Override public void onSuccess(String r) {
+                try { JsonObject res = gson.fromJson(r, JsonObject.class); if (res.has("code") && res.get("code").getAsInt()==200) pendingVal[0] = JsonUtil.extractArray(res, "data").size(); }
+                catch (Exception ignored) {}
+                checkDone(done, totalVal, pendingVal);
             }
-            @Override
-            public void onFailure(Exception e) {
-                Platform.runLater(() -> { totalCoursesLabel.setText("--"); pendingCoursesLabel.setText("--"); });
-            }
+            @Override public void onFailure(Exception e) { checkDone(done, totalVal, pendingVal); }
+        });
+    }
+
+    private void checkDone(int[] done, int[] totalVal, int[] pendingVal) {
+        synchronized (done) { done[0]++; if (done[0] < 2) return; }
+        Platform.runLater(() -> {
+            totalCoursesLabel.setText(String.valueOf(totalVal[0]));
+            pendingCoursesLabel.setText(String.valueOf(pendingVal[0]));
         });
     }
 

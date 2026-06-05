@@ -8,6 +8,7 @@ public class Data {
     private String currentTerm;
     private ObservableList<String> semesterList = FXCollections.observableArrayList();
     private ObservableList<String> classRoomList = FXCollections.observableArrayList();
+    private final java.util.Map<String, String> sectionNameMap = new java.util.HashMap<>();
 
     private Data() {}
 
@@ -22,4 +23,5 @@ public class Data {
     public void setSemesterList(ObservableList<String> list) { this.semesterList = list; }
     public ObservableList<String> getClassRoomList() { return classRoomList; }
     public void setClassRoomList(ObservableList<String> list) { this.classRoomList = list; }
+    public java.util.Map<String, String> getSectionNameMap() { return sectionNameMap; }
 }
