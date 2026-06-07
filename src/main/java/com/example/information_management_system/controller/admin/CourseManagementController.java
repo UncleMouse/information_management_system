@@ -72,8 +72,9 @@ public class CourseManagementController {
     }
 
     private void setupTableColumns() {
+        colCode.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTeacher()));
         colCode.setCellFactory(col -> new TableCell<Course, String>() {
-            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
         });
         colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCode()));
         colTeacher.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTeacherName()));
@@ -171,6 +172,8 @@ public class CourseManagementController {
                         c.setId(id);
                         c.setCode(JsonUtil.safeGetString(obj, "name"));
                         c.setTeacherName(JsonUtil.safeGetString(obj, "teacherName"));
+                        String cn = JsonUtil.safeGetString(obj, "classNum");
+                        c.setTeacher(cn.isEmpty() ? "-" : cn);
                         c.setCredit(obj.has("point") && !obj.get("point").isJsonNull() ? obj.get("point").getAsDouble() : 0.0);
                         c.setType(JsonUtil.safeGetString(obj, "type"));
                         c.setTerm(JsonUtil.safeGetString(obj, "term"));

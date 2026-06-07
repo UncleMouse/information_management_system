@@ -165,30 +165,37 @@ public class TeacherManagementController {
             loadTeachers();
             return;
         }
-        statusLabel.setText("加载中…");
+        statusLabel.setText("搜索中…");
+        // /admin/searchSdu 不含 college/email，改用 getTeacherList 全量拉取后客户端过滤
         Map<String, String> params = new HashMap<>();
-        params.put("keyword", keyword);
-        params.put("permission", "1");
-        params.put("pageNum", "1");
-        params.put("pageSize", "100");
+        params.put("page", "1");
+        params.put("limit", "500");
 
-        NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
+        NetworkUtils.get("/admin/getTeacherList", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
+                        String kw = keyword.toLowerCase();
                         List<TeacherInfo> list = new ArrayList<>();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
+                            String sduid = JsonUtil.safeGetString(obj, "sduid");
+                            String name = JsonUtil.safeGetString(obj, "username");
+                            String college = JsonUtil.safeGetString(obj, "college");
+                            if (!sduid.toLowerCase().contains(kw)
+                                    && !name.toLowerCase().contains(kw)
+                                    && !college.toLowerCase().contains(kw)) continue;
                             TeacherInfo t = new TeacherInfo();
                             t.setId(JsonUtil.safeGetInt(obj, "id"));
-                            t.setSduid(JsonUtil.safeGetString(obj, "sduid"));
-                            t.setName(JsonUtil.safeGetString(obj, "username"));
-                            t.setCollege(JsonUtil.safeGetString(obj, "college"));
+                            t.setSduid(sduid);
+                            t.setName(name);
+                            t.setCollege(college);
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
-                            t.setStatus(mapTeacherStatus(JsonUtil.safeGetString(obj, "status")));
+                            int sc = JsonUtil.safeGetInt(obj, "status");
+                            t.setStatus(sc==0?"在职":sc==1?"休假":sc==2?"降转":sc==3?"离职":"在职");
                             list.add(t);
                         }
                         Platform.runLater(() -> {
@@ -196,25 +203,16 @@ public class TeacherManagementController {
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> {
-                            statusLabel.setText("搜索失败");
-                            ShowMessage.showErrorMessage("错误", "搜索失败: " + (res.has("msg") ? res.get("msg").getAsString() : "未知错误"));
-                        });
+                        Platform.runLater(() -> statusLabel.setText("搜索失败"));
                     }
                 } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("数据解析失败");
-                        ShowMessage.showErrorMessage("错误", "数据解析失败: " + e.getMessage());
-                    });
+                    Platform.runLater(() -> statusLabel.setText("数据解析失败"));
                 }
             }
 
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("网络请求失败");
-                    ShowMessage.showErrorMessage("错误", "网络请求失败: " + e.getMessage());
-                });
+                Platform.runLater(() -> statusLabel.setText("网络请求失败"));
             }
         });
     }

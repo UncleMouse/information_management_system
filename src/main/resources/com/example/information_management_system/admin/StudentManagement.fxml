@@ -26,7 +26,7 @@
 
     <!-- Search and Action Bar -->
     <HBox spacing="12" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="搜索学号、姓名、专业..." styleClass="search-field"
+        <TextField fx:id="searchField" promptText="搜索学号、姓名..." styleClass="search-field"
                    HBox.hgrow="ALWAYS" />
         <Button fx:id="btnSearch" text="搜索" styleClass="btn-primary" />
         <Region HBox.hgrow="ALWAYS" />

@@ -23,8 +23,8 @@ public class AddNewAnnouncementController {
 
     private static final Map<String, String> VISIBILITY_MAP = new HashMap<>();
     static {
-        VISIBILITY_MAP.put("全部可见", "1");
-        VISIBILITY_MAP.put("学生可见", "2");
+        VISIBILITY_MAP.put("全部可见", "2");
+        VISIBILITY_MAP.put("教师可见", "1");
     }
 
     private final Gson gson = new Gson();
@@ -122,7 +122,7 @@ public class AddNewAnnouncementController {
 
         // 表单初始化
         visibilityCombo.setItems(FXCollections.observableArrayList(
-                "全部可见", "学生可见"));
+                "全部可见", "教师可见"));
         visibilityCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> showList());
@@ -312,8 +312,8 @@ public class AddNewAnnouncementController {
     private String mapScope(String val) {
         if (val == null) return "";
         switch (val) {
-            case "2": return "学生可见";
-            case "1": return "全部可见";
+            case "2": return "全部可见";
+            case "1": return "教师可见";
             default: return val;
         }
     }
