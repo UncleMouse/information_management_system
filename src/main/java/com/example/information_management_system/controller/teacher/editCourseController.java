@@ -105,11 +105,11 @@ public class editCourseController {
             categoryComboBox.setValue(safeStr(obj, "type"));
         if (creditField != null && obj.has("point"))
             creditField.setText(String.valueOf(obj.get("point").getAsDouble()));
-        if (classroomComboBox != null && obj.has("classroom")) {
-            String cr = safeStr(obj, "classroom");
+        if (classroomComboBox != null) {
+            String cr = obj.has("classroom") ? safeStr(obj, "classroom") : "";
             if (!cr.isEmpty() && !classroomComboBox.getItems().contains(cr))
-                classroomComboBox.getItems().add(0, cr);
-            classroomComboBox.setValue(cr);
+                classroomComboBox.getItems().add(1, cr);
+            classroomComboBox.setValue(cr.isEmpty() || !classroomComboBox.getItems().contains(cr) ? "无教室" : cr);
         }
         if (capacityField != null && obj.has("capacity"))
             capacityField.setText(String.valueOf(obj.get("capacity").getAsInt()));
@@ -162,7 +162,8 @@ public class editCourseController {
         bodyMap.put("category", categoryComboBox.getValue());
         bodyMap.put("type", categoryComboBox.getValue());
         bodyMap.put("point", Double.parseDouble(creditField.getText().trim()));
-        if (classroomComboBox.getValue() != null) bodyMap.put("classroom", classroomComboBox.getValue());
+        String crVal = classroomComboBox.getValue();
+        if (crVal != null && !"无教室".equals(crVal)) bodyMap.put("classroom", crVal);
         bodyMap.put("capacity", Integer.parseInt(capacityField.getText().trim()));
         bodyMap.put("weekStart", weekStart);
         bodyMap.put("weekEnd", weekEnd);
@@ -200,7 +201,7 @@ public class editCourseController {
             }
             @Override
             public void onFailure(Exception e) {
-                Platform.runLater(() -> { ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"); submitButton.setDisable(false); });
+                Platform.runLater(() -> { ShowMessage.showErrorMessage("错误", e.getMessage() != null ? e.getMessage() : "网络请求失败，请检查连接"); submitButton.setDisable(false); });
             }
         });
     }
@@ -232,6 +233,7 @@ public class editCourseController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = res.getAsJsonArray("data");
                         javafx.collections.ObservableList<String> list = javafx.collections.FXCollections.observableArrayList();
+                        list.add("无教室");
                         for (int i = 0; i < arr.size(); i++)
                             list.add(arr.get(i).getAsJsonObject().get("location").getAsString());
                         Platform.runLater(() -> {

@@ -45,7 +45,7 @@ public class ScheduleManagementController {
 
     public static class CourseScheduleRow {
         final int courseId;
-        final JsonObject rawData;
+        JsonObject rawData;
         final SimpleStringProperty name = new SimpleStringProperty();
         final SimpleStringProperty teacher = new SimpleStringProperty();
         final SimpleStringProperty status = new SimpleStringProperty();
@@ -114,7 +114,7 @@ public class ScheduleManagementController {
             private final Button btn = new Button("保存");
             { btn.getStyleClass().add("btn-primary"); btn.setOnAction(e -> {
                 CourseScheduleRow row = getTableRow().getItem();
-                if (row != null) saveOne(row);
+                if (row != null) saveOne(row, () -> Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已保存")));
             });}
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -187,14 +187,19 @@ public class ScheduleManagementController {
         String term = termSelector.getValue();
         if (term == null || term.isEmpty()) return;
 
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> cp = new HashMap<>();
+        cp.put("pageSize", "200");
+        NetworkUtils.get("/class/list", cp, new NetworkUtils.Callback<String>() {
             @Override public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
-                        ObservableList<CourseScheduleRow> list = FXCollections.observableArrayList();
-                        for (int i = 0; i < arr.size(); i++) {
+                        int total = arr.size();
+                        if (total == 0) { Platform.runLater(() -> rows.clear()); return; }
+                        // 先收集基本信息，再逐门获取详情（/class/list 不含 time/classroom）
+                        List<CourseScheduleRow> list = new ArrayList<>();
+                        for (int i = 0; i < total; i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             CourseScheduleRow row = new CourseScheduleRow(
                                 JsonUtil.safeGetInt(obj, "id"),
@@ -202,20 +207,41 @@ public class ScheduleManagementController {
                                 JsonUtil.safeGetString(obj, "teacherName"),
                                 JsonUtil.safeGetString(obj, "status"),
                                 obj);
-                            String t = JsonUtil.safeGetString(obj, "time");
-                            if (t.matches("\\d+")) {
-                                int slot = Integer.parseInt(t);
-                                if (slot >= 1 && slot <= 2) row.time.set("1-2节");
-                                else if (slot >= 3 && slot <= 4) row.time.set("3-4节");
-                                else if (slot >= 5 && slot <= 6) row.time.set("5-6节");
-                                else if (slot >= 7 && slot <= 8) row.time.set("7-8节");
-                                else if (slot >= 9 && slot <= 10) row.time.set("9-10节");
-                            }
-                            String cr = JsonUtil.safeGetString(obj, "classroom");
-                            if (!cr.isEmpty()) row.classroom.set(cr);
                             list.add(row);
                         }
-                        Platform.runLater(() -> rows.setAll(list));
+                        // 逐门获取详情，拿到完整的 time / classroom 等字段
+                        final int[] loaded = {0};
+                        for (CourseScheduleRow row : list) {
+                            NetworkUtils.get("/class/detail/" + row.courseId, new NetworkUtils.Callback<String>() {
+                                @Override public void onSuccess(String detailResult) {
+                                    try {
+                                        JsonObject dr = gson.fromJson(detailResult, JsonObject.class);
+                                        if (dr.has("code") && dr.get("code").getAsInt() == 200) {
+                                            JsonObject detail = dr.getAsJsonObject("data");
+                                            // 用详情数据更新 rawData，以便 saveOne 能拿到完整字段
+                                            row.rawData = detail;
+                                            String t = JsonUtil.safeGetString(detail, "time");
+                                            if (!t.isEmpty()) {
+                                                String firstPart = t.contains(",") ? t.split(",")[0].trim() : t.trim();
+                                                try {
+                                                    int globalSlot = Integer.parseInt(firstPart);
+                                                    int dayIdx = globalSlot / 5;
+                                                    int slotIdx = globalSlot % 5;
+                                                    if (dayIdx >= 0 && dayIdx < DAYS.size()) row.day.set(DAYS.get(dayIdx));
+                                                    if (slotIdx >= 0 && slotIdx < TIMES.size()) row.time.set(TIMES.get(slotIdx));
+                                                } catch (NumberFormatException ignored) {}
+                                            }
+                                            String cr = JsonUtil.safeGetString(detail, "classroom");
+                                            if (!cr.isEmpty()) row.classroom.set(cr);
+                                        }
+                                    } catch (Exception ignored) {}
+                                    synchronized (loaded) { loaded[0]++; if (loaded[0] >= list.size()) Platform.runLater(() -> rows.setAll(list)); }
+                                }
+                                @Override public void onFailure(Exception e) {
+                                    synchronized (loaded) { loaded[0]++; if (loaded[0] >= list.size()) Platform.runLater(() -> rows.setAll(list)); }
+                                }
+                            });
+                        }
                     }
                 } catch (Exception ignored) {}
             }
@@ -223,20 +249,20 @@ public class ScheduleManagementController {
         });
     }
 
-    private void saveOne(CourseScheduleRow row) {
+    private void saveOne(CourseScheduleRow row, Runnable onComplete) {
         String day = row.getDay();
         String time = row.getTime();
         String classroom = row.getClassroom();
-        if (time == null || time.isEmpty()) { ShowMessage.showWarningMessage("提示","请选择节次"); return; }
+        if (day == null || day.isEmpty() || time == null || time.isEmpty()) { if (onComplete != null) onComplete.run(); return; }
 
-        int timeVal = switch (time) {
-            case "1-2节" -> 1; case "3-4节" -> 3; case "5-6节" -> 5;
-            case "7-8节" -> 7; case "9-10节" -> 9; default -> 1;
+        int slotIdx = switch (time) {
+            case "1-2节" -> 0; case "3-4节" -> 1; case "5-6节" -> 2;
+            case "7-8节" -> 3; case "9-10节" -> 4; default -> 0;
         };
-        // DB time 是 SET('0'..'24')，只能存节次数字
-        String combinedTime = String.valueOf(timeVal);
+        int dayIdx = DAYS.indexOf(day);
+        if (dayIdx < 0) dayIdx = 0;
+        String combinedTime = String.valueOf(dayIdx * 5 + slotIdx);
 
-        // 传所有字段，防止 Spring BeanUtils 把 null 覆盖到原有数据
         Map<String, Object> body = new HashMap<>();
         JsonObject r = row.rawData;
         body.put("name", JsonUtil.safeGetString(r, "name"));
@@ -257,30 +283,28 @@ public class ScheduleManagementController {
         body.put("classroom", classroom != null ? classroom : "");
 
         String req = gson.toJson(body);
-        System.out.println("[排课] save=" + req);
         NetworkUtils.post("/class/adUpdate/" + row.courseId, req, new NetworkUtils.Callback<String>() {
             @Override public void onSuccess(String result) {
-                System.out.println("[排课] resp=" + result);
-                try {
-                    JsonObject res = gson.fromJson(result, JsonObject.class);
-                    Platform.runLater(() -> {
-                        if (res.has("code") && res.get("code").getAsInt() == 200)
-                            ShowMessage.showInfoMessage("成功", "已保存");
-                        else
-                            ShowMessage.showErrorMessage("错误", res.has("msg")?res.get("msg").getAsString():"保存失败");
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析失败"));
-                }
+                if (onComplete != null) onComplete.run();
             }
             @Override public void onFailure(Exception e) {
-                Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败"));
+                if (onComplete != null) onComplete.run();
             }
         });
     }
 
     private void saveAll() {
-        for (CourseScheduleRow row : rows) saveOne(row);
+        int total = rows.size();
+        if (total == 0) { ShowMessage.showWarningMessage("提示", "没有可保存的课程"); return; }
+        final int[] done = {0};
+        for (CourseScheduleRow row : rows) {
+            saveOne(row, () -> {
+                done[0]++;
+                if (done[0] >= total) {
+                    Platform.runLater(() -> ShowMessage.showInfoMessage("完成", "已全部保存 " + total + " 门课程"));
+                }
+            });
+        }
     }
 
     private void navigateBack() {

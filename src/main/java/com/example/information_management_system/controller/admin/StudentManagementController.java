@@ -153,7 +153,7 @@ public class StudentManagementController {
                             String secNum = JsonUtil.safeGetString(obj, "section");
                             String secName = Data.getInstance().getSectionNameMap().get(secNum);
                             s.setClassName(secName != null ? secName : secNum);
-                            s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            s.setStatus(mapStudentStatus(JsonUtil.safeGetString(obj, "status")));
                             s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);
                         }
@@ -219,7 +219,7 @@ public class StudentManagementController {
                             String secNum = JsonUtil.safeGetString(obj, "section");
                             String secName = Data.getInstance().getSectionNameMap().get(secNum);
                             s.setClassName(secName != null ? secName : secNum);
-                            s.setStatus(JsonUtil.safeGetString(obj, "status"));
+                            s.setStatus(mapStudentStatus(JsonUtil.safeGetString(obj, "status")));
                             s.setGrade(String.valueOf(JsonUtil.safeGetInt(obj, "grade")));
                             list.add(s);
                         }
@@ -250,6 +250,17 @@ public class StudentManagementController {
                 });
             }
         });
+    }
+
+    private String mapStudentStatus(String v) {
+        if (v == null || v.isEmpty()) return "";
+        switch (v) {
+            case "STUDYING": return "在读";
+            case "SUSPENDED": return "休学";
+            case "TRANSFERRED": return "降转";
+            case "DROPPED_OUT": return "退学";
+            default: return v;
+        }
     }
 
     private void openAddStudentDialog() {

@@ -144,7 +144,9 @@ public class CourseManagementController {
             Map<Integer, Course> map = new HashMap<>();
             int[] done = {0};
 
-            NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+            Map<String, String> clParams = new HashMap<>();
+            clParams.put("pageSize", "200");
+            NetworkUtils.get("/class/list", clParams, new NetworkUtils.Callback<String>() {
                 @Override public void onSuccess(String result) { parseAndMerge(result, map, done); }
                 @Override public void onFailure(Exception e) { checkDone(map, done); }
             });

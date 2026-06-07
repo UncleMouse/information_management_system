@@ -8,6 +8,8 @@ import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import java.util.HashMap;
+import java.util.Map;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -115,7 +117,9 @@ public class AdminHomePageController {
         final int[] totalVal = {0};
         final int[] pendingVal = {0};
 
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> clParams = new HashMap<>();
+        clParams.put("pageSize", "200");
+        NetworkUtils.get("/class/list", clParams, new NetworkUtils.Callback<String>() {
             @Override public void onSuccess(String r) {
                 try { JsonObject res = gson.fromJson(r, JsonObject.class); if (res.has("code") && res.get("code").getAsInt()==200) totalVal[0] = JsonUtil.extractArray(res, "data").size(); }
                 catch (Exception ignored) {}

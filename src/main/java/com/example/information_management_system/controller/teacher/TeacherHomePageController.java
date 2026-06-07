@@ -12,6 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TeacherHomePageController {
 
@@ -52,7 +54,8 @@ public class TeacherHomePageController {
     }
 
     private void fetchDashboardData() {
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> clParams = new HashMap<>(); clParams.put("pageSize", "200");
+        NetworkUtils.get("/class/list", clParams, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -84,7 +87,8 @@ public class TeacherHomePageController {
     }
 
     private void fetchRecentCourses() {
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> clParams = new HashMap<>(); clParams.put("pageSize", "200");
+        NetworkUtils.get("/class/list", clParams, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {

@@ -180,7 +180,6 @@ public class CourseScheduleContentController {
     }
 
     private ObservableList<CourseRow> buildScheduleRows(JsonArray courses) {
-        // 为每门课分配随机柔和底色
         Map<String, String> colorMap = new HashMap<>();
         int colorIdx = 0;
 
@@ -196,7 +195,6 @@ public class CourseScheduleContentController {
             String time = getStr(c, "time");
             if (time == null || time.isEmpty() || name == null) continue;
 
-            // 分配颜色
             String hex = colorMap.get(name);
             if (hex == null) {
                 hex = toHex(PASTEL_COLORS[colorIdx % PASTEL_COLORS.length]);
@@ -204,33 +202,49 @@ public class CourseScheduleContentController {
                 colorMap.put(name, hex);
             }
 
-            int slot = -1, dayIdx = -1;
-            if (time.matches("\\d{2,3}")) {
-                int t = Integer.parseInt(time);
-                if (t > 100) { dayIdx = (t / 100) - 1; slot = parseTimeSlot(String.valueOf(t % 100)); }
-                else { slot = parseTimeSlot(time); }
-            } else { slot = parseTimeSlot(time); }
-            if (slot < 0) continue;
-
-            boolean hasDay = false;
-            for (int d = 0; d < 7; d++) {
-                String dv = getStr(c, DAYS[d]);
-                if (dv != null && !dv.isEmpty() && !"null".equals(dv)) {
-                    gridText[slot][d] = name + " @" + classroom;
-                    gridColor[slot][d] = hex;
-                    hasDay = true;
+            // 解析全局 slot 编号 (0-24)，转换为 (day, 节次) 对
+            boolean placed = false;
+            for (String part : time.split(",")) {
+                try {
+                    int globalSlot = Integer.parseInt(part.trim());
+                    int dayIdx = globalSlot / 5;     // 0=周一, 1=周二, ...
+                    int slot = globalSlot % 5;        // 节次 0-4
+                    if (dayIdx < 0 || dayIdx > 6 || slot < 0 || slot > 4) continue;
+                    gridText[slot][dayIdx] = name + " @" + classroom;
+                    gridColor[slot][dayIdx] = hex;
+                    placed = true;
+                } catch (NumberFormatException ignored) {}
+            }
+            if (!placed) {
+                // 兜底：尝试老逻辑
+                int slot = -1, dayIdx = -1;
+                if (time.matches("\\d{2,3}")) {
+                    int t = Integer.parseInt(time);
+                    if (t > 100) { dayIdx = (t / 100) - 1; slot = parseTimeSlot(String.valueOf(t % 100)); }
+                    else { slot = parseTimeSlot(time); }
+                } else { slot = parseTimeSlot(time); }
+                if (slot >= 0) {
+                    boolean hasDay = false;
+                    for (int d = 0; d < 7; d++) {
+                        String dv = getStr(c, DAYS[d]);
+                        if (dv != null && !dv.isEmpty() && !"null".equals(dv)) {
+                            gridText[slot][d] = name + " @" + classroom;
+                            gridColor[slot][d] = hex;
+                            hasDay = true;
+                        }
+                    }
+                    String dayStr = getStr(c, "day");
+                    if (dayStr != null && !dayStr.isEmpty() && dayIdx < 0) dayIdx = parseDay(dayStr);
+                    if (dayIdx >= 0 && dayIdx < 7) {
+                        gridText[slot][dayIdx] = name + " @" + classroom;
+                        gridColor[slot][dayIdx] = hex;
+                        hasDay = true;
+                    }
+                    if (!hasDay) {
+                        gridText[slot][0] = name + " @" + classroom;
+                        gridColor[slot][0] = hex;
+                    }
                 }
-            }
-            String dayStr = getStr(c, "day");
-            if (dayStr != null && !dayStr.isEmpty() && dayIdx < 0) dayIdx = parseDay(dayStr);
-            if (dayIdx >= 0 && dayIdx < 7) {
-                gridText[slot][dayIdx] = name + " @" + classroom;
-                gridColor[slot][dayIdx] = hex;
-                hasDay = true;
-            }
-            if (!hasDay) {
-                gridText[slot][0] = name + " @" + classroom;
-                gridColor[slot][0] = hex;
             }
         }
 

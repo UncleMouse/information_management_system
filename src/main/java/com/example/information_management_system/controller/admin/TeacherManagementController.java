@@ -169,6 +169,8 @@ public class TeacherManagementController {
         Map<String, String> params = new HashMap<>();
         params.put("keyword", keyword);
         params.put("permission", "1");
+        params.put("pageNum", "1");
+        params.put("pageSize", "100");
 
         NetworkUtils.get("/admin/searchSdu", params, new NetworkUtils.Callback<String>() {
             @Override
@@ -186,9 +188,7 @@ public class TeacherManagementController {
                             t.setName(JsonUtil.safeGetString(obj, "username"));
                             t.setCollege(JsonUtil.safeGetString(obj, "college"));
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
-                            int sc = JsonUtil.safeGetInt(obj, "status");
-                            String st = sc==0?"在职":sc==1?"休假":sc==2?"降转":sc==3?"离职":"在职";
-                            t.setStatus(st);
+                            t.setStatus(mapTeacherStatus(JsonUtil.safeGetString(obj, "status")));
                             list.add(t);
                         }
                         Platform.runLater(() -> {
@@ -217,6 +217,11 @@ public class TeacherManagementController {
                 });
             }
         });
+    }
+
+    private String mapTeacherStatus(String v) {
+        if (v == null || v.isEmpty()) return "在职";
+        return "在职";
     }
 
     private void openAddTeacherDialog() {

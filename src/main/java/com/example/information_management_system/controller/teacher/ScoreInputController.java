@@ -107,7 +107,9 @@ public class ScoreInputController {
     }
 
     private void fetchTeacherClasses() {
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> params = new HashMap<>();
+        params.put("pageSize", "200");
+        NetworkUtils.get("/class/list", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
