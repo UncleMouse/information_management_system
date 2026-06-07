@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class TeacherBaseViewController {
 
-    @FXML private VBox contentArea;
+    @FXML private StackPane contentArea;
     @FXML private VBox navContainer;
     @FXML private Button logoutBtn;
     @FXML private Label teacherNameLabel;
@@ -75,14 +75,6 @@ public class TeacherBaseViewController {
             Parent view = loader.load();
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
-            VBox.setVgrow(view, Priority.ALWAYS);
-            // 延迟触发布局刷新，解决表格坍缩问题
-            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
-            pt.setOnFinished(ev -> {
-                contentArea.requestLayout();
-                contentArea.getParent().requestLayout();
-            });
-            pt.play();
         } catch (IOException e) { e.printStackTrace(); }
     }
 

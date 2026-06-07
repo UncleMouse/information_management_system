@@ -6,7 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class AdminBaseViewController {
 
-    @FXML private VBox contentArea;
+    @FXML private StackPane contentArea;
     @FXML private VBox navContainer;
     @FXML private Button logoutBtn;
     @FXML private Label userDisplayName;
@@ -80,10 +80,6 @@ public class AdminBaseViewController {
             Parent view = loader.load();
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
-            VBox.setVgrow(view, Priority.ALWAYS);
-            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
-            pt.setOnFinished(ev -> { contentArea.requestLayout(); contentArea.getParent().requestLayout(); });
-            pt.play();
         } catch (IOException e) {
             e.printStackTrace();
             Label errorLabel = new Label("页面加载失败: " + fxmlName);

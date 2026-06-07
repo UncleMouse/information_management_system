@@ -5,9 +5,10 @@ import com.example.information_management_system.entity.UserSession;
 import com.example.information_management_system.util.ShowMessage;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.Objects;
 public class StudentBaseViewController {
 
     @FXML private Label studentNameLabel;
-    @FXML private VBox contentArea;
+    @FXML private StackPane contentArea;
     @FXML private VBox navContainer;
     @FXML private Button logoutBtn;
 
@@ -73,13 +74,9 @@ public class StudentBaseViewController {
         try {
             String path = "/com/example/information_management_system/" + fxmlPath;
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(path)));
-            VBox content = loader.load();
+            Parent view = loader.load();
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(content);
-            VBox.setVgrow(content, Priority.ALWAYS);
-            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
-            pt.setOnFinished(ev -> { contentArea.requestLayout(); contentArea.getParent().requestLayout(); });
-            pt.play();
+            contentArea.getChildren().add(view);
         } catch (IOException e) {
             ShowMessage.showErrorMessage("错误", "页面加载失败，请重启应用");
             e.printStackTrace();

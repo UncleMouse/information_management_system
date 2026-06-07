@@ -40,7 +40,7 @@
     </left>
 
     <center>
-        <VBox fx:id="contentArea" styleClass="content-area"/>
+        <StackPane fx:id="contentArea" styleClass="content-area"/>
     </center>
 
 </BorderPane>
