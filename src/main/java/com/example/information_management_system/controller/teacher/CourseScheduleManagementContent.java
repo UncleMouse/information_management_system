@@ -54,7 +54,13 @@ public class CourseScheduleManagementContent {
 
     private int currentWeek = 1;
     private ObservableList<CourseRow> scheduleData = FXCollections.observableArrayList();
-    private Background defaultBg = new Background(new BackgroundFill(Color.WHITE, null, null));
+    private static final Color DARK_CELL_BG = Color.web("#1e293b");
+
+    private Background defaultBg() {
+        return new Background(new BackgroundFill(
+            com.example.information_management_system.util.ThemeManager.isDark() ? DARK_CELL_BG : Color.WHITE,
+            null, null));
+    }
 
     @FXML
     public void initialize() {
@@ -128,12 +134,12 @@ public class CourseScheduleManagementContent {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null || item.isEmpty()) {
-                    setText(null); setStyle(""); setBackground(defaultBg); return;
+                    setText(null); setStyle(""); setBackground(defaultBg()); return;
                 }
                 String[] parts = item.split("\\|\\|");
                 setText(parts.length > 0 ? parts[0] : "");
                 if (parts.length > 1) setBackground(new Background(new BackgroundFill(Color.web(parts[1]), null, null)));
-                else setBackground(defaultBg);
+                else setBackground(defaultBg());
                 setStyle("");
             }
         });

@@ -112,16 +112,19 @@ public class TeacherHomePageController {
                                 for (String name : courseNames) {
                                     String[] parts = name.split(" \\| ");
                                     Label nl = new Label(parts[0]);
-                                    nl.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e293b;");
+                                    nl.getStyleClass().add("home-course-title");
+                                    nl.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
                                     VBox card = new VBox(4);
-                                    card.setStyle("-fx-background-color: #eef2ff; -fx-padding: 10 14; -fx-background-radius: 8; -fx-border-color: #c7d2fe; -fx-border-radius: 8;");
+                                    card.getStyleClass().add("home-course-card");
+                                    card.setStyle("-fx-padding: 10 14; -fx-background-radius: 8; -fx-border-radius: 8;");
                                     card.getChildren().add(nl);
-                                    if (parts.length > 1) { Label tl = new Label(parts[1].trim()); tl.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;"); card.getChildren().add(tl); }
+                                    if (parts.length > 1) { Label tl = new Label(parts[1].trim()); tl.getStyleClass().add("home-course-term"); tl.setStyle("-fx-font-size: 12px;"); card.getChildren().add(tl); }
                                     recentCoursesBox.getChildren().add(card);
                                 }
                                 if (courseNames.isEmpty()) {
                                     Label empty = new Label("  暂无课程数据");
-                                    empty.setStyle("-fx-font-size: 14px; -fx-text-fill: #94a3b8; -fx-padding: 6 0;");
+                                    empty.getStyleClass().add("home-empty-text");
+                                    empty.setStyle("-fx-font-size: 14px; -fx-padding: 6 0;");
                                     recentCoursesBox.getChildren().add(empty);
                                 }
                             }
@@ -138,7 +141,8 @@ public class TeacherHomePageController {
                     if (recentCoursesBox != null) {
                         recentCoursesBox.getChildren().clear();
                         Label err = new Label("  数据加载失败");
-                        err.setStyle("-fx-font-size: 14px; -fx-text-fill: #ef4444;");
+                        err.getStyleClass().add("home-error-text");
+                        err.setStyle("-fx-font-size: 14px;");
                         recentCoursesBox.getChildren().add(err);
                     }
                 });
@@ -157,19 +161,23 @@ public class TeacherHomePageController {
                             if (noticesBox != null) noticesBox.getChildren().clear();
                             if (arr.size() == 0) {
                                 Label empty = new Label("  暂无公告");
-                                empty.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 13px;");
+                                empty.getStyleClass().add("home-empty-text");
+                                empty.setStyle("-fx-font-size: 13px;");
                                 if (noticesBox != null) noticesBox.getChildren().add(empty);
                             } else {
-                                for (int i = 0; i < Math.min(arr.size(), 4); i++) {
+                                for (int i = 0; i < arr.size(); i++) {
                                     JsonObject n = arr.get(i).getAsJsonObject();
                                     String t = n.has("title") ? n.get("title").getAsString() : "公告";
                                     String c = n.has("content") ? n.get("content").getAsString() : "";
                                     Label tl = new Label(t.isEmpty() ? "无标题" : t);
-                                    tl.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1e293b;");
+                                    tl.getStyleClass().add("home-notice-title");
+                                    tl.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
                                     Label cl = new Label(c.length() > 50 ? c.substring(0, 50) + "..." : c);
-                                    cl.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b; -fx-wrap-text: true;");
+                                    cl.getStyleClass().add("home-notice-content");
+                                    cl.setStyle("-fx-font-size: 12px; -fx-wrap-text: true;");
                                     VBox card = new VBox(4);
-                                    card.setStyle("-fx-background-color: #fff; -fx-padding: 10 14; -fx-background-radius: 8; -fx-border-color: #e8ecf0; -fx-border-radius: 8; -fx-cursor: hand;");
+                                    card.getStyleClass().add("home-notice-card");
+                                    card.setStyle("-fx-padding: 10 14; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;");
                                     final String ft = t, fc = c;
                                     card.setOnMouseClicked(e -> {
                                         Dialog<Void> d = new Dialog<>();

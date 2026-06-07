@@ -209,8 +209,7 @@ public class AdminHomePageController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
                         List<NoticeItem> items = new ArrayList<>();
-                        int limit = Math.min(arr.size(), 5);
-                        for (int i = 0; i < limit; i++) {
+                        for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             items.add(new NoticeItem(
                                 JsonUtil.safeGetString(obj, "title"),
@@ -236,13 +235,17 @@ public class AdminHomePageController {
         if (items.isEmpty()) { showEmptyNotices(); return; }
         for (NoticeItem item : items) {
             Label titleLabel = new Label(item.title.isEmpty() ? "无标题" : item.title);
-            titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #1e293b;");
+            titleLabel.getStyleClass().add("home-notice-title");
+            titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
             Label contentLabel = new Label(item.content.length() > 80 ? item.content.substring(0, 80) + "..." : item.content);
-            contentLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;");
+            contentLabel.getStyleClass().add("home-notice-content");
+            contentLabel.setStyle("-fx-font-size: 12px;");
             Label timeLabel = new Label(item.time);
-            timeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #94a3b8;");
+            timeLabel.getStyleClass().add("home-course-sub");
+            timeLabel.setStyle("-fx-font-size: 11px;");
             VBox card = new VBox(6);
-            card.setStyle("-fx-background-color: #ffffff; -fx-padding: 12 16; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6; -fx-cursor: hand;");
+            card.getStyleClass().add("home-notice-card");
+            card.setStyle("-fx-padding: 12 16; -fx-background-radius: 6; -fx-border-radius: 6; -fx-cursor: hand;");
             card.setOnMouseClicked(e -> showNoticeDetail(item.title, item.content, "", item.time));
             card.getChildren().addAll(titleLabel, contentLabel, timeLabel);
             noticesContainer.getChildren().add(card);
@@ -256,12 +259,15 @@ public class AdminHomePageController {
         VBox box = new VBox(10);
         box.setPrefWidth(500); box.setStyle("-fx-padding: 16;");
         Label t = new Label(title);
-        t.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-wrap-text: true;");
+        t.getStyleClass().add("dialog-title-dark");
+        t.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-wrap-text: true;");
         Label i = new Label("发布时间: " + time);
-        i.setStyle("-fx-font-size: 12px; -fx-text-fill: #64748b;");
+        i.getStyleClass().add("dialog-info-dark");
+        i.setStyle("-fx-font-size: 12px;");
         TextArea ta = new TextArea(content);
         ta.setEditable(false); ta.setWrapText(true); ta.setPrefRowCount(15);
-        ta.setStyle("-fx-font-size: 14px; -fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 6;");
+        ta.getStyleClass().add("dialog-content-dark");
+        ta.setStyle("-fx-font-size: 14px; -fx-border-radius: 6;");
         box.getChildren().addAll(t, i, new Separator(), ta);
         d.getDialogPane().setContent(box);
         d.showAndWait();
@@ -270,7 +276,8 @@ public class AdminHomePageController {
     private void showEmptyNotices() {
         noticesContainer.getChildren().clear();
         Label empty = new Label("暂无最近通知");
-        empty.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 14px; -fx-padding: 20;");
+        empty.getStyleClass().add("home-empty-text");
+        empty.setStyle("-fx-font-size: 14px; -fx-padding: 20;");
         noticesContainer.getChildren().add(empty);
     }
 

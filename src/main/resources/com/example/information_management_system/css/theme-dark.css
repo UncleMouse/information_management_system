@@ -392,3 +392,229 @@
 .scroll-pane > .corner {
     -fx-background-color: transparent !important;
 }
+
+/* ===== 节标题（管理员首页） ===== */
+.section-title {
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 取消/关闭按钮 ===== */
+.btn-cancel, .cancel-btn {
+    -fx-background-color: #334155 !important;
+    -fx-text-fill: #cbd5e1 !important;
+    -fx-border-color: #475569 !important;
+}
+.btn-cancel:hover, .cancel-btn:hover {
+    -fx-background-color: #475569 !important;
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 教师端删除按钮 ===== */
+.btn-delete {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #f87171 !important;
+    -fx-border-color: #7f1d1d !important;
+}
+.btn-delete:hover {
+    -fx-background-color: #7f1d1d !important;
+    -fx-text-fill: #fca5a5 !important;
+}
+
+/* ===== 课表选中行 ===== */
+.schedule-table .table-row-cell:selected {
+    -fx-background-color: #1e3a5f !important;
+}
+.schedule-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 表格单元格边框 ===== */
+.data-table, .schedule-table {
+    -fx-table-cell-border-color: #334155 !important;
+}
+
+/* ===== 课表行边框 ===== */
+.schedule-table .table-row-cell {
+    -fx-border-color: #1e293b !important;
+}
+
+/* ===== 角色标签文本 ===== */
+.role-tag {
+    -fx-text-fill: #93c5fd !important;
+}
+
+/* ===== 表单副标题 ===== */
+.form-subtitle {
+    -fx-text-fill: #94a3b8 !important;
+}
+
+/* ===== 课表时间列 ===== */
+.time-column .table-cell {
+    -fx-text-fill: #94a3b8 !important;
+}
+
+/* ===== 提交/批准按钮 ===== */
+.btn-submit, .submit-btn {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-submit:hover, .submit-btn:hover {
+    -fx-background-color: #3d5bd5 !important;
+}
+.btn-approve {
+    -fx-background-color: #059669 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-approve:hover {
+    -fx-background-color: #047857 !important;
+}
+
+/* ===== 首页卡片悬停效果 ===== */
+.stat-card:hover, .stat-card-small:hover {
+    -fx-effect: dropshadow(gaussian, rgba(79,110,247,0.15), 8, 0, 0, 2) !important;
+}
+
+/* ===== 表格占位文本 ===== */
+.data-table .placeholder .label, .schedule-table .placeholder .label {
+    -fx-text-fill: #64748b !important;
+}
+
+/* ===== 首页统计副文本 ===== */
+.stat-sub, .stat-label-small, .summary-note {
+    -fx-text-fill: #64748b !important;
+}
+
+/* ===== 编辑个人信息页按钮 ===== */
+.btn-save {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+.btn-save:hover {
+    -fx-background-color: #3d5bd5 !important;
+}
+
+/* ===== 课程管理课程操作按钮 ===== */
+.btn-view, .btn-edit {
+    -fx-background-color: #334155 !important;
+    -fx-text-fill: #cbd5e1 !important;
+}
+.btn-view:hover, .btn-edit:hover {
+    -fx-background-color: #475569 !important;
+}
+
+/* ===== 选课页面筛选栏 ===== */
+.filter-bar {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 搜索结果高亮 ===== */
+.search-highlight {
+    -fx-fill: #fbbf24 !important;
+}
+
+/* ===== 表单错误提示 ===== */
+.form-error {
+    -fx-text-fill: #f87171 !important;
+}
+
+/* ===== 成功提示 ===== */
+.success-text, .status-active {
+    -fx-text-fill: #34d399 !important;
+}
+
+/* ===== 警告提示 ===== */
+.warning-text {
+    -fx-text-fill: #fbbf24 !important;
+}
+
+/* ===== 分页控件 ===== */
+.pagination .page-button {
+    -fx-background-color: #1e293b !important;
+    -fx-text-fill: #cbd5e1 !important;
+    -fx-border-color: #334155 !important;
+}
+.pagination .page-button:selected {
+    -fx-background-color: #4f6ef7 !important;
+    -fx-text-fill: #ffffff !important;
+}
+
+/* ===== 首页欢迎卡片 ===== */
+.welcome-card {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 课程详情对话框 ===== */
+.detail-pane, .detail-content {
+    -fx-background-color: #1e293b !important;
+}
+
+/* ===== 菜单弹出 ===== */
+.context-menu {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+.menu-item .label, .context-menu .label {
+    -fx-text-fill: #cbd5e1 !important;
+}
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #334155 !important;
+}
+
+/* ===== 日期选择器 ===== */
+.date-picker .text-field {
+    -fx-background-color: #020617 !important;
+    -fx-text-fill: #e2e8f0 !important;
+}
+
+/* ===== 提示框 ===== */
+.tooltip {
+    -fx-background-color: #1e293b !important;
+    -fx-text-fill: #e2e8f0 !important;
+    -fx-border-color: #334155 !important;
+}
+
+/* ===== 首页动态组件暗色适配 ===== */
+.home-course-title {
+    -fx-text-fill: #e2e8f0 !important;
+}
+.home-course-sub, .home-course-term {
+    -fx-text-fill: #94a3b8 !important;
+}
+.home-course-card {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+.home-notice-title {
+    -fx-text-fill: #e2e8f0 !important;
+}
+.home-notice-content {
+    -fx-text-fill: #94a3b8 !important;
+}
+.home-notice-card {
+    -fx-background-color: #1e293b !important;
+    -fx-border-color: #334155 !important;
+}
+.home-loading-text, .home-empty-text {
+    -fx-text-fill: #94a3b8 !important;
+}
+.home-error-text {
+    -fx-text-fill: #f87171 !important;
+}
+
+/* ===== 课程详情对话框暗色 ===== */
+.dialog-title-dark {
+    -fx-text-fill: #e2e8f0 !important;
+}
+.dialog-info-dark {
+    -fx-text-fill: #94a3b8 !important;
+}
+.dialog-content-dark {
+    -fx-background-color: #0f172a !important;
+    -fx-border-color: #334155 !important;
+    -fx-text-fill: #cbd5e1 !important;
+}
+.dialog-content-dark .content {
+    -fx-background-color: #0f172a !important;
+}

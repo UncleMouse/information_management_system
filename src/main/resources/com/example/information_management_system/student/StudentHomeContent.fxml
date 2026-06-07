@@ -79,9 +79,11 @@
                 <HBox styleClass="card-header">
                     <Label text="最新公告" styleClass="card-title"/>
                 </HBox>
-                <VBox fx:id="noticesContainer" styleClass="card-body" VBox.vgrow="ALWAYS" spacing="4">
-                    <Label text="加载中..." styleClass="loading-text"/>
-                </VBox>
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;" hbarPolicy="NEVER">
+                    <VBox fx:id="noticesContainer" styleClass="card-body" spacing="4">
+                        <Label text="加载中..." styleClass="loading-text"/>
+                    </VBox>
+                </ScrollPane>
             </VBox>
         </VBox>
     </HBox>

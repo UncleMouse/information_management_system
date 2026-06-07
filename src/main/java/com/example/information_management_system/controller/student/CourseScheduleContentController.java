@@ -59,7 +59,14 @@ public class CourseScheduleContentController {
     };
 
     private int currentWeek = 1;
-    private Background defaultBg = new Background(new BackgroundFill(Color.WHITE, null, null));
+    private static final Color DARK_CELL_BG = Color.web("#1e293b");
+    private static final Color DARK_TEXT = Color.web("#cbd5e1");
+
+    private Background defaultBg() {
+        return new Background(new BackgroundFill(
+            com.example.information_management_system.util.ThemeManager.isDark() ? DARK_CELL_BG : Color.WHITE,
+            null, null));
+    }
 
     @FXML
     public void initialize() {
@@ -135,7 +142,7 @@ public class CourseScheduleContentController {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null || item.isEmpty()) {
-                    setText(null); setStyle(""); setBackground(defaultBg);
+                    setText(null); setStyle(""); setBackground(defaultBg());
                     return;
                 }
                 String[] parts = item.split("\\|\\|");
@@ -143,9 +150,9 @@ public class CourseScheduleContentController {
                 if (parts.length > 1) {
                     setBackground(new Background(new BackgroundFill(Color.web(parts[1]), null, null)));
                 } else {
-                    setBackground(defaultBg);
+                    setBackground(defaultBg());
                 }
-                setTextFill(Color.BLACK);
+                setTextFill(com.example.information_management_system.util.ThemeManager.isDark() ? DARK_TEXT : Color.BLACK);
                 setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-wrap-text: true;");
             }
         });
