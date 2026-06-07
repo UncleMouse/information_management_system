@@ -136,10 +136,10 @@ public class ClassManagementController {
         String keyword = searchField.getText().trim();
         if (keyword.isEmpty()) { loadClasses(); return; }
         statusLabel.setText("搜索中...");
+        // /section/getSectionListAll 不支持 keyword 参数，前端拉全量后本地过滤
         Map<String, String> params = new HashMap<>();
-        params.put("keyword", keyword);
         params.put("page", "1");
-        params.put("size", "100");
+        params.put("size", "500");
 
         NetworkUtils.get("/section/getSectionListAll", params, new NetworkUtils.Callback<String>() {
             @Override
@@ -148,16 +148,24 @@ public class ClassManagementController {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
+                        String kw = keyword.toLowerCase();
                         List<Section> list = new ArrayList<>();
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
+                            String clsNum = JsonUtil.safeGetString(obj, "number");
+                            String major = JsonUtil.safeGetString(obj, "major");
+                            String grd = JsonUtil.safeGetString(obj, "grade");
+                            String display = grd.length() >= 4 ? grd.substring(0, 4) : grd;
+                            String className = clsNum.endsWith("班") ? clsNum : clsNum + "班";
+                            // 本地过滤：匹配班级号、专业名、年级
+                            if (!className.toLowerCase().contains(kw)
+                                    && !major.toLowerCase().contains(kw)
+                                    && !display.contains(kw)) continue;
                             Section s = new Section();
                             s.setId(JsonUtil.safeGetInt(obj, "id"));
-                            String clsNum = JsonUtil.safeGetString(obj, "number");
-                            s.setClassName(clsNum.endsWith("班") ? clsNum : clsNum + "班");
-                            s.setMajor(JsonUtil.safeGetString(obj, "major"));
-                            String grd = JsonUtil.safeGetString(obj, "grade");
-                            s.setGrade(grd.length() >= 4 ? grd.substring(0, 4) : grd);
+                            s.setClassName(className);
+                            s.setMajor(major);
+                            s.setGrade(display);
                             s.setNumber(JsonUtil.safeGetInt(obj, "studentCount"));
                             list.add(s);
                         }

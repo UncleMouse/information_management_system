@@ -5,33 +5,33 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.information_management_system.controller.student.StudentAnnouncementController"
-      styleClass="page-root" stylesheets="@../css/admin/announcement.css"
-      spacing="16">
+<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.information_management_system.controller.student.StudentAnnouncementController"
+            fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+    <VBox styleClass="page-root" stylesheets="@../css/admin/announcement.css" spacing="16">
+        <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
 
-    <padding><Insets top="24" right="28" bottom="24" left="28"/></padding>
+        <Label text="公告查看" styleClass="page-title">
+            <font><Font name="System Bold" size="20"/></font>
+        </Label>
 
-    <Label text="公告查看" styleClass="page-title">
-        <font><Font name="System Bold" size="20"/></font>
-    </Label>
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="搜索公告标题..." styleClass="search-field"
+                       HBox.hgrow="ALWAYS" prefWidth="300"/>
+            <Button fx:id="searchBtn" text="搜索" styleClass="btn-primary"/>
+        </HBox>
 
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <TextField fx:id="searchField" promptText="搜索公告标题..." styleClass="search-field"
-                   HBox.hgrow="ALWAYS" prefWidth="300"/>
-        <Button fx:id="searchBtn" text="搜索" styleClass="btn-primary"/>
-    </HBox>
-
-    <TableView fx:id="announcementTable" styleClass="data-table" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colId" text="序号" prefWidth="50" sortable="false"/>
-            <TableColumn fx:id="colTitle" text="标题" prefWidth="300" sortable="false"/>
-            <TableColumn fx:id="colCreator" text="发布者" prefWidth="120" sortable="false"/>
-            <TableColumn fx:id="colTime" text="发布时间" prefWidth="170" sortable="false"/>
-            <TableColumn fx:id="colAction" text="操作" prefWidth="80" sortable="false"/>
-        </columns>
-        <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-        </columnResizePolicy>
-    </TableView>
-</VBox>
+        <TableView fx:id="announcementTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colId" text="序号" prefWidth="50" sortable="false"/>
+                <TableColumn fx:id="colTitle" text="标题" prefWidth="300" sortable="false"/>
+                <TableColumn fx:id="colCreator" text="发布者" prefWidth="120" sortable="false"/>
+                <TableColumn fx:id="colTime" text="发布时间" prefWidth="170" sortable="false"/>
+                <TableColumn fx:id="colAction" text="操作" prefWidth="80" sortable="false"/>
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+</ScrollPane>

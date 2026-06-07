@@ -83,7 +83,7 @@ public class CourseSelectionContentController {
         availColType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getType()));
         availColCapacity.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getClassNum()).asObject());
         availColEnrolled.setCellValueFactory(cell -> new javafx.beans.property.SimpleIntegerProperty(cell.getValue().getPeopleNum()).asObject());
-        availColTime.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTerm()));
+        availColTime.setCellValueFactory(cell -> new SimpleStringProperty(formatTimeDisplay(cell.getValue().getTerm())));
 
         // 居中
         centerCell(availColName); centerCell(availColTeacher); centerCell(availColCredit);
@@ -124,7 +124,7 @@ public class CourseSelectionContentController {
         selColTeacher.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTeacherName()));
         selColCredit.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getCredit()).asObject());
         selColType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getType()));
-        selColTime.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTerm()));
+        selColTime.setCellValueFactory(cell -> new SimpleStringProperty(formatTimeDisplay(cell.getValue().getTerm())));
         centerCell(selColName); centerCell(selColTeacher); centerCell(selColCredit);
         centerCell(selColType); centerCell(selColTime);
 
@@ -345,6 +345,25 @@ public class CourseSelectionContentController {
                 });
             }
         });
+    }
+
+    private static final String[] DAY_NAMES = {"周一","周二","周三","周四","周五","周六","周日"};
+    private static final String[] TIME_NAMES = {"1-2节","3-4节","5-6节","7-8节","9-10节"};
+
+    private String formatTimeDisplay(String rawTime) {
+        if (rawTime == null || rawTime.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+        for (String part : rawTime.split(",")) {
+            try {
+                int gs = Integer.parseInt(part.trim());
+                int d = gs / 5, s = gs % 5;
+                if (d >= 0 && d < DAY_NAMES.length && s >= 0 && s < TIME_NAMES.length) {
+                    if (sb.length() > 0) sb.append(",");
+                    sb.append(DAY_NAMES[d]).append(" ").append(TIME_NAMES[s]);
+                }
+            } catch (NumberFormatException ignored) {}
+        }
+        return sb.toString();
     }
 
     private ObservableList<Course> parseCourseArray(JsonArray arr) {

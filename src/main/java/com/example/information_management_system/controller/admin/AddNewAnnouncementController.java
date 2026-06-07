@@ -25,8 +25,6 @@ public class AddNewAnnouncementController {
     static {
         VISIBILITY_MAP.put("全部可见", "1");
         VISIBILITY_MAP.put("学生可见", "2");
-        VISIBILITY_MAP.put("教师可见", "1");
-        VISIBILITY_MAP.put("管理员可见", "1");
     }
 
     private final Gson gson = new Gson();
@@ -124,7 +122,7 @@ public class AddNewAnnouncementController {
 
         // 表单初始化
         visibilityCombo.setItems(FXCollections.observableArrayList(
-                "全部可见", "学生可见", "教师可见", "管理员可见"));
+                "全部可见", "学生可见"));
         visibilityCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> showList());

@@ -82,16 +82,19 @@ public class AddNewTeacherController {
         params.put("college", college != null ? college : "软件学院");
         params.put("email", contact.isEmpty() ? sduid + "@sdu.edu.cn" : contact);
         params.put("phone", contact.isEmpty() ? "" : contact);
-        params.put("password", "123456");
         params.put("permission", "1");
-        params.put("major", "0");
         params.put("ethnic", "汉族");
         params.put("nation", "中国");
         params.put("PoliticsStatus", "群众");
 
-        if (editingTeacher != null) params.put("id", String.valueOf(editingTeacher.getId()));
+        if (editingTeacher != null) {
+            params.put("id", String.valueOf(editingTeacher.getId()));
+        } else {
+            params.put("password", "123456");
+            params.put("major", "MAJOR_0");
+        }
 
-        String endpoint = editingTeacher != null ? "/admin/updateUser" : "/admin/addUser";
+        String endpoint = editingTeacher != null ? "/user/updateStudent" : "/admin/addUser";
         btnSubmit.setDisable(true);
 
         NetworkUtils.postWithQueryParams(endpoint, params, new NetworkUtils.Callback<String>() {
