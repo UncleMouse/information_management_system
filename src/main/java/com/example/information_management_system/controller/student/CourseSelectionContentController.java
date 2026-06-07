@@ -8,7 +8,6 @@ import com.example.information_management_system.util.ShowMessage;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;

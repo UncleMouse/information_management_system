@@ -80,7 +80,7 @@ public class AddNewTeacherController {
         params.put("username", name);
         params.put("sex", gender != null ? gender : "男");
         params.put("college", college != null ? college : "软件学院");
-        params.put("email", contact.isEmpty() ? sduid + "@sdu.edu.cn" : contact);
+        params.put("email", contact.isEmpty() ? sduid + "@mail.sdu.edu.cn" : contact);
         params.put("phone", contact.isEmpty() ? "" : contact);
         params.put("permission", "1");
         params.put("ethnic", "汉族");

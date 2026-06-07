@@ -145,7 +145,7 @@ public class AddNewStudentController {
         params.put("ethnic", "汉族");
         params.put("nation", "中国");
         params.put("PoliticsStatus", "群众");
-        params.put("email", sduid + "@sdu.edu.cn");
+        params.put("email", sduid + "@mail.sdu.edu.cn");
         params.put("phone", "");
         if (statusCombo.getValue() != null) params.put("status", mapStatus(statusCombo.getValue()));
         if (className != null && !className.isEmpty()) {

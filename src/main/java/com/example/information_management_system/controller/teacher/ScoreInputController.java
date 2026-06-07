@@ -1,12 +1,10 @@
 package com.example.information_management_system.controller.teacher;
 
-import com.example.information_management_system.model.CourseForScoreInput;
 import com.example.information_management_system.model.ScoreEntry;
 import com.example.information_management_system.util.ExportUtils;
 import com.example.information_management_system.util.JsonUtil;
 import com.example.information_management_system.util.NetworkUtils;
 import com.example.information_management_system.util.ShowMessage;
-import com.example.information_management_system.util.StringUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -19,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.FileChooser;
-import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
 import java.io.File;
