@@ -24,6 +24,7 @@
         <Button fx:id="editCourseButton" text="编辑课程" styleClass="btn-outline"/>
         <Button fx:id="viewStudentsButton" text="学生名单" styleClass="btn-outline"/>
         <Button fx:id="deleteCourseButton" text="删除课程" styleClass="btn-delete"/>
+        <Button fx:id="viewReasonButton" text="查看理由" styleClass="btn-outline"/>
     </HBox>
 
     <TableView fx:id="courseTable" styleClass="data-table" VBox.vgrow="ALWAYS">

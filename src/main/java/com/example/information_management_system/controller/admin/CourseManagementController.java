@@ -208,11 +208,8 @@ public class CourseManagementController {
 
     private void handleApprove() {
         Course selected = courseTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            ShowMessage.showWarningMessage("提示", "请先选择一门课程");
-            return;
-        }
-        reviewCourse(selected, true);
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一门课程"); return; }
+        reviewCourse(selected, true, null);
     }
 
     private void handleAutoSchedule() {
@@ -233,14 +230,17 @@ public class CourseManagementController {
 
     private void handleReject() {
         Course selected = courseTable.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            ShowMessage.showWarningMessage("提示", "请先选择一门课程");
-            return;
-        }
-        reviewCourse(selected, false);
+        if (selected == null) { ShowMessage.showWarningMessage("提示", "请先选择一门课程"); return; }
+        // 弹出输入框填写拒绝理由
+        TextInputDialog d = new TextInputDialog();
+        d.setTitle("拒绝理由"); d.setHeaderText("请输入拒绝 " + selected.getCode() + " 的理由"); d.setContentText("理由:");
+        d.showAndWait().ifPresent(reason -> {
+            if (reason.trim().isEmpty()) { ShowMessage.showWarningMessage("提示", "拒绝理由不能为空"); return; }
+            reviewCourse(selected, false, reason.trim());
+        });
     }
 
-    private void reviewCourse(Course course, boolean approve) {
+    private void reviewCourse(Course course, boolean approve, String reason) {
         String action = approve ? "通过" : "拒绝";
         boolean confirmed = ShowMessage.showConfirmMessage("确认",
                 "确定要" + action + "课程 " + course.getCode() + " 吗？");
@@ -249,11 +249,11 @@ public class CourseManagementController {
         statusLabel.setText("加载中...");
         int courseId = course.getId();
 
-        // 后端期望: status=1(通过) 或 2(拒绝) 作为查询参数, JSON body 为 sectionId 数组
         Map<String, String> params = new HashMap<>();
         params.put("status", approve ? "1" : "2");
+        if (!approve && reason != null) params.put("reason", reason);
 
-        String json = "[]"; // 空的 sectionId 数组
+        String json = "[]";
         String endpoint = "/class/approve/" + courseId;
 
         NetworkUtils.post(endpoint, params, json, new NetworkUtils.Callback<String>() {

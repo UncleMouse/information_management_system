@@ -16,7 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -74,11 +74,11 @@ public class TeacherManagementController {
     }
 
     private void setupTableColumns() {
-        colSduid.setCellValueFactory(new PropertyValueFactory<>("sduid"));
-        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        colCollege.setCellValueFactory(new PropertyValueFactory<>("college"));
-        colContact.setCellValueFactory(new PropertyValueFactory<>("contactInfo"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colSduid.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
+        colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        colCollege.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCollege()));
+        colContact.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getContactInfo()));
+        if (colStatus != null) colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
 
         colId.setCellFactory(col -> new TableCell<TeacherInfo, Integer>() {
             @Override protected void updateItem(Integer item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
@@ -89,7 +89,7 @@ public class TeacherManagementController {
         colContact.setCellFactory(col -> new TableCell<TeacherInfo, String>() {
             @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
         });
-        colStatus.setCellFactory(column -> new TableCell<TeacherInfo, String>() {
+        if (colStatus != null) colStatus.setCellFactory(column -> new TableCell<TeacherInfo, String>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) { setText(null); setStyle(""); return; }
@@ -125,7 +125,9 @@ public class TeacherManagementController {
                             t.setName(JsonUtil.safeGetString(obj, "username"));
                             t.setCollege(JsonUtil.safeGetString(obj, "college"));
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
-                            t.setStatus("在职");
+                            int sc = JsonUtil.safeGetInt(obj, "status");
+                            String st = sc==0?"在职":sc==1?"休假":sc==2?"降转":sc==3?"离职":"在职";
+                            t.setStatus(st);
                             list.add(t);
                         }
                         Platform.runLater(() -> {
@@ -184,7 +186,9 @@ public class TeacherManagementController {
                             t.setName(JsonUtil.safeGetString(obj, "username"));
                             t.setCollege(JsonUtil.safeGetString(obj, "college"));
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
-                            t.setStatus("在职");
+                            int sc = JsonUtil.safeGetInt(obj, "status");
+                            String st = sc==0?"在职":sc==1?"休假":sc==2?"降转":sc==3?"离职":"在职";
+                            t.setStatus(st);
                             list.add(t);
                         }
                         Platform.runLater(() -> {

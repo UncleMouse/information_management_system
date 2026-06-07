@@ -65,6 +65,7 @@
         <VBox styleClass="info-card" spacing="12">
             <padding><Insets top="18" right="24" bottom="18" left="24" /></padding>
             <Label text="修改密码" styleClass="card-title" />
+            <Label text="初始默认密码为 admin123456" style="-fx-text-fill: #94a3b8; -fx-font-size: 11px; -fx-padding: 0 0 4 0;" />
             <GridPane hgap="20" vgap="12" style="-fx-padding: 8 0 0 0;">
                 <columnConstraints>
                     <ColumnConstraints percentWidth="33" />

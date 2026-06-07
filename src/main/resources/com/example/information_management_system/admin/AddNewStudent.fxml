@@ -52,6 +52,10 @@
         <Label text="班级" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
         <ComboBox fx:id="classCombo" styleClass="form-combo" prefWidth="260" promptText="请选择班级"
                   GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+        <Label text="状态" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+        <ComboBox fx:id="statusCombo" styleClass="form-combo" prefWidth="260"
+                  GridPane.rowIndex="6" GridPane.columnIndex="1" />
     </GridPane>
 
     <HBox spacing="12" alignment="CENTER_RIGHT">

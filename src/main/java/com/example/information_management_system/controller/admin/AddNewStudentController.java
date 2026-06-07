@@ -31,6 +31,7 @@ public class AddNewStudentController {
     @FXML private ComboBox<String> majorCombo;
     @FXML private ComboBox<String> gradeCombo;
     @FXML private ComboBox<String> classCombo;
+    @FXML private ComboBox<String> statusCombo;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
@@ -41,6 +42,7 @@ public class AddNewStudentController {
         genderCombo.getItems().addAll("男","女"); genderCombo.getSelectionModel().selectFirst();
         majorCombo.getItems().addAll("软件工程","数字媒体技术","大数据","AI"); majorCombo.getSelectionModel().selectFirst();
         gradeCombo.getItems().addAll("2021","2022","2023","2024","2025","2026"); gradeCombo.getSelectionModel().select("2025");
+        statusCombo.getItems().addAll("在读","休学","降转","退学"); statusCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> closeDialog());
         loadSections();
@@ -110,7 +112,7 @@ public class AddNewStudentController {
         if (genderCombo != null) genderCombo.setValue(student.getGender());
         if (majorCombo != null) majorCombo.setValue(student.getMajor());
         if (gradeCombo != null) gradeCombo.setValue(student.getGrade());
-        // 班级由 loadSections 异步设置：学生列表返回的是 sectionId，需在加载完成后通过反向映射设置
+        if (statusCombo != null && student.getStatus() != null) statusCombo.setValue(student.getStatus());
     }
 
     public void setOnStudentAddedListener(Runnable listener) { this.onStudentAddedListener = listener; }
@@ -145,6 +147,7 @@ public class AddNewStudentController {
         params.put("PoliticsStatus", "群众");
         params.put("email", sduid + "@sdu.edu.cn");
         params.put("phone", "");
+        if (statusCombo.getValue() != null) params.put("status", mapStatus(statusCombo.getValue()));
         if (className != null && !className.isEmpty()) {
             Integer sid = sectionIdMap.get(className);
             if (sid != null && sid > 0) params.put("sectionId", String.valueOf(sid));
@@ -217,5 +220,6 @@ public class AddNewStudentController {
         });
     }
 
+    private String mapStatus(String s) { return switch(s){ case "休学"->"SUSPENDED"; case "降转"->"TRANSFERRED"; case "退学"->"DROPPED_OUT"; default->"STUDYING"; }; }
     private void closeDialog() { ((Stage) btnSubmit.getScene().getWindow()).close(); }
 }

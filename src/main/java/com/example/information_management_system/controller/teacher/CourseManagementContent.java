@@ -19,6 +19,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CourseManagementContent {
@@ -37,6 +39,7 @@ public class CourseManagementContent {
     @FXML private Button editCourseButton;
     @FXML private Button viewStudentsButton;
     @FXML private Button deleteCourseButton;
+    @FXML private Button viewReasonButton;
 
     private ObservableList<Course> courseList = FXCollections.observableArrayList();
 
@@ -45,6 +48,19 @@ public class CourseManagementContent {
         courseTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         setupTableColumns();
         courseTable.setItems(courseList);
+
+        // 双击被拒绝课程查看拒绝理由
+        courseTable.setRowFactory(tv -> {
+            TableRow<Course> row = new TableRow<>();
+            row.setOnMouseClicked(e -> {
+                if (e.getClickCount() == 2 && !row.isEmpty()) {
+                    Course c = row.getItem();
+                    if ("REJECTED".equalsIgnoreCase(c.getStatus()) || "已拒绝".equals(c.getStatus()))
+                        handleViewReason(c);
+                }
+            });
+            return row;
+        });
 
         if (applyNewCourseButton != null) {
             applyNewCourseButton.setOnAction(e -> openApplyNewCourse());
@@ -57,6 +73,9 @@ public class CourseManagementContent {
         }
         if (deleteCourseButton != null) {
             deleteCourseButton.setOnAction(e -> handleDeleteCourse());
+        }
+        if (viewReasonButton != null) {
+            viewReasonButton.setOnAction(e -> handleViewReason());
         }
         if (searchField != null) {
             searchField.textProperty().addListener((obs, old, val) -> filterCourses());
@@ -81,13 +100,14 @@ public class CourseManagementContent {
     }
 
     private void fetchCourses() {
-        NetworkUtils.get("/class/list", new NetworkUtils.Callback<String>() {
+        Map<String, String> p = new HashMap<>();
+        p.put("pageSize", "100");
+        NetworkUtils.get("/class/list", p, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
                     JsonObject res = gson.fromJson(result, JsonObject.class);
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
-                        // data 可能是对象 {list:[], total:0, ...} 或直接是数组
                         JsonArray arr = extractArray(res, "data");
                         ObservableList<Course> list = FXCollections.observableArrayList();
                         for (int i = 0; i < arr.size(); i++) {
@@ -194,6 +214,24 @@ public class CourseManagementContent {
             e.printStackTrace();
             ShowMessage.showErrorMessage("错误", "无法打开编辑课程页面");
         }
+    }
+
+    private void handleViewReason() {
+        handleViewReason(courseTable.getSelectionModel().getSelectedItem());
+    }
+
+    private void handleViewReason(Course course) {
+        if (course == null) { ShowMessage.showWarningMessage("提示", "请先选择一门课程"); return; }
+        NetworkUtils.get("/class/getReason/" + course.getId(), new NetworkUtils.Callback<String>() {
+            @Override public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    String reason = res.has("data") && !res.get("data").isJsonNull() ? res.get("data").getAsString() : "无拒绝理由";
+                    Platform.runLater(() -> ShowMessage.showInfoMessage("拒绝理由", reason));
+                } catch (Exception e) { Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "获取失败")); }
+            }
+            @Override public void onFailure(Exception e) { Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败")); }
+        });
     }
 
     private void handleDeleteCourse() {

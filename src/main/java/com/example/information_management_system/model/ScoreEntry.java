@@ -13,15 +13,10 @@ public class ScoreEntry {
     private final DoubleProperty totalScore = new SimpleDoubleProperty();
     private final StringProperty status = new SimpleStringProperty();
     private final StringProperty remarks = new SimpleStringProperty();
+    private int courseId;
 
-    public ScoreEntry() {
-        regularScore.addListener((obs, old, val) -> updateTotal());
-        finalScore.addListener((obs, old, val) -> updateTotal());
-    }
-
-    private void updateTotal() {
-        setTotalScore(getRegularScore() + getFinalScore());
-    }
+    public int getCourseId() { return courseId; }
+    public void setCourseId(int id) { this.courseId = id; }
 
     public int getStudentId() { return studentId.get(); }
     public IntegerProperty studentIdProperty() { return studentId; }

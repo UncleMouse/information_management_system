@@ -366,6 +366,10 @@ public class CourseSelectionContentController {
             if (obj.has("term")) course.setTerm(obj.get("term").getAsString());
             if (obj.has("time")) course.setTerm(obj.get("time").getAsString());
             if (obj.has("status")) course.setStatus(obj.get("status").getAsString());
+            // 只显示已排课的课程（有时间+教室）
+            String t = JsonUtil.safeGetString(obj, "time");
+            String cr = JsonUtil.safeGetString(obj, "classroom");
+            if (t.isEmpty() && cr.isEmpty()) continue;
             list.add(course);
         }
         return list;

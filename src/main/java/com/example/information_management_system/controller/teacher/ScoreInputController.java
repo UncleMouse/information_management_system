@@ -46,6 +46,7 @@ public class ScoreInputController {
     private ObservableList<ScoreEntry> scoreList = FXCollections.observableArrayList();
     private Map<String, Integer> courseNameToId = new HashMap<>();
     private Map<Integer, String> courseIdToTerm = new HashMap<>();
+    private Map<Integer, double[]> courseIdToRatio = new HashMap<>();
     private String selectedCourseCode;
 
     @FXML
@@ -83,7 +84,8 @@ public class ScoreInputController {
         regularScoreColumn.setOnEditCommit(event -> {
             ScoreEntry entry = event.getRowValue();
             entry.setRegularScore(event.getNewValue());
-            entry.setTotalScore(event.getNewValue() + entry.getFinalScore());
+            double[] ratio = courseIdToRatio.getOrDefault(entry.getCourseId(), new double[]{0.3, 0.7});
+            entry.setTotalScore(event.getNewValue() * ratio[0] + entry.getFinalScore() * ratio[1]);
             scoreTable.refresh();
         });
         finalScoreColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getFinalScore()).asObject());
@@ -91,7 +93,8 @@ public class ScoreInputController {
         finalScoreColumn.setOnEditCommit(event -> {
             ScoreEntry entry = event.getRowValue();
             entry.setFinalScore(event.getNewValue());
-            entry.setTotalScore(entry.getRegularScore() + event.getNewValue());
+            double[] ratio = courseIdToRatio.getOrDefault(entry.getCourseId(), new double[]{0.3, 0.7});
+            entry.setTotalScore(entry.getRegularScore() * ratio[0] + event.getNewValue() * ratio[1]);
             scoreTable.refresh();
         });
         totalScoreColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleDoubleProperty(cell.getValue().getTotalScore()).asObject());
@@ -112,20 +115,23 @@ public class ScoreInputController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonArray arr = JsonUtil.extractArray(res, "data");
                         ObservableList<String> courseNames = FXCollections.observableArrayList();
-                        courseNames.add("全部");
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
-                            String name = obj.has("name") ? obj.get("name").getAsString() :
-                                    obj.has("code") ? obj.get("code").getAsString() : "";
+                            String status = JsonUtil.safeGetString(obj, "status");
+                            if (!"APPROVED".equalsIgnoreCase(status)) continue;
+                            String name = obj.has("name") ? obj.get("name").getAsString() : "";
                             int id = obj.has("id") ? obj.get("id").getAsInt() : 0;
                             courseNames.add(name);
                             courseNameToId.put(name, id);
                             if (obj.has("term")) courseIdToTerm.put(id, obj.get("term").getAsString());
+                            double rr = obj.has("regularRatio") ? obj.get("regularRatio").getAsDouble() : 0.3;
+                            double fr = obj.has("finalRatio") ? obj.get("finalRatio").getAsDouble() : 0.7;
+                            courseIdToRatio.put(id, new double[]{rr, fr});
                         }
                         Platform.runLater(() -> {
                             if (courseComboBox != null) {
                                 courseComboBox.setItems(courseNames);
-                                courseComboBox.setValue("全部");
+                                if (!courseNames.isEmpty()) courseComboBox.setValue(courseNames.get(0));
                             }
                         });
                     }
@@ -146,46 +152,7 @@ public class ScoreInputController {
         String selected = courseComboBox.getValue();
         if (selected == null) return;
         selectedCourseCode = selected;
-        if ("全部".equals(selected)) {
-            fetchAllScores();
-            return;
-        }
         fetchScoresForCourse(selected);
-    }
-
-    private void fetchAllScores() {
-        scoreList.clear();
-        if (courseNameToId.isEmpty()) return;
-        final int[] done = {0};
-        for (Map.Entry<String, Integer> entry : courseNameToId.entrySet()) {
-            Integer cid = entry.getValue();
-            if (cid == 0) { done[0]++; continue; }
-            NetworkUtils.get("/class/" + cid + "/students", new NetworkUtils.Callback<String>() {
-                @Override public void onSuccess(String result) {
-                    try {
-                        JsonObject res = gson.fromJson(result, JsonObject.class);
-                        if (res.has("code") && res.get("code").getAsInt() == 200) {
-                            JsonArray arr = JsonUtil.extractArray(res, "data");
-                            for (int i = 0; i < arr.size(); i++) {
-                                JsonObject obj = arr.get(i).getAsJsonObject();
-                                ScoreEntry e = new ScoreEntry();
-                                if (obj.has("sduid")) e.setSduid(obj.get("sduid").getAsString());
-                                if (obj.has("username")) e.setName(obj.get("username").getAsString());
-                                if (obj.has("number")) e.setClassName(obj.get("number").getAsString());
-                                if (obj.has("id")) e.setStudentId(obj.get("id").getAsInt());
-                                if (obj.has("regular")) e.setRegularScore(obj.get("regular").getAsDouble());
-                                if (obj.has("finalScore")) e.setFinalScore(obj.get("finalScore").getAsDouble());
-                                if (obj.has("grade")) e.setTotalScore(obj.get("grade").getAsDouble());
-                                e.setCourseName(entry.getKey());
-                                Platform.runLater(() -> scoreList.add(e));
-                            }
-                        }
-                    } catch (Exception ignored) {}
-                    done[0]++;
-                }
-                @Override public void onFailure(Exception e) { done[0]++; }
-            });
-        }
     }
 
     private void fetchScoresForCourse(String courseName) {
@@ -200,7 +167,8 @@ public class ScoreInputController {
             params.put("courseId", String.valueOf(courseId));
         }
 
-        NetworkUtils.get("/class/" + courseId + "/students", params, new NetworkUtils.Callback<String>() {
+        final int cid = courseId;
+        NetworkUtils.get("/class/" + cid + "/students", params, new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -211,7 +179,7 @@ public class ScoreInputController {
                         for (int i = 0; i < arr.size(); i++) {
                             JsonObject obj = arr.get(i).getAsJsonObject();
                             ScoreEntry entry = new ScoreEntry();
-                            // API: sduid, username, number/sectionNumber, id, regular, finalScore, grade
+                            entry.setCourseId(cid);
                             if (obj.has("sduid")) entry.setSduid(obj.get("sduid").getAsString());
                             if (obj.has("username")) entry.setName(obj.get("username").getAsString());
                             if (obj.has("number")) entry.setClassName(obj.get("number").getAsString());
@@ -258,20 +226,19 @@ public class ScoreInputController {
     }
 
     private void handleSaveScores() {
-        if (scoreList.isEmpty()) {
-            ShowMessage.showWarningMessage("提示", "没有成绩数据可保存");
-            return;
-        }
+        if (scoreList.isEmpty()) { ShowMessage.showWarningMessage("提示", "没有成绩数据可保存"); return; }
 
-        Integer courseId = courseNameToId.get(selectedCourseCode);
-        final int[] done = {0};
-        final int total = scoreList.size();
+        final int[] done = {0}; final int[] total = {0}; final boolean[] hasErr = {false};
         for (ScoreEntry entry : scoreList) {
+            if (entry.getRegularScore() == 0 && entry.getFinalScore() == 0 && entry.getTotalScore() == 0) continue;
+            total[0]++;
+            Integer cid = courseNameToId.get(entry.getCourseName());
+            if (cid == null) cid = courseNameToId.get(selectedCourseCode);
             Map<String, String> params = new HashMap<>();
             params.put("studentId", String.valueOf(entry.getStudentId()));
-            if (courseId != null) {
-                params.put("courseId", String.valueOf(courseId));
-                String term = courseIdToTerm.get(courseId);
+            if (cid != null) {
+                params.put("courseId", String.valueOf(cid));
+                String term = courseIdToTerm.get(cid);
                 if (term != null) params.put("term", term);
             }
             params.put("regular", String.valueOf((int) entry.getRegularScore()));
@@ -279,17 +246,13 @@ public class ScoreInputController {
             params.put("grade", String.valueOf((int) entry.getTotalScore()));
             params.put("rank", "0");
             NetworkUtils.postWithQueryParams("/grade/setGrade", params, new NetworkUtils.Callback<String>() {
-                @Override public void onSuccess(String result) { done[0]++; checkAllSaved(done, total); }
-                @Override public void onFailure(Exception e) { done[0]++; checkAllSaved(done, total); }
-            });
-        }
-    }
-
-    private void checkAllSaved(int[] done, int total) {
-        if (done[0] >= total) {
-            Platform.runLater(() -> {
-                ShowMessage.showInfoMessage("成功", "已保存 " + total + " 条");
-                fetchScoresForCourse(selectedCourseCode);
+                @Override public void onSuccess(String r) { try { JsonObject j = gson.fromJson(r, JsonObject.class); if (j.has("code") && j.get("code").getAsInt()!=200) hasErr[0]=true; } catch(Exception ignored){} done[0]++; checkDone(); }
+                @Override public void onFailure(Exception e) { hasErr[0] = true; done[0]++; checkDone(); }
+                private void checkDone() { if (done[0] >= total[0]) Platform.runLater(() -> {
+                    if (total[0] == 0) ShowMessage.showWarningMessage("提示", "没有需要保存的成绩");
+                    else ShowMessage.showInfoMessage("成功", hasErr[0] ? "部分保存失败" : "已保存 "+total[0]+" 条");
+                    fetchScoresForCourse(selectedCourseCode);
+                });}
             });
         }
     }
@@ -298,27 +261,8 @@ public class ScoreInputController {
         if (selectedCourseCode == null || selectedCourseCode.isEmpty()) {
             ShowMessage.showWarningMessage("提示", "请先选择课程"); return;
         }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认",
-            "全部".equals(selectedCourseCode) ? "确定要发布所有课程的成绩吗？" : "确定要发布该课程的成绩吗？");
+        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要发布该课程的成绩吗？");
         if (!confirmed) return;
-
-        // "全部"模式下逐门发布
-        if ("全部".equals(selectedCourseCode)) {
-            if (courseNameToId.isEmpty()) { ShowMessage.showWarningMessage("提示", "没有可发布的课程"); return; }
-            final int[] done = {0};
-            final int total = courseNameToId.size();
-            for (Map.Entry<String, Integer> e : courseNameToId.entrySet()) {
-                Integer cid = e.getValue();
-                if (cid == null || cid == 0) { done[0]++; continue; }
-                Map<String, String> p = new HashMap<>();
-                p.put("courseId", String.valueOf(cid));
-                NetworkUtils.post("/grade/releaseGrade", p, "", new NetworkUtils.Callback<String>() {
-                    @Override public void onSuccess(String r) { done[0]++; if (done[0] >= total) Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已全部发布")); }
-                    @Override public void onFailure(Exception ex) { done[0]++; if (done[0] >= total) Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已全部发布")); }
-                });
-            }
-            return;
-        }
 
         Integer courseId = courseNameToId.get(selectedCourseCode);
         Map<String, String> params = new HashMap<>();

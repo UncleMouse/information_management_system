@@ -23,6 +23,7 @@ public class AddNewTeacherController {
     @FXML private TextField nameField;
     @FXML private ComboBox<String> genderCombo;
     @FXML private ComboBox<String> collegeCombo;
+    @FXML private ComboBox<String> statusCombo;
     @FXML private TextField contactField;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
@@ -34,6 +35,7 @@ public class AddNewTeacherController {
         genderCombo.getItems().addAll("男","女"); genderCombo.getSelectionModel().selectFirst();
         collegeCombo.getItems().addAll("软件学院","计算机科学与技术学院","数学学院","物理学院","外国语学院","集成电路学院","文学院","历史学院","法学院","医学院","生命科学学院");
         collegeCombo.getSelectionModel().selectFirst();
+        statusCombo.getItems().addAll("在职","离职","休假"); statusCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit()); btnCancel.setOnAction(e -> closeDialog());
         addErr(sduidField); addErr(nameField);
     }
@@ -88,6 +90,8 @@ public class AddNewTeacherController {
         params.put("ethnic", "汉族");
         params.put("nation", "中国");
         params.put("PoliticsStatus", "群众");
+        if (statusCombo.getValue() != null)
+            params.put("status", statusCombo.getValue().equals("在职")?"STUDYING":statusCombo.getValue().equals("休假")?"SUSPENDED":"DROPPED_OUT");
 
         if (editingTeacher != null) params.put("id", String.valueOf(editingTeacher.getId()));
 
