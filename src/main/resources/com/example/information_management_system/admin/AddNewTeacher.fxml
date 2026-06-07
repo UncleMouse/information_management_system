@@ -48,9 +48,6 @@
         <TextField fx:id="contactField" promptText="手机号或邮箱" styleClass="form-field"
                    GridPane.rowIndex="4" GridPane.columnIndex="1" />
 
-        <Label text="状态" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-        <ComboBox fx:id="statusCombo" styleClass="form-combo" prefWidth="260"
-                  GridPane.rowIndex="5" GridPane.columnIndex="1" />
     </GridPane>
 
     <HBox spacing="12" alignment="CENTER_RIGHT">

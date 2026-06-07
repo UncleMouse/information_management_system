@@ -81,6 +81,9 @@ public class AdminBaseViewController {
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
             VBox.setVgrow(view, Priority.ALWAYS);
+            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
+            pt.setOnFinished(ev -> { contentArea.requestLayout(); contentArea.getParent().requestLayout(); });
+            pt.play();
         } catch (IOException e) {
             e.printStackTrace();
             Label errorLabel = new Label("页面加载失败: " + fxmlName);

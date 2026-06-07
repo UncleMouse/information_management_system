@@ -64,16 +64,32 @@ public class UserInfoController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         JsonObject data = res.getAsJsonObject("data");
                         UserSession session = UserSession.getInstance();
-                        session.setSduid(jsonStr(data, "sduid"));
-                        session.setUsername(jsonStr(data, "username"));
-                        session.setSex(jsonStr(data, "sex"));
-                        session.setCollege(jsonStr(data, "college"));
-                        session.setMajor(jsonStr(data, "major"));
-                        session.setNation(jsonStr(data, "nation"));
-                        session.setEthnic(jsonStr(data, "ethnic"));
-                        session.setPoliticsStatus(jsonStr(data, "politicsStatus"));
-                        session.setPhone(jsonStr(data, "phone"));
-                        session.setEmail(jsonStr(data, "email"));
+                        // user 字段
+                        if (data.has("user") && !data.get("user").isJsonNull()) {
+                            JsonObject u = data.getAsJsonObject("user");
+                            session.setSduid(jsonStr(u, "sduid"));
+                            session.setUsername(jsonStr(u, "username"));
+                            session.setSex(jsonStr(u, "sex"));
+                            session.setCollege(jsonStr(u, "college"));
+                            session.setMajor(jsonStr(u, "major"));
+                            session.setNation(jsonStr(u, "nation"));
+                            session.setEthnic(jsonStr(u, "ethnic"));
+                            session.setPoliticsStatus(jsonStr(u, "politicsStatus"));
+                            session.setPhone(jsonStr(u, "phone"));
+                            session.setEmail(jsonStr(u, "email"));
+                        }
+                        // status 字段
+                        if (data.has("status") && !data.get("status").isJsonNull()) {
+                            JsonObject st = data.getAsJsonObject("status");
+                            if (st.has("admission") && !st.get("admission").isJsonNull())
+                                session.setAdmission(String.valueOf(st.get("admission").getAsInt()));
+                            if (st.has("graduation") && !st.get("graduation").isJsonNull())
+                                session.setGraduation(String.valueOf(st.get("graduation").getAsInt()));
+                        }
+                        // section 字段 — 构造班级名称
+                        if (data.has("section") && !data.get("section").isJsonNull()) {
+                            session.setSection(buildClassName(data.getAsJsonObject("section")));
+                        }
                     }
                 } catch (Exception ignored) {}
                 Platform.runLater(() -> displayUserInfo());
@@ -83,6 +99,17 @@ public class UserInfoController {
                 Platform.runLater(() -> displayUserInfo());
             }
         });
+    }
+
+    private String buildClassName(JsonObject sec) {
+        String major = jsonStr(sec, "major");
+        String grade = jsonStr(sec, "grade");
+        String number = jsonStr(sec, "number");
+        if (grade != null && number != null) {
+            String prefix = major != null && !major.isEmpty() ? major : "";
+            return prefix + grade + "级" + number + "班";
+        }
+        return "";
     }
 
     private String jsonStr(JsonObject obj, String key) {
@@ -108,8 +135,12 @@ public class UserInfoController {
         classNameLabel.setText(nullToEmpty(session.getSection()));
         nationLabel.setText(nullToEmpty(session.getEthnic()));
         politicsLabel.setText(nullToEmpty(session.getPoliticsStatus()));
-        admissionLabel.setText(nullToEmpty(session.getAdmission()));
-        graduationLabel.setText(nullToEmpty(session.getGraduation()));
+        String sid = nullToEmpty(session.getSduid());
+        admissionLabel.setText(sid.length() >= 4 ? sid.substring(0, 4) : "-");
+        if (sid.length() >= 4) {
+            try { graduationLabel.setText(String.valueOf(Integer.parseInt(sid.substring(0,4)) + 4)); }
+            catch (NumberFormatException e) { graduationLabel.setText("-"); }
+        } else graduationLabel.setText("-");
     }
 
     private void openEditDialog() {

@@ -77,6 +77,9 @@ public class StudentBaseViewController {
             contentArea.getChildren().clear();
             contentArea.getChildren().add(content);
             VBox.setVgrow(content, Priority.ALWAYS);
+            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
+            pt.setOnFinished(ev -> { contentArea.requestLayout(); contentArea.getParent().requestLayout(); });
+            pt.play();
         } catch (IOException e) {
             ShowMessage.showErrorMessage("错误", "页面加载失败，请重启应用");
             e.printStackTrace();

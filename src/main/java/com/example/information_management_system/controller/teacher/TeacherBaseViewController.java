@@ -76,6 +76,13 @@ public class TeacherBaseViewController {
             contentArea.getChildren().clear();
             contentArea.getChildren().add(view);
             VBox.setVgrow(view, Priority.ALWAYS);
+            // 延迟触发布局刷新，解决表格坍缩问题
+            javafx.animation.PauseTransition pt = new javafx.animation.PauseTransition(javafx.util.Duration.millis(50));
+            pt.setOnFinished(ev -> {
+                contentArea.requestLayout();
+                contentArea.getParent().requestLayout();
+            });
+            pt.play();
         } catch (IOException e) { e.printStackTrace(); }
     }
 
