@@ -33,3 +33,12 @@
     -fx-padding: 10 22; -fx-background-radius: 10; -fx-border-color: #c7d2fe; -fx-border-radius: 10; -fx-cursor: hand;
 }
 .btn-outline:hover { -fx-background-color: #eef2ff; }
+
+.home-notice-card { -fx-background-color: #ffffff; -fx-border-color: #e8ecf0; }
+.home-notice-title { -fx-text-fill: #1e293b; }
+.home-notice-content { -fx-text-fill: #64748b; }
+.home-course-card { -fx-background-color: #eef2ff; -fx-border-color: #c7d2fe; }
+.home-course-title { -fx-text-fill: #1e293b; }
+.home-course-sub { -fx-text-fill: #64748b; }
+.home-empty-text { -fx-text-fill: #94a3b8; }
+.home-error-text { -fx-text-fill: #ef4444; }

@@ -81,3 +81,45 @@
     -fx-border-color: #e2e8f0;
     -fx-border-radius: 8;
 }
+
+/* 首页动态组件 - 亮色 */
+.home-notice-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+}
+.home-notice-title {
+    -fx-text-fill: #1e293b;
+}
+.home-notice-content {
+    -fx-text-fill: #64748b;
+}
+.home-course-card {
+    -fx-background-color: #eef2ff;
+    -fx-border-color: #c7d2fe;
+}
+.home-course-title {
+    -fx-text-fill: #1e293b;
+}
+.home-course-sub, .home-course-term {
+    -fx-text-fill: #64748b;
+}
+.home-empty-text {
+    -fx-text-fill: #94a3b8;
+}
+.home-error-text {
+    -fx-text-fill: #ef4444;
+}
+.dialog-title-dark {
+    -fx-text-fill: #1e293b;
+}
+.dialog-info-dark {
+    -fx-text-fill: #64748b;
+}
+.dialog-content-dark {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    -fx-text-fill: #334155;
+}
+.dialog-content-dark .content {
+    -fx-background-color: #f8fafc;
+}
