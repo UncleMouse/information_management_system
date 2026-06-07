@@ -56,7 +56,7 @@ public class UserInfoController {
     }
 
     private void fetchAndDisplay() {
-        NetworkUtils.post("/user/getInfo", "", new NetworkUtils.Callback<String>() {
+        NetworkUtils.post("/status/getStatusCard", "", new NetworkUtils.Callback<String>() {
             @Override
             public void onSuccess(String result) {
                 try {
@@ -79,16 +79,26 @@ public class UserInfoController {
                             session.setEmail(jsonStr(u, "email"));
                         }
                         // status 字段
+                        String secNum = null;
+                        String grade = null;
                         if (data.has("status") && !data.get("status").isJsonNull()) {
                             JsonObject st = data.getAsJsonObject("status");
                             if (st.has("admission") && !st.get("admission").isJsonNull())
                                 session.setAdmission(String.valueOf(st.get("admission").getAsInt()));
                             if (st.has("graduation") && !st.get("graduation").isJsonNull())
                                 session.setGraduation(String.valueOf(st.get("graduation").getAsInt()));
+                            secNum = jsonStr(st, "section");
+                            if (st.has("grade") && !st.get("grade").isJsonNull())
+                                grade = String.valueOf(st.get("grade").getAsInt());
                         }
-                        // section 字段 — 构造班级名称
-                        if (data.has("section") && !data.get("section").isJsonNull()) {
-                            session.setSection(buildClassName(data.getAsJsonObject("section")));
+                        // 从 status.section + user.major 拼装班级名称
+                        String major = null;
+                        if (data.has("user") && !data.get("user").isJsonNull()) {
+                            major = jsonStr(data.getAsJsonObject("user"), "major");
+                        }
+                        if (secNum != null && !secNum.isEmpty() && grade != null) {
+                            String prefix = major != null && !major.isEmpty() ? major : "";
+                            session.setSection(prefix + grade + "级" + secNum + "班");
                         }
                     }
                 } catch (Exception ignored) {}
@@ -99,17 +109,6 @@ public class UserInfoController {
                 Platform.runLater(() -> displayUserInfo());
             }
         });
-    }
-
-    private String buildClassName(JsonObject sec) {
-        String major = jsonStr(sec, "major");
-        String grade = jsonStr(sec, "grade");
-        String number = jsonStr(sec, "number");
-        if (grade != null && number != null) {
-            String prefix = major != null && !major.isEmpty() ? major : "";
-            return prefix + grade + "级" + number + "班";
-        }
-        return "";
     }
 
     private String jsonStr(JsonObject obj, String key) {
