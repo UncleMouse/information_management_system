@@ -8,9 +8,16 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,6 +36,9 @@ public class MainApplication extends Application {
         stage.setHeight(APP_HEIGHT);
         stage.setMinWidth(900);
         stage.setMinHeight(600);
+
+        // 设置应用图标（内置生成 / 外部 logo.png）
+        stage.getIcons().add(loadAppIcon());
 
         // 自动登录检查
         if (tryAutoLogin()) {
@@ -85,6 +95,32 @@ public class MainApplication extends Application {
         stage.setScene(scene);
         stage.setWidth(currentWidth);
         stage.setHeight(currentHeight);
+    }
+
+    /** 加载应用图标：优先使用 images/logo.png，否则生成内置图标 */
+    private static Image loadAppIcon() {
+        // 1. 尝试加载用户自定义 logo
+        try {
+            InputStream is = MainApplication.class.getResourceAsStream("/com/example/information_management_system/images/logo.png");
+            if (is != null) {
+                Image img = new Image(is);
+                is.close();
+                return img;
+            }
+        } catch (Exception ignored) {}
+        // 2. 内置生成：深蓝底色 + 白色"校"字图标
+        Canvas c = new Canvas(64, 64);
+        GraphicsContext g = c.getGraphicsContext2D();
+        g.setFill(Color.web("#1e3a5f"));
+        g.fillRoundRect(0, 0, 64, 64, 14, 14);
+        g.setFill(Color.web("#4f6ef7"));
+        g.fillRoundRect(4, 4, 56, 56, 12, 12);
+        g.setFill(Color.WHITE);
+        g.setFont(javafx.scene.text.Font.font("System", javafx.scene.text.FontWeight.BOLD, 30));
+        g.fillText("校", 14, 44);
+        WritableImage wi = new WritableImage(64, 64);
+        c.snapshot(new SnapshotParameters(), wi);
+        return wi;
     }
 
     public static void showMainView() throws IOException {
