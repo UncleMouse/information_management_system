@@ -50,7 +50,8 @@
                 </VBox>
                 <VBox spacing="0" GridPane.columnIndex="1" GridPane.rowIndex="0">
                     <HBox styleClass="info-row"><Label text="班级" styleClass="info-label"/><Label fx:id="classNameLabel" text="-" styleClass="info-value"/></HBox>
-                    <HBox styleClass="info-row"><Label text="民族" styleClass="info-label"/><Label fx:id="nationLabel" text="-" styleClass="info-value"/></HBox>
+                    <HBox styleClass="info-row"><Label text="国籍" styleClass="info-label"/><Label fx:id="nationInfoLabel" text="-" styleClass="info-value"/></HBox>
+                    <HBox styleClass="info-row"><Label text="民族" styleClass="info-label"/><Label fx:id="ethnicLabel" text="-" styleClass="info-value"/></HBox>
                     <HBox styleClass="info-row"><Label text="政治面貌" styleClass="info-label"/><Label fx:id="politicsLabel" text="-" styleClass="info-value"/></HBox>
                     <HBox styleClass="info-row"><Label text="邮箱" styleClass="info-label"/><Label fx:id="emailLabel" text="-" styleClass="info-value"/></HBox>
                     <HBox styleClass="info-row"><Label text="入学年份" styleClass="info-label"/><Label fx:id="admissionLabel" text="-" styleClass="info-value"/></HBox>

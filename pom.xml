@@ -73,9 +73,9 @@
       <version>2.10.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.poi</groupId>
-      <artifactId>poi-ooxml</artifactId>
-      <version>5.4.0</version>
+      <groupId>cn.idev.excel</groupId>
+      <artifactId>fastexcel</artifactId>
+      <version>1.1.0</version>
     </dependency><dependency>
       <groupId>eu.hansolo</groupId>
       <artifactId>tilesfx</artifactId>
@@ -121,9 +121,9 @@
             <id>default-cli</id>
             <configuration>
               <mainClass>com.example.information_management_system/com.example.information_management_system.MainApplication</mainClass>
-              <launcher>app</launcher>
-              <jlinkZipName>app</jlinkZipName>
-              <jlinkImageName>app</jlinkImageName>
+              <launcher>launcher</launcher>
+              <jlinkZipName>javafx</jlinkZipName>
+              <jlinkImageName>javafx</jlinkImageName>
               <noManPages>true</noManPages>
               <stripDebug>true</stripDebug>
               <noHeaderFiles>true</noHeaderFiles>

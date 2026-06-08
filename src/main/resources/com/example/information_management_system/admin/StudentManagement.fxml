@@ -31,7 +31,6 @@
         <Button fx:id="btnSearch" text="搜索" styleClass="btn-primary" />
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="btnAddStudent" text="+ 添加学生" styleClass="btn-primary" />
-        <Button fx:id="btnBatchImport" text="批量导入" styleClass="btn-secondary" />
         <Button fx:id="btnExportExcel" text="导出Excel" styleClass="btn-secondary" />
     </HBox>
 

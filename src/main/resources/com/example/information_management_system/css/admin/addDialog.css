@@ -1,7 +1,19 @@
 .dialog-root {
     -fx-background-color: #ffffff;
-    -fx-min-width: 400;
-    -fx-max-width: 400;
+    -fx-min-width: 420;
+    -fx-max-width: 420;
+    -fx-min-height: 500;
+    -fx-max-height: 650;
+}
+
+.form-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.form-scroll > .viewport {
+    -fx-background-color: transparent;
 }
 
 .dialog-title {

@@ -12,6 +12,9 @@ public class Student {
     private final StringProperty grade = new SimpleStringProperty();
     private final StringProperty className = new SimpleStringProperty();
     private final StringProperty status = new SimpleStringProperty();
+    private final StringProperty nation = new SimpleStringProperty();
+    private final StringProperty ethnic = new SimpleStringProperty();
+    private final StringProperty politicsStatus = new SimpleStringProperty();
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
     public int getId() { return id.get(); }
@@ -49,6 +52,18 @@ public class Student {
     public String getStatus() { return status.get(); }
     public StringProperty statusProperty() { return status; }
     public void setStatus(String status) { this.status.set(status); }
+
+    public String getNation() { return nation.get(); }
+    public StringProperty nationProperty() { return nation; }
+    public void setNation(String nation) { this.nation.set(nation); }
+
+    public String getEthnic() { return ethnic.get(); }
+    public StringProperty ethnicProperty() { return ethnic; }
+    public void setEthnic(String ethnic) { this.ethnic.set(ethnic); }
+
+    public String getPoliticsStatus() { return politicsStatus.get(); }
+    public StringProperty politicsStatusProperty() { return politicsStatus; }
+    public void setPoliticsStatus(String politicsStatus) { this.politicsStatus.set(politicsStatus); }
 
     public boolean isSelected() { return selected.get(); }
     public BooleanProperty selectedProperty() { return selected; }

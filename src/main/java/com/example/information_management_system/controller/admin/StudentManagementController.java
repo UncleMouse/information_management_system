@@ -43,7 +43,7 @@ public class StudentManagementController {
     @FXML private TextField searchField;
     @FXML private Button btnSearch;
     @FXML private Button btnAddStudent;
-    @FXML private Button btnBatchImport;
+
     @FXML private Button btnExportExcel;
     @FXML private Button btnEditStudent;
     @FXML private Button btnDeleteStudent;
@@ -58,7 +58,7 @@ public class StudentManagementController {
 
         btnSearch.setOnAction(e -> searchStudents());
         btnAddStudent.setOnAction(e -> openAddStudentDialog());
-        btnBatchImport.setOnAction(e -> handleBatchImport());
+
         btnExportExcel.setOnAction(e -> handleExportExcel());
         btnEditStudent.setOnAction(e -> handleEditStudent());
         btnDeleteStudent.setOnAction(e -> handleDeleteStudent());
@@ -280,35 +280,6 @@ public class StudentManagementController {
         }
     }
 
-    private void handleBatchImport() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("选择Excel文件");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Excel文件", "*.xlsx", "*.xls"));
-        File file = fileChooser.showOpenDialog(studentTable.getScene().getWindow());
-        if (file != null) {
-            statusLabel.setText("加载中…");
-            NetworkUtils.postMultipartFileAsync("/admin/upload", file)
-                    .thenAccept(result -> Platform.runLater(() -> {
-                        try {
-                            JsonObject res = gson.fromJson(result, JsonObject.class);
-                            if (res.has("code") && res.get("code").getAsInt() == 200) {
-                                ShowMessage.showInfoMessage("成功", "已成功导入");
-                                loadStudents();
-                            } else {
-                                ShowMessage.showErrorMessage("错误", res.has("msg") ? res.get("msg").getAsString() : "操作失败，请稍后重试");
-                            }
-                        } catch (Exception e) {
-                            ShowMessage.showErrorMessage("错误", "解析响应失败");
-                        }
-                    }))
-                    .exceptionally(ex -> {
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
-                        return null;
-                    });
-        }
-    }
-
     private void handleExportExcel() {
         if (studentList.isEmpty()) { ShowMessage.showWarningMessage("提示", "暂无数据"); return; }
         FileChooser fileChooser = new FileChooser();
@@ -317,10 +288,10 @@ public class StudentManagementController {
         fileChooser.setInitialFileName("学生信息.xlsx");
         File file = fileChooser.showSaveDialog(studentTable.getScene().getWindow());
         if (file != null) {
-            List<String> headers = Arrays.asList("学号","姓名","性别","院系","专业","年级","班级","状态");
+            List<String> headers = Arrays.asList("学号","姓名","性别","专业","年级","班级","状态");
             List<List<String>> data = new ArrayList<>();
             for (Student s : studentList) {
-                data.add(Arrays.asList(s.getSduid(),s.getName(),s.getGender(),s.getDepartment(),s.getMajor(),s.getGrade(),s.getClassName(),s.getStatus()));
+                data.add(Arrays.asList(s.getSduid(),s.getName(),s.getGender(),s.getMajor(),s.getGrade(),s.getClassName(),s.getStatus()));
             }
             com.example.information_management_system.util.ExportUtils.exportToExcel(file.getAbsolutePath(), headers, data, "学生信息");
             ShowMessage.showInfoMessage("成功", "已导出至: " + file.getName());

@@ -37,7 +37,8 @@ public class UserInfoController {
     @FXML private Label collegeLabel;
     @FXML private Label majorLabel;
     @FXML private Label classNameLabel;
-    @FXML private Label nationLabel;
+    @FXML private Label nationInfoLabel;
+    @FXML private Label ethnicLabel;
     @FXML private Label politicsLabel;
     @FXML private Label admissionLabel;
     @FXML private Label graduationLabel;
@@ -132,7 +133,8 @@ public class UserInfoController {
         collegeLabel.setText(nullToEmpty(session.getCollege()));
         majorLabel.setText(nullToEmpty(session.getMajor()));
         classNameLabel.setText(nullToEmpty(session.getSection()));
-        nationLabel.setText(nullToEmpty(session.getEthnic()));
+        nationInfoLabel.setText(nullToEmpty(session.getNation()));
+        ethnicLabel.setText(nullToEmpty(session.getEthnic()));
         politicsLabel.setText(nullToEmpty(session.getPoliticsStatus()));
         String sid = nullToEmpty(session.getSduid());
         admissionLabel.setText(sid.length() >= 4 ? sid.substring(0, 4) : "-");

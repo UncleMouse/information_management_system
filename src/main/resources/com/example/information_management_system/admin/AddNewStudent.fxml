@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -23,10 +24,11 @@
         <font><Font name="System Bold" size="18" /></font>
     </Label>
 
+    <ScrollPane fitToWidth="true" styleClass="form-scroll" VBox.vgrow="ALWAYS">
     <GridPane hgap="16" vgap="14">
         <columnConstraints>
             <ColumnConstraints prefWidth="80" />
-            <ColumnConstraints prefWidth="260" />
+            <ColumnConstraints prefWidth="248" />
         </columnConstraints>
 
         <Label text="学号 *" styleClass="form-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
@@ -38,25 +40,42 @@
                    GridPane.rowIndex="1" GridPane.columnIndex="1" />
 
         <Label text="性别" styleClass="form-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-        <ComboBox fx:id="genderCombo" styleClass="form-combo" prefWidth="260"
+        <ComboBox fx:id="genderCombo" styleClass="form-combo" prefWidth="248"
                   GridPane.rowIndex="2" GridPane.columnIndex="1" />
 
         <Label text="专业" styleClass="form-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-        <ComboBox fx:id="majorCombo" styleClass="form-combo" prefWidth="260"
+        <ComboBox fx:id="majorCombo" styleClass="form-combo" prefWidth="248"
                   GridPane.rowIndex="3" GridPane.columnIndex="1" />
 
         <Label text="年级" styleClass="form-label" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-        <ComboBox fx:id="gradeCombo" styleClass="form-combo" prefWidth="260" promptText="选择年级"
+        <ComboBox fx:id="gradeCombo" styleClass="form-combo" prefWidth="248" promptText="选择年级"
                   GridPane.rowIndex="4" GridPane.columnIndex="1" />
 
         <Label text="班级" styleClass="form-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-        <ComboBox fx:id="classCombo" styleClass="form-combo" prefWidth="260" promptText="请选择班级"
+        <ComboBox fx:id="classCombo" styleClass="form-combo" prefWidth="248" promptText="请选择班级"
                   GridPane.rowIndex="5" GridPane.columnIndex="1" />
 
         <Label text="状态" styleClass="form-label" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-        <ComboBox fx:id="statusCombo" styleClass="form-combo" prefWidth="260"
+        <ComboBox fx:id="statusCombo" styleClass="form-combo" prefWidth="248"
                   GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+        <Label text="学院" styleClass="form-label" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+        <ComboBox fx:id="collegeCombo" styleClass="form-combo" prefWidth="248" promptText="请选择学院"
+                  GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+        <Label text="国籍" styleClass="form-label" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+        <ComboBox fx:id="nationCombo" styleClass="form-combo" prefWidth="248"
+                  GridPane.rowIndex="8" GridPane.columnIndex="1" />
+
+        <Label text="民族" styleClass="form-label" GridPane.rowIndex="9" GridPane.columnIndex="0" />
+        <ComboBox fx:id="ethnicCombo" styleClass="form-combo" prefWidth="248"
+                  GridPane.rowIndex="9" GridPane.columnIndex="1" />
+
+        <Label text="政治面貌" styleClass="form-label" GridPane.rowIndex="10" GridPane.columnIndex="0" />
+        <ComboBox fx:id="politicsCombo" styleClass="form-combo" prefWidth="248"
+                  GridPane.rowIndex="10" GridPane.columnIndex="1" />
     </GridPane>
+    </ScrollPane>
 
     <HBox spacing="12" alignment="CENTER_RIGHT">
         <Button fx:id="btnCancel" text="取消" styleClass="btn-cancel" />

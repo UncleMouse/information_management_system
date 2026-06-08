@@ -32,6 +32,10 @@ public class AddNewStudentController {
     @FXML private ComboBox<String> gradeCombo;
     @FXML private ComboBox<String> classCombo;
     @FXML private ComboBox<String> statusCombo;
+    @FXML private ComboBox<String> collegeCombo;
+    @FXML private ComboBox<String> nationCombo;
+    @FXML private ComboBox<String> ethnicCombo;
+    @FXML private ComboBox<String> politicsCombo;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
@@ -43,6 +47,14 @@ public class AddNewStudentController {
         majorCombo.getItems().addAll("软件工程","数字媒体技术","大数据","AI"); majorCombo.getSelectionModel().selectFirst();
         gradeCombo.getItems().addAll("2021","2022","2023","2024","2025","2026"); gradeCombo.getSelectionModel().select("2025");
         statusCombo.getItems().addAll("在读","休学","降转","退学"); statusCombo.getSelectionModel().selectFirst();
+        collegeCombo.getItems().addAll("软件学院","计算机科学与技术学院","网络空间安全学院","人工智能学院","数学学院","物理学院");
+        collegeCombo.getSelectionModel().selectFirst();
+        nationCombo.getItems().addAll("中国","美国","英国","日本","韩国","法国","德国","俄罗斯","加拿大","澳大利亚");
+        nationCombo.getSelectionModel().select("中国");
+        ethnicCombo.getItems().addAll("汉族","蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族");
+        ethnicCombo.getSelectionModel().select("汉族");
+        politicsCombo.getItems().addAll("群众","共青团员","中共预备党员","中共党员","民主党派");
+        politicsCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit());
         btnCancel.setOnAction(e -> closeDialog());
         loadSections();
@@ -113,6 +125,33 @@ public class AddNewStudentController {
         if (majorCombo != null) majorCombo.setValue(student.getMajor());
         if (gradeCombo != null) gradeCombo.setValue(student.getGrade());
         if (statusCombo != null && student.getStatus() != null) statusCombo.setValue(student.getStatus());
+
+        // 从后端获取完整用户信息以填充学院/国籍/民族/政治面貌
+        Map<String, String> q = new HashMap<>();
+        q.put("userId", String.valueOf(student.getId()));
+        NetworkUtils.get("/admin/getUserInfo", q, new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonObject data = res.getAsJsonObject("data");
+                        JsonObject user = data.getAsJsonObject("user");
+                        Platform.runLater(() -> {
+                            if (user.has("college") && !user.get("college").isJsonNull())
+                                collegeCombo.setValue(user.get("college").getAsString());
+                            if (user.has("nation") && !user.get("nation").isJsonNull())
+                                nationCombo.setValue(user.get("nation").getAsString());
+                            if (user.has("ethnic") && !user.get("ethnic").isJsonNull())
+                                ethnicCombo.setValue(user.get("ethnic").getAsString());
+                            if (user.has("politicsStatus") && !user.get("politicsStatus").isJsonNull())
+                                politicsCombo.setValue(user.get("politicsStatus").getAsString());
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+            @Override public void onFailure(Exception ignored) {}
+        });
     }
 
     public void setOnStudentAddedListener(Runnable listener) { this.onStudentAddedListener = listener; }
@@ -141,10 +180,10 @@ public class AddNewStudentController {
         if (editingStudent == null) params.put("password", "123456");
         if (grade != null && !grade.isEmpty()) params.put("grade", grade);
         params.put("permission", "2");
-        params.put("college", "软件学院");
-        params.put("ethnic", "汉族");
-        params.put("nation", "中国");
-        params.put("PoliticsStatus", "群众");
+        params.put("college", collegeCombo.getValue() != null ? collegeCombo.getValue() : "软件学院");
+        params.put("ethnic", ethnicCombo.getValue() != null ? ethnicCombo.getValue() : "汉族");
+        params.put("nation", nationCombo.getValue() != null ? nationCombo.getValue() : "中国");
+        params.put("PoliticsStatus", politicsCombo.getValue() != null ? politicsCombo.getValue() : "群众");
         params.put("email", sduid + "@mail.sdu.edu.cn");
         params.put("phone", "");
         if (statusCombo.getValue() != null) params.put("status", mapStatus(statusCombo.getValue()));
