@@ -23,7 +23,11 @@ public class AddNewTeacherController {
     @FXML private TextField nameField;
     @FXML private ComboBox<String> genderCombo;
     @FXML private ComboBox<String> collegeCombo;
-    @FXML private TextField contactField;
+    @FXML private TextField phoneField;
+    @FXML private TextField emailField;
+    @FXML private ComboBox<String> nationCombo;
+    @FXML private ComboBox<String> ethnicCombo;
+    @FXML private ComboBox<String> politicsCombo;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
@@ -34,6 +38,12 @@ public class AddNewTeacherController {
         genderCombo.getItems().addAll("男","女"); genderCombo.getSelectionModel().selectFirst();
         collegeCombo.getItems().addAll("软件学院","计算机科学与技术学院","数学学院","物理学院","外国语学院","集成电路学院","文学院","历史学院","法学院","医学院","生命科学学院");
         collegeCombo.getSelectionModel().selectFirst();
+        nationCombo.getItems().addAll("中国","美国","英国","日本","韩国","法国","德国","俄罗斯","加拿大","澳大利亚");
+        nationCombo.getSelectionModel().select("中国");
+        ethnicCombo.getItems().addAll("汉族","蒙古族","回族","藏族","维吾尔族","苗族","彝族","壮族","布依族","朝鲜族","满族","侗族","瑶族","白族","土家族","哈尼族");
+        ethnicCombo.getSelectionModel().select("汉族");
+        politicsCombo.getItems().addAll("群众","共青团员","中共预备党员","中共党员","民主党派");
+        politicsCombo.getSelectionModel().selectFirst();
         btnSubmit.setOnAction(e -> handleSubmit()); btnCancel.setOnAction(e -> closeDialog());
         addErr(sduidField); addErr(nameField);
     }
@@ -56,16 +66,45 @@ public class AddNewTeacherController {
         if (dialogTitle != null) dialogTitle.setText("编辑教师");
         if (sduidField != null) sduidField.setText(teacher.getSduid());
         if (nameField != null) nameField.setText(teacher.getName());
-        if (genderCombo != null && teacher.getSduid() != null) genderCombo.setValue("男"); // TeacherInfo 无性别字段
+        if (genderCombo != null) genderCombo.setValue(teacher.getSex() != null ? teacher.getSex() : "男");
         if (collegeCombo != null) collegeCombo.setValue(teacher.getCollege());
-        if (contactField != null) contactField.setText(teacher.getContactInfo());
+
+        // 从后端获取完整用户信息
+        Map<String, String> q = new HashMap<>();
+        q.put("userId", String.valueOf(teacher.getId()));
+        NetworkUtils.get("/admin/getUserInfo", q, new NetworkUtils.Callback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                try {
+                    JsonObject res = gson.fromJson(result, JsonObject.class);
+                    if (res.has("code") && res.get("code").getAsInt() == 200) {
+                        JsonObject data = res.getAsJsonObject("data");
+                        JsonObject user = data.getAsJsonObject("user");
+                        Platform.runLater(() -> {
+                            if (user.has("nation") && !user.get("nation").isJsonNull())
+                                nationCombo.setValue(user.get("nation").getAsString());
+                            if (user.has("ethnic") && !user.get("ethnic").isJsonNull())
+                                ethnicCombo.setValue(user.get("ethnic").getAsString());
+                            if (user.has("politicsStatus") && !user.get("politicsStatus").isJsonNull())
+                                politicsCombo.setValue(user.get("politicsStatus").getAsString());
+                            if (user.has("phone") && !user.get("phone").isJsonNull())
+                                phoneField.setText(user.get("phone").getAsString());
+                            if (user.has("email") && !user.get("email").isJsonNull())
+                                emailField.setText(user.get("email").getAsString());
+                        });
+                    }
+                } catch (Exception ignored) {}
+            }
+            @Override public void onFailure(Exception ignored) {}
+        });
     }
 
     private void handleSubmit() {
         String sduid = sduidField.getText().trim();
         String name = nameField.getText().trim();
         String college = collegeCombo.getValue();
-        String contact = contactField.getText().trim();
+        String phone = phoneField.getText().trim();
+        String email = emailField.getText().trim();
         String gender = genderCombo.getValue();
 
         boolean err = false;
@@ -80,12 +119,12 @@ public class AddNewTeacherController {
         params.put("username", name);
         params.put("sex", gender != null ? gender : "男");
         params.put("college", college != null ? college : "软件学院");
-        params.put("email", contact.isEmpty() ? sduid + "@mail.sdu.edu.cn" : contact);
-        params.put("phone", contact.isEmpty() ? "" : contact);
+        params.put("email", email.isEmpty() ? sduid + "@mail.sdu.edu.cn" : email);
+        params.put("phone", phone);
+        params.put("nation", nationCombo.getValue() != null ? nationCombo.getValue() : "中国");
+        params.put("ethnic", ethnicCombo.getValue() != null ? ethnicCombo.getValue() : "汉族");
+        params.put("PoliticsStatus", politicsCombo.getValue() != null ? politicsCombo.getValue() : "群众");
         params.put("permission", "1");
-        params.put("ethnic", "汉族");
-        params.put("nation", "中国");
-        params.put("PoliticsStatus", "群众");
 
         if (editingTeacher != null) {
             params.put("id", String.valueOf(editingTeacher.getId()));

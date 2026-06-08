@@ -142,3 +142,12 @@
     -fx-text-fill: #94a3b8;
     -fx-font-size: 14px;
 }
+
+.data-table .scroll-bar:vertical {
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
+}
+.data-table .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}

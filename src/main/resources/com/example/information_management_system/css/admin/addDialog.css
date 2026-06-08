@@ -16,6 +16,15 @@
     -fx-background-color: transparent;
 }
 
+.form-scroll .scroll-bar:vertical {
+    -fx-pref-width: 0;
+    -fx-opacity: 0;
+}
+.form-scroll .scroll-bar:horizontal {
+    -fx-pref-height: 0;
+    -fx-opacity: 0;
+}
+
 .dialog-title {
     -fx-text-fill: #1e293b;
     -fx-font-weight: bold;

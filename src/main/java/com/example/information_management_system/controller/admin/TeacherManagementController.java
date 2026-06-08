@@ -32,6 +32,7 @@ public class TeacherManagementController {
     @FXML private TableColumn<TeacherInfo, Integer> colId;
     @FXML private TableColumn<TeacherInfo, String> colSduid;
     @FXML private TableColumn<TeacherInfo, String> colName;
+    @FXML private TableColumn<TeacherInfo, String> colSex;
     @FXML private TableColumn<TeacherInfo, String> colCollege;
     @FXML private TableColumn<TeacherInfo, String> colContact;
     @FXML private TableColumn<TeacherInfo, String> colStatus;
@@ -76,6 +77,7 @@ public class TeacherManagementController {
     private void setupTableColumns() {
         colSduid.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
         colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
+        colSex.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSex()));
         colCollege.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getCollege()));
         colContact.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getContactInfo()));
         if (colStatus != null) colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
@@ -84,6 +86,9 @@ public class TeacherManagementController {
             @Override protected void updateItem(Integer item, boolean empty) { super.updateItem(item, empty); setText(empty?null:String.valueOf(getIndex()+1)); setStyle("-fx-alignment: CENTER;"); }
         });
         colSduid.setCellFactory(col -> new TableCell<TeacherInfo, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colSex.setCellFactory(col -> new TableCell<TeacherInfo, String>() {
             @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
         });
         colContact.setCellFactory(col -> new TableCell<TeacherInfo, String>() {
@@ -123,6 +128,7 @@ public class TeacherManagementController {
                             t.setId(JsonUtil.safeGetInt(obj, "id"));
                             t.setSduid(JsonUtil.safeGetString(obj, "sduid"));
                             t.setName(JsonUtil.safeGetString(obj, "username"));
+                            t.setSex(JsonUtil.safeGetString(obj, "sex"));
                             t.setCollege(JsonUtil.safeGetString(obj, "college"));
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
                             int sc = JsonUtil.safeGetInt(obj, "status");
@@ -192,6 +198,7 @@ public class TeacherManagementController {
                             t.setId(JsonUtil.safeGetInt(obj, "id"));
                             t.setSduid(sduid);
                             t.setName(name);
+                            t.setSex(JsonUtil.safeGetString(obj, "sex"));
                             t.setCollege(college);
                             t.setContactInfo(JsonUtil.safeGetString(obj, "email"));
                             int sc = JsonUtil.safeGetInt(obj, "status");

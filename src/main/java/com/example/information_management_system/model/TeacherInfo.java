@@ -5,6 +5,7 @@ public class TeacherInfo {
     private String sduid;
     private String name;
     private String college;
+    private String sex;
     private String contactInfo;
     private String status;
 
@@ -16,6 +17,8 @@ public class TeacherInfo {
     public void setName(String name) { this.name = name; }
     public String getCollege() { return college; }
     public void setCollege(String college) { this.college = college; }
+    public String getSex() { return sex; }
+    public void setSex(String sex) { this.sex = sex; }
     public String getContactInfo() { return contactInfo; }
     public void setContactInfo(String contactInfo) { this.contactInfo = contactInfo; }
     public String getStatus() { return status; }

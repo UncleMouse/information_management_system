@@ -45,8 +45,16 @@
                     <Label fx:id="nameLabel2" text="-" styleClass="info-value"/>
                 </HBox>
                 <HBox styleClass="info-row">
+                    <Label text="性别" styleClass="info-label"/>
+                    <Label fx:id="genderLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
                     <Label text="学院" styleClass="info-label"/>
                     <Label fx:id="collegeLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="专业" styleClass="info-label"/>
+                    <Label fx:id="majorLabel" text="-" styleClass="info-value"/>
                 </HBox>
                 <HBox styleClass="info-row">
                     <Label text="手机号" styleClass="info-label"/>
@@ -55,6 +63,18 @@
                 <HBox styleClass="info-row">
                     <Label text="邮箱" styleClass="info-label"/>
                     <Label fx:id="emailLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="国籍" styleClass="info-label"/>
+                    <Label fx:id="nationLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="民族" styleClass="info-label"/>
+                    <Label fx:id="ethnicLabel" text="-" styleClass="info-value"/>
+                </HBox>
+                <HBox styleClass="info-row">
+                    <Label text="政治面貌" styleClass="info-label"/>
+                    <Label fx:id="politicsLabel" text="-" styleClass="info-value"/>
                 </HBox>
             </VBox>
         </VBox>

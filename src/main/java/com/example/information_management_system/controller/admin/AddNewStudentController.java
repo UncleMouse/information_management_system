@@ -36,6 +36,8 @@ public class AddNewStudentController {
     @FXML private ComboBox<String> nationCombo;
     @FXML private ComboBox<String> ethnicCombo;
     @FXML private ComboBox<String> politicsCombo;
+    @FXML private TextField phoneField;
+    @FXML private TextField emailField;
     @FXML private Button btnSubmit;
     @FXML private Button btnCancel;
 
@@ -146,6 +148,10 @@ public class AddNewStudentController {
                                 ethnicCombo.setValue(user.get("ethnic").getAsString());
                             if (user.has("politicsStatus") && !user.get("politicsStatus").isJsonNull())
                                 politicsCombo.setValue(user.get("politicsStatus").getAsString());
+                            if (user.has("phone") && !user.get("phone").isJsonNull())
+                                phoneField.setText(user.get("phone").getAsString());
+                            if (user.has("email") && !user.get("email").isJsonNull())
+                                emailField.setText(user.get("email").getAsString());
                         });
                     }
                 } catch (Exception ignored) {}
@@ -184,8 +190,10 @@ public class AddNewStudentController {
         params.put("ethnic", ethnicCombo.getValue() != null ? ethnicCombo.getValue() : "汉族");
         params.put("nation", nationCombo.getValue() != null ? nationCombo.getValue() : "中国");
         params.put("PoliticsStatus", politicsCombo.getValue() != null ? politicsCombo.getValue() : "群众");
-        params.put("email", sduid + "@mail.sdu.edu.cn");
-        params.put("phone", "");
+        String phone = phoneField.getText().trim();
+        String email = emailField.getText().trim();
+        params.put("email", email.isEmpty() ? sduid + "@mail.sdu.edu.cn" : email);
+        params.put("phone", phone);
         if (statusCombo.getValue() != null) params.put("status", mapStatus(statusCombo.getValue()));
         if (className != null && !className.isEmpty()) {
             Integer sid = sectionIdMap.get(className);

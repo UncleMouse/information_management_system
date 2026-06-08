@@ -109,7 +109,9 @@ public class TermManagementController {
             NetworkUtils.postWithQueryParams("/term/deleteTerm", p, new NetworkUtils.Callback<String>() {
                 @Override public void onSuccess(String r) {
                     try { JsonObject res = gson.fromJson(r, JsonObject.class);
-                        if (res.has("code") && res.get("code").getAsInt()==200) { ShowMessage.showInfoMessage("成功", "已删除"); loadTerms(); }
+                        int code = res.has("code") ? res.get("code").getAsInt() : -1;
+                        if (code == 200) { ShowMessage.showInfoMessage("成功", "已删除"); loadTerms(); }
+                        else if (code == 409) { ShowMessage.showErrorMessage("错误", "该学期下有课程已安排，无法删除"); }
                         else ShowMessage.showErrorMessage("错误", res.has("msg")?res.get("msg").getAsString():"删除失败");
                     } catch (Exception ex) { ShowMessage.showErrorMessage("错误", "解析失败"); }
                 }

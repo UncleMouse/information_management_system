@@ -32,6 +32,11 @@ public class PersonalCenterContent {
     @FXML private Label sduidLabel;
     @FXML private Label phoneLabel;
     @FXML private Label emailLabel;
+    @FXML private Label genderLabel;
+    @FXML private Label majorLabel;
+    @FXML private Label nationLabel;
+    @FXML private Label ethnicLabel;
+    @FXML private Label politicsLabel;
     @FXML private Button btnEditInfo;
 
     @FXML private PasswordField oldPasswordField;
@@ -66,6 +71,16 @@ public class PersonalCenterContent {
                             session.setPhone(data.get("phone").getAsString());
                         if (data.has("email") && !data.get("email").isJsonNull())
                             session.setEmail(data.get("email").getAsString());
+                        if (data.has("sex") && !data.get("sex").isJsonNull())
+                            session.setSex(data.get("sex").getAsString());
+                        if (data.has("major") && !data.get("major").isJsonNull())
+                            session.setMajor(data.get("major").getAsString());
+                        if (data.has("nation") && !data.get("nation").isJsonNull())
+                            session.setNation(data.get("nation").getAsString());
+                        if (data.has("ethnic") && !data.get("ethnic").isJsonNull())
+                            session.setEthnic(data.get("ethnic").getAsString());
+                        if (data.has("politicsStatus") && !data.get("politicsStatus").isJsonNull())
+                            session.setPoliticsStatus(data.get("politicsStatus").getAsString());
                     }
                 } catch (Exception ignored) {}
                 Platform.runLater(() -> displayUserInfo());
@@ -90,6 +105,29 @@ public class PersonalCenterContent {
         if (sduidLabel != null) sduidLabel.setText(sid);
         if (phoneLabel != null) phoneLabel.setText(session.getPhone() != null && !session.getPhone().isEmpty() ? session.getPhone() : "未设置");
         if (emailLabel != null) emailLabel.setText(session.getEmail() != null && !session.getEmail().isEmpty() ? session.getEmail() : "未设置");
+        if (genderLabel != null) genderLabel.setText(session.getSex() != null && !session.getSex().isEmpty() ? session.getSex() : "-");
+        String major = session.getMajor();
+        if (majorLabel != null) {
+            if (major != null && !major.isEmpty()) {
+                majorLabel.setText(mapMajor(major));
+            } else {
+                majorLabel.setText("-");
+            }
+        }
+        if (nationLabel != null) nationLabel.setText(session.getNation() != null && !session.getNation().isEmpty() ? session.getNation() : "-");
+        if (ethnicLabel != null) ethnicLabel.setText(session.getEthnic() != null && !session.getEthnic().isEmpty() ? session.getEthnic() : "-");
+        if (politicsLabel != null) politicsLabel.setText(session.getPoliticsStatus() != null && !session.getPoliticsStatus().isEmpty() ? session.getPoliticsStatus() : "-");
+    }
+
+    private String mapMajor(String v) {
+        if (v == null) return "-";
+        switch (v) {
+            case "MAJOR_0": case "0": return "软件工程";
+            case "MAJOR_1": case "1": return "数字媒体技术";
+            case "MAJOR_2": case "2": return "大数据";
+            case "MAJOR_3": case "3": return "AI";
+            default: return v;
+        }
     }
 
     private void openEditDialog() {

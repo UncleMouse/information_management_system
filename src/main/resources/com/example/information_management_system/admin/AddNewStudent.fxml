@@ -74,6 +74,14 @@
         <Label text="政治面貌" styleClass="form-label" GridPane.rowIndex="10" GridPane.columnIndex="0" />
         <ComboBox fx:id="politicsCombo" styleClass="form-combo" prefWidth="248"
                   GridPane.rowIndex="10" GridPane.columnIndex="1" />
+
+        <Label text="手机号" styleClass="form-label" GridPane.rowIndex="11" GridPane.columnIndex="0" />
+        <TextField fx:id="phoneField" promptText="请输入手机号" styleClass="form-field"
+                   GridPane.rowIndex="11" GridPane.columnIndex="1" />
+
+        <Label text="邮箱" styleClass="form-label" GridPane.rowIndex="12" GridPane.columnIndex="0" />
+        <TextField fx:id="emailField" promptText="请输入邮箱" styleClass="form-field"
+                   GridPane.rowIndex="12" GridPane.columnIndex="1" />
     </GridPane>
     </ScrollPane>
 
