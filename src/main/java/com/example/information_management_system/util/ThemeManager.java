@@ -26,5 +26,10 @@ public class ThemeManager {
             scene.getStylesheets().removeIf(s ->
                 s.contains("theme-dark.css"));
         }
+        // 强制刷新 CSS，避免切换主题后残留旧样式
+        if (scene.getRoot() != null) {
+            scene.getRoot().applyCss();
+            scene.getRoot().layout();
+        }
     }
 }

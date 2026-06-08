@@ -59,17 +59,16 @@ public class CourseScheduleContentController {
     };
 
     private int currentWeek = 1;
-    private static final Color DARK_CELL_BG = Color.web("#1e293b");
-    private static final Color DARK_TEXT = Color.web("#cbd5e1");
-
-    private Background defaultBg() {
-        return new Background(new BackgroundFill(
-            com.example.information_management_system.util.ThemeManager.isDark() ? DARK_CELL_BG : Color.WHITE,
-            null, null));
-    }
-
     @FXML
     public void initialize() {
+        // 监听主题切换，自动刷新课表样式
+        scheduleTable.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.getStylesheets().addListener((javafx.collections.ListChangeListener<String>) c -> {
+                    while (c.next()) scheduleTable.refresh();
+                });
+            }
+        });
         scheduleTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         final double[] ratios = {1.0, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3};
         final double totalRatio = Arrays.stream(ratios).sum();
@@ -142,18 +141,23 @@ public class CourseScheduleContentController {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null || item.isEmpty()) {
-                    setText(null); setStyle(""); setBackground(defaultBg());
+                    setText(null); setStyle(""); setBackground(null);
                     return;
                 }
+                boolean isDark = com.example.information_management_system.util.ThemeManager.isDark();
                 String[] parts = item.split("\\|\\|");
                 setText(parts.length > 0 ? parts[0] : "");
-                if (parts.length > 1) {
-                    setBackground(new Background(new BackgroundFill(Color.web(parts[1]), null, null)));
+                if (isDark) {
+                    setBackground(null);
+                    setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-wrap-text: true;");
                 } else {
-                    setBackground(defaultBg());
+                    if (parts.length > 1) {
+                        setBackground(new Background(new BackgroundFill(Color.web(parts[1]), null, null)));
+                    } else {
+                        setBackground(null);
+                    }
+                    setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-wrap-text: true;");
                 }
-                setTextFill(com.example.information_management_system.util.ThemeManager.isDark() ? DARK_TEXT : Color.BLACK);
-                setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-alignment: CENTER; -fx-wrap-text: true;");
             }
         });
     }

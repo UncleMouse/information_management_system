@@ -280,7 +280,6 @@
     -fx-border-color: #0f172a !important;
 }
 .schedule-table .table-cell {
-    -fx-background-color: transparent !important;
     -fx-text-fill: #cbd5e1 !important;
     -fx-border-color: #0f172a !important;
 }
