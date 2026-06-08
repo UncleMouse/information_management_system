@@ -230,6 +230,7 @@ public class AddNewAnnouncementController {
         titleField.clear();
         contentArea.clear();
         visibilityCombo.getSelectionModel().selectFirst();
+        btnSubmit.setDisable(false);
         noticeListSection.setVisible(false);
         noticeListSection.setManaged(false);
         formSection.setVisible(true);

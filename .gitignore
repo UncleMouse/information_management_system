@@ -43,3 +43,6 @@ javafx_beginner_guide.md
 .claude/settings.json
 .claude/settings.local.json
 .idea/claudeCodeEditorTabs.xml
+target.zip
+debug.log
+项目报告.md
