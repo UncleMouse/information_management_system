@@ -36,6 +36,7 @@ public class StudentManagementController {
     @FXML private TableColumn<Student, String> colSduid;
     @FXML private TableColumn<Student, String> colName;
     @FXML private TableColumn<Student, String> colGender;
+    @FXML private TableColumn<Student, String> colGrade;
     @FXML private TableColumn<Student, String> colMajor;
     @FXML private TableColumn<Student, String> colClassName;
     @FXML private TableColumn<Student, String> colStatus;
@@ -86,6 +87,7 @@ public class StudentManagementController {
         colSduid.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSduid()));
         colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getName()));
         colGender.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGender()));
+        colGrade.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getGrade()));
         colMajor.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMajor()));
         colClassName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getClassName()));
         colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus()));
@@ -103,6 +105,9 @@ public class StudentManagementController {
             @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
         });
         colGender.setCellFactory(col -> new TableCell<Student, String>() {
+            @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
+        });
+        colGrade.setCellFactory(col -> new TableCell<Student, String>() {
             @Override protected void updateItem(String item, boolean empty) { super.updateItem(item, empty); setText(empty||item==null?null:item); setStyle("-fx-alignment: CENTER;"); }
         });
         colClassName.setCellFactory(col -> new TableCell<Student, String>() {

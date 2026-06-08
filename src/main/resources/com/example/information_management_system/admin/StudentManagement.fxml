@@ -50,7 +50,8 @@
             <TableColumn fx:id="colSduid" text="学号" prefWidth="120" />
             <TableColumn fx:id="colName" text="姓名" prefWidth="100" />
             <TableColumn fx:id="colGender" text="性别" prefWidth="60" />
-            <TableColumn fx:id="colMajor" text="专业" prefWidth="150" />
+            <TableColumn fx:id="colGrade" text="年级" prefWidth="60" />
+            <TableColumn fx:id="colMajor" text="专业" prefWidth="120" />
             <TableColumn fx:id="colClassName" text="班级" prefWidth="120" />
             <TableColumn fx:id="colStatus" text="状态" prefWidth="80" />
         </columns>
