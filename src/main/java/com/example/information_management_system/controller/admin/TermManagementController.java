@@ -190,7 +190,8 @@ public class TermManagementController {
                             statusLabel.setText("共 " + termList.size() + " 个学期");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("加载失败"));
+                        String msg = res.has("msg") ? res.get("msg").getAsString() : "加载失败";
+                        Platform.runLater(() -> statusLabel.setText(msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> statusLabel.setText("解析失败"));

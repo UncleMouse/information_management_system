@@ -118,7 +118,8 @@ public class ClassManagementController {
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("数据加载失败"));
+                        String msg = res.has("msg") ? res.get("msg").getAsString() : "数据加载失败";
+                    Platform.runLater(() -> statusLabel.setText(msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> statusLabel.setText("数据解析失败"));
@@ -238,7 +239,7 @@ public class ClassManagementController {
                     if (res.has("code") && res.get("code").getAsInt() == 200) {
                         Platform.runLater(() -> { ShowMessage.showInfoMessage("成功", "已删除"); loadClasses(); });
                     } else {
-                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "操作失败"));
+                        Platform.runLater(() -> ShowMessage.showErrorMessage("错误", res.has("msg") ? res.get("msg").getAsString() : "操作失败"));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "解析失败"));
@@ -269,7 +270,8 @@ public class ClassManagementController {
                             showStudentsDialog(selected, arr);
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("加载失败"));
+                        String msg = res.has("msg") ? res.get("msg").getAsString() : "加载失败";
+                    Platform.runLater(() -> statusLabel.setText(msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> statusLabel.setText("解析失败"));

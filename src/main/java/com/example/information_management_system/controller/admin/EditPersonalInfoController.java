@@ -54,6 +54,7 @@ public class EditPersonalInfoController {
         final int[] completed = {0};
         final int total = (StringUtil.isEmpty(phone) ? 0 : 1) + (StringUtil.isEmpty(email) ? 0 : 1);
         final boolean[] failed = {false};
+        final String[] errMsg = {null};
 
         Runnable checkAllDone = () -> {
             completed[0]++;
@@ -67,7 +68,7 @@ public class EditPersonalInfoController {
                         if (onInfoUpdatedListener != null) onInfoUpdatedListener.run();
                         closeDialog();
                     } else {
-                        ShowMessage.showErrorMessage("错误", "更新失败");
+                        ShowMessage.showErrorMessage("错误", errMsg[0] != null ? errMsg[0] : "更新失败");
                         btnSubmit.setDisable(false);
                     }
                 });
@@ -86,6 +87,7 @@ public class EditPersonalInfoController {
                             checkAllDone.run();
                         } else {
                             failed[0] = true;
+                            if (errMsg[0] == null && res.has("msg")) errMsg[0] = res.get("msg").getAsString();
                             checkAllDone.run();
                         }
                     } catch (Exception e) {
@@ -113,6 +115,7 @@ public class EditPersonalInfoController {
                             checkAllDone.run();
                         } else {
                             failed[0] = true;
+                            if (errMsg[0] == null && res.has("msg")) errMsg[0] = res.get("msg").getAsString();
                             checkAllDone.run();
                         }
                     } catch (Exception e) {

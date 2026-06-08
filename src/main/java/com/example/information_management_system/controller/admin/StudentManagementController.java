@@ -241,7 +241,8 @@ public class StudentManagementController {
                             statusLabel.setText("共 " + list.size() + " 条");
                         });
                     } else {
-                        Platform.runLater(() -> statusLabel.setText("搜索失败"));
+                        String msg = res.has("msg") ? res.get("msg").getAsString() : "搜索失败";
+                        Platform.runLater(() -> statusLabel.setText(msg));
                     }
                 } catch (Exception e) {
                     Platform.runLater(() -> statusLabel.setText("数据解析失败"));

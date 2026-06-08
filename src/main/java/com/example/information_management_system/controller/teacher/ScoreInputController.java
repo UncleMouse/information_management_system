@@ -228,6 +228,7 @@ public class ScoreInputController {
         if (scoreList.isEmpty()) { ShowMessage.showWarningMessage("提示", "没有成绩数据可保存"); return; }
 
         final int[] done = {0}; final int[] total = {0}; final boolean[] hasErr = {false};
+        final String[] errMsg = {null};
         for (ScoreEntry entry : scoreList) {
             if (entry.getRegularScore() == 0 && entry.getFinalScore() == 0 && entry.getTotalScore() == 0) continue;
             total[0]++;
@@ -245,11 +246,21 @@ public class ScoreInputController {
             params.put("grade", String.valueOf((int) entry.getTotalScore()));
             params.put("rank", "0");
             NetworkUtils.postWithQueryParams("/grade/setGrade", params, new NetworkUtils.Callback<String>() {
-                @Override public void onSuccess(String r) { try { JsonObject j = gson.fromJson(r, JsonObject.class); if (j.has("code") && j.get("code").getAsInt()!=200) hasErr[0]=true; } catch(Exception ignored){} done[0]++; checkDone(); }
+                @Override public void onSuccess(String r) {
+                    try {
+                        JsonObject j = gson.fromJson(r, JsonObject.class);
+                        if (j.has("code") && j.get("code").getAsInt() != 200) {
+                            hasErr[0] = true;
+                            if (errMsg[0] == null && j.has("msg")) errMsg[0] = j.get("msg").getAsString();
+                        }
+                    } catch (Exception ignored) {}
+                    done[0]++; checkDone();
+                }
                 @Override public void onFailure(Exception e) { hasErr[0] = true; done[0]++; checkDone(); }
                 private void checkDone() { if (done[0] >= total[0]) Platform.runLater(() -> {
                     if (total[0] == 0) ShowMessage.showWarningMessage("提示", "没有需要保存的成绩");
-                    else ShowMessage.showInfoMessage("成功", hasErr[0] ? "部分保存失败" : "已保存 "+total[0]+" 条");
+                    else if (hasErr[0]) ShowMessage.showErrorMessage("错误", errMsg[0] != null ? errMsg[0] : "保存失败，部分成绩已发布");
+                    else ShowMessage.showInfoMessage("成功", "已保存 " + total[0] + " 条");
                     fetchScoresForCourse(selectedCourseCode);
                 });}
             });
@@ -260,7 +271,7 @@ public class ScoreInputController {
         if (selectedCourseCode == null || selectedCourseCode.isEmpty()) {
             ShowMessage.showWarningMessage("提示", "请先选择课程"); return;
         }
-        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要发布该课程的成绩吗？");
+        boolean confirmed = ShowMessage.showConfirmMessage("确认", "确定要发布当前已保存的成绩吗？\n发布后将更新学生端显示的成绩排名。");
         if (!confirmed) return;
 
         Integer courseId = courseNameToId.get(selectedCourseCode);
@@ -268,7 +279,10 @@ public class ScoreInputController {
         if (courseId != null) params.put("courseId", String.valueOf(courseId));
         NetworkUtils.post("/grade/releaseGrade", params, "", new NetworkUtils.Callback<String>() {
             @Override public void onSuccess(String result) {
-                Platform.runLater(() -> ShowMessage.showInfoMessage("成功", "已成功发布"));
+                Platform.runLater(() -> {
+                    ShowMessage.showInfoMessage("提示", "成绩已发布，正在刷新...");
+                    fetchScoresForCourse(selectedCourseCode);
+                });
             }
             @Override public void onFailure(Exception e) {
                 Platform.runLater(() -> ShowMessage.showErrorMessage("错误", "网络请求失败，请检查连接"));
