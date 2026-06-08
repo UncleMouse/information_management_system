@@ -269,6 +269,21 @@
 }
 
 /* ===== 课表 ===== */
+.schedule-table {
+    -fx-background-color: #0a0f1a !important;
+}
+.schedule-table .column-header-background {
+    -fx-background-color: #060a12 !important;
+}
+.schedule-table .table-row-cell {
+    -fx-background-color: #0a0f1a !important;
+    -fx-border-color: #0f172a !important;
+}
+.schedule-table .table-cell {
+    -fx-background-color: transparent !important;
+    -fx-text-fill: #cbd5e1 !important;
+    -fx-border-color: #0f172a !important;
+}
 .week-label {
     -fx-text-fill: #e2e8f0 !important;
 }
