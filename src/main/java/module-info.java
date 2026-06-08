@@ -14,7 +14,7 @@ module com.example.information_management_system {
     requires java.logging;
     requires java.prefs;
     requires transitive com.google.gson;
-    requires fastexcel.core;
+    requires org.apache.poi.ooxml;
 
     opens com.example.information_management_system to javafx.fxml;
     opens com.example.information_management_system.controller to javafx.fxml;
